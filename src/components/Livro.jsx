@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icone } from '../pixel/Sprite';
 import { TextoRico } from './TextoRico';
 
@@ -60,6 +60,19 @@ export function Livro({ fases, liberadas, paginaInicial, modo, introducao, aoFec
   const [pagina, setPagina] = useState(paginaInicial);
   const fase = fases[pagina];
 
+  useEffect(() => {
+    function aoApertarTecla(evento) {
+      if (evento.key === 'Escape') aoFechar();
+    }
+    window.addEventListener('keydown', aoApertarTecla);
+    return () => window.removeEventListener('keydown', aoApertarTecla);
+  }, [aoFechar]);
+
+  function abrirPagina(indice) {
+    setPagina(indice);
+    document.querySelector('.modal')?.scrollTo({ top: 0 });
+  }
+
   return (
     <div className="modal" role="dialog" aria-modal="true" aria-label="Livro">
       <div className="livro janela">
@@ -74,7 +87,7 @@ export function Livro({ fases, liberadas, paginaInicial, modo, introducao, aoFec
               type="button"
               disabled={i >= liberadas}
               className={i === pagina ? 'livro__capitulo--ativo' : ''}
-              onClick={() => setPagina(i)}
+              onClick={() => abrirPagina(i)}
             >
               {i >= liberadas ? <Icone nome="cadeado" /> : <span className="livro__numero">{i + 1}</span>}
               {f.livro.titulo}
@@ -83,7 +96,12 @@ export function Livro({ fases, liberadas, paginaInicial, modo, introducao, aoFec
         </nav>
 
         <article className="livro__pagina">
-          <span className="livro__fase">Fase {pagina + 1}</span>
+          <div className="livro__topo">
+            <span className="livro__fase">Fase {pagina + 1}</span>
+            <button type="button" className="botao botao--pedra botao--pequeno" onClick={aoFechar} autoFocus>
+              Fechar
+            </button>
+          </div>
           <h2>{fase.livro.titulo}</h2>
           {fase.livro.blocos.map((bloco, i) => (
             <Bloco key={`${fase.id}-${i}`} bloco={bloco} modo={modo} />

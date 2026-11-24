@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BAU } from '../pixel/desenhos';
 import { Sprite } from '../pixel/Sprite';
 import { TextoRico } from './TextoRico';
@@ -5,6 +6,14 @@ import { TextoRico } from './TextoRico';
 export function Vitoria({ fase, modo, temProxima, outroModoFeito, aoProxima, aoTrocarModo, aoFechar }) {
   const aprendeu = typeof fase.aprendeu === 'object' ? fase.aprendeu[modo] : fase.aprendeu;
   const outroModo = modo === 'web' ? 'Mobile' : 'Web';
+
+  useEffect(() => {
+    function aoApertarTecla(evento) {
+      if (evento.key === 'Escape') aoFechar();
+    }
+    window.addEventListener('keydown', aoApertarTecla);
+    return () => window.removeEventListener('keydown', aoApertarTecla);
+  }, [aoFechar]);
 
   return (
     <div className="modal" role="dialog" aria-modal="true" aria-label="Fase concluída">
