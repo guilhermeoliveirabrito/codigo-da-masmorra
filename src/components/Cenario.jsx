@@ -1,0 +1,130 @@
+import { TOCHA } from '../pixel/desenhos';
+import { PERSONAGENS } from '../pixel/personagens';
+import { Sprite } from '../pixel/Sprite';
+import { Seguro } from './Seguro';
+
+// 192 x 108 pixels de jogo, esticados pra largura da tela
+export const LARGURA = 192;
+export const ALTURA = 108;
+export const CHAO = 80;
+
+export function posicao(x, y, largura, altura) {
+  const estilo = { left: `${(x / LARGURA) * 100}%`, top: `${(y / ALTURA) * 100}%` };
+  if (largura !== undefined) estilo.width = `${(largura / LARGURA) * 100}%`;
+  if (altura !== undefined) estilo.height = `${(altura / ALTURA) * 100}%`;
+  return estilo;
+}
+
+// pseudo-aleatório, pra parede sair sempre igual
+function ruido(a, b) {
+  const n = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
+  return n - Math.floor(n);
+}
+
+const TONS_DA_PEDRA = ['#3a4466', '#363f5f', '#3f4a6e', '#343d5c'];
+
+function montarParede() {
+  const pedras = [];
+  for (let linha = 0; linha * 8 < CHAO; linha++) {
+    const y = linha * 8;
+    const deslocamento = linha % 2 ? -8 : 0;
+    for (let coluna = 0; coluna <= LARGURA / 16; coluna++) {
+      const x = coluna * 16 + deslocamento;
+      const sorte = ruido(linha, coluna);
+      pedras.push({ x: x + 1, y: y + 1, w: 15, h: 7, c: TONS_DA_PEDRA[Math.floor(sorte * 4)] });
+      pedras.push({ x: x + 1, y: y + 1, w: 15, h: 1, c: '#4a5679' });
+      if (sorte > 0.82) pedras.push({ x: x + 4 + Math.floor(sorte * 8), y: y + 3, w: 1, h: 3, c: '#262b44' });
+      if (linha >= 8 && ruido(coluna, linha) > 0.6) {
+        pedras.push({ x: x + 3, y: y + 7, w: 6, h: 1, c: '#265c42' });
+        pedras.push({ x: x + 5, y: y + 6, w: 2, h: 1, c: '#3e8948' });
+      }
+    }
+  }
+  return pedras;
+}
+
+function montarChao() {
+  const lajes = [
+    { x: 0, y: CHAO, w: LARGURA, h: 1, c: '#8b9bb4' },
+    { x: 0, y: CHAO + 1, w: LARGURA, h: 2, c: '#5a6988' },
+    { x: 0, y: CHAO + 3, w: LARGURA, h: ALTURA - CHAO - 3, c: '#2b3150' },
+  ];
+  for (let linha = 0; CHAO + 3 + linha * 9 < ALTURA; linha++) {
+    const y = CHAO + 3 + linha * 9;
+    lajes.push({ x: 0, y, w: LARGURA, h: 1, c: '#1f2338' });
+    for (let x = linha % 2 ? 12 : 0; x < LARGURA; x += 24) {
+      lajes.push({ x, y, w: 1, h: 9, c: '#1f2338' });
+      lajes.push({ x: x + 1, y: y + 1, w: 23, h: 1, c: '#353c5e' });
+    }
+  }
+  return lajes;
+}
+
+const PAREDE = montarParede();
+const PISO = montarChao();
+
+export function Cena({ modo, tochas = [12, 172], children, fundo, className = '' }) {
+  return (
+    <div className={`cena ${className}`}>
+      <svg
+        className="cena__fundo"
+        viewBox={`0 0 ${LARGURA} ${ALTURA}`}
+        shapeRendering="crispEdges"
+        aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id="luz-da-tocha">
+            <stop offset="0" stopColor="#f77622" stopOpacity="0.32" />
+            <stop offset="1" stopColor="#f77622" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="sombra-da-cena" r="0.75">
+            <stop offset="0.55" stopColor="#181425" stopOpacity="0" />
+            <stop offset="1" stopColor="#181425" stopOpacity="0.7" />
+          </radialGradient>
+        </defs>
+        <rect width={LARGURA} height={CHAO} fill="#262b44" />
+        {PAREDE.map((p, i) => (
+          <rect key={i} x={p.x} y={p.y} width={p.w} height={p.h} fill={p.c} />
+        ))}
+        {PISO.map((p, i) => (
+          <rect key={`c${i}`} x={p.x} y={p.y} width={p.w} height={p.h} fill={p.c} />
+        ))}
+        {fundo}
+        {tochas.map((x) => (
+          <circle key={x} cx={x + 4} cy={20} r={44} fill="url(#luz-da-tocha)" />
+        ))}
+        <rect width={LARGURA} height={ALTURA} fill="url(#sombra-da-cena)" />
+      </svg>
+
+      {tochas.map((x) => (
+        <Sprite key={x} desenho={TOCHA} className="tocha" style={posicao(x, 14, 8, 14)} />
+      ))}
+
+      {children}
+
+      <span className="cena__modo">{modo === 'web' ? 'Modo Web' : 'Modo Mobile'}</span>
+    </div>
+  );
+}
+
+export function Personagem({ quem, x, y, fala, lado = 'centro', className = '', style }) {
+  const { nome, desenho } = PERSONAGENS[quem];
+  const camadas = desenho.camadas;
+  const largura = camadas[0][0].length;
+  const altura = camadas[0].length;
+
+  return (
+    <div className={`personagem ${className}`} style={{ ...posicao(x, y, largura, altura), ...style }}>
+      {fala && <span className={`balao balao--${lado}`}>{fala}</span>}
+      <Sprite desenho={desenho} titulo={nome} className="personagem__sprite" />
+    </div>
+  );
+}
+
+export function Tela({ modo, vazio, className = '', style, children }) {
+  return (
+    <div className={`tela tela--${modo} ${className}`} style={style}>
+      {children ? <Seguro>{children}</Seguro> : <span className="tela__vazia">{vazio}</span>}
+    </div>
+  );
+}
