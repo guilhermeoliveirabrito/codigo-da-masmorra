@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { compilar } from './compilar';
 import { ErroDoJogo, mensagemNaoImportado } from './erros';
+import * as Masmorra from './masmorra';
 import * as ReactNativeSimulado from './reactNative';
 
 // existem no React Native de verdade, mas ainda não são simulados
@@ -41,7 +42,7 @@ const HTML_PARA_RN = {
 export function executar(codigo, modo, avisos) {
   const js = compilar(codigo);
 
-  const modulos = { react: { ...React, default: React } };
+  const modulos = { react: { ...React, default: React }, masmorra: Masmorra };
   if (modo === 'mobile') modulos['react-native'] = ReactNativeSimulado;
 
   function importar(nomeDoModulo, linha, nomes) {
@@ -53,7 +54,7 @@ export function executar(codigo, modo, avisos) {
 
     const modulo = modulos[nomeDoModulo];
     if (!modulo) {
-      const permitidos = modo === 'mobile' ? "'react' e 'react-native'" : "'react'";
+      const permitidos = modo === 'mobile' ? "'react', 'react-native' e 'masmorra'" : "'react' e 'masmorra'";
       throw new ErroDoJogo(
         `Linha ${linha}: a biblioteca '${nomeDoModulo}' não existe aqui na masmorra. Por enquanto dá pra importar ${permitidos}.`
       );
@@ -125,6 +126,27 @@ function criarH(modo, avisos) {
       }
     }
 
+    for (const filho of filhos) {
+      if (Array.isArray(filho)) conferirKeys(filho, linha, avisos);
+    }
+
     return React.createElement(tipo, props, ...filhos);
   };
+}
+
+function conferirKeys(lista, linha, avisos) {
+  const elementos = lista.filter((item) => React.isValidElement(item));
+  if (elementos.some((elemento) => elemento.key === null)) {
+    avisos.add(
+      `Linha ${linha}: cada item criado pelo map precisa de uma key, tipo key={item.id}. É assim que o React sabe qual item é qual quando a lista muda.`
+    );
+    return;
+  }
+  const keys = elementos.map((elemento) => elemento.key);
+  const repetidas = [...new Set(keys.filter((key, i) => keys.indexOf(key) !== i))];
+  if (repetidas.length) {
+    avisos.add(
+      `Linha ${linha}: tem key repetida na lista (${repetidas.join(', ')}). Cada key precisa ser única: o id de cada item é a melhor escolha.`
+    );
+  }
 }

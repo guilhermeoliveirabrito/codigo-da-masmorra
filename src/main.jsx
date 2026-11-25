@@ -14,3 +14,10 @@ createRoot(document.getElementById('root'), { onCaughtError: aoCapturarErro }).r
     <App />
   </StrictMode>
 );
+
+// deixa o jogo instalável e abrindo sem internet (só no build publicado)
+if (import.meta.env?.PROD && 'serviceWorker' in navigator && window.top === window.self) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}

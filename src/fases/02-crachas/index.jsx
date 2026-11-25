@@ -60,6 +60,7 @@ export const faseCrachas = {
   id: 'crachas',
   numero: 2,
   titulo: 'Crachás para todos',
+  conceito: 'props',
   componente: 'Cracha',
   arquivo: 'Cracha.jsx',
   Cena: CenaCrachas,
@@ -146,12 +147,9 @@ export function Saudacao(props) {
           'Erro comum: escrever `function Cracha(nome, classe)`, sem as chaves. Aí `nome` recebe o objeto inteiro das props, e o React reclama que não sabe mostrar um objeto na tela.',
       },
       {
-        tipo: 'projeto',
-        texto: {
-          web: "No MeuCine, o `MovieCard.jsx` recebe `{ movie, isFavorite, onToggleFavorite }` e mostra o `{title}` do filme. E o `Loading.jsx` recebe `{ message = 'Carregando...' }`: o `=` dá um valor padrão quando ninguém passa a prop.",
-          mobile:
-            'No Mentor, o `DisciplinaCard.tsx` recebe `{ disciplina, fotoUrl, onPress }` e mostra `{disciplina.nome}`. Uma função só desenha o cartão de todas as disciplinas.',
-        },
+        tipo: 'pratica',
+        texto:
+          "Numa loja, um único `CartaoDeProduto` recebe nome, preço e foto pelas props e desenha todos os produtos da tela. Dá até pra ter valor padrão: `({ preco = 0 })` usa `0` quando ninguém passa o preço.",
       },
     ],
   },

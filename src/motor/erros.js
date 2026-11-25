@@ -46,7 +46,13 @@ export function traduzirErroDeSintaxe(erro, codigo) {
   const prefixo = linha ? `Linha ${linha}: ` : '';
   const original = limparMensagemDoAcorn(erro.message ?? '');
   const noFim = erro.pos >= codigo.trimEnd().length;
+  const textoDaLinha = linha ? codigo.split('\n')[linha - 1] ?? '' : '';
   let m;
+
+  if ((m = textoDaLinha.match(/\b([a-z]+)-([a-z]+)\s*:(?=\s*['"\d])/))) {
+    const certo = m[1] + m[2][0].toUpperCase() + m[2].slice(1);
+    return `${prefixo}no style do JSX, os nomes são escritos em camelCase: ${certo}, e não ${m[0].replace(/\s*:$/, '')}.`;
+  }
 
   if ((m = original.match(/Expected corresponding JSX closing tag for <(.+)>/))) {
     return `${prefixo}a tag <${m[1]}> foi aberta, mas o fechamento não bate. Ela precisa fechar com </${m[1]}>.`;
@@ -113,7 +119,17 @@ function traduzir(erro, codigo, modo) {
     return 'uma das tags aponta pra algo que não é um componente. Confira se o nome da tag e o import estão certos.';
   }
   if (/Too many re-renders|Minified React error #301/.test(mensagem)) {
-    return 'a tela entrou num loop: alguma coisa muda o estado enquanto a tela é desenhada, e isso redesenha a tela de novo, sem parar.';
+    const evento = modo === 'mobile' ? 'onPress' : 'onClick';
+    return `a tela entrou num loop: o estado muda enquanto a tela é desenhada, e isso desenha a tela de novo, sem parar. Costuma ser um ${evento}={setAlgo(...)} sem a arrow function. Use ${evento}={() => setAlgo(...)}.`;
+  }
+  if (/Invalid hook call|Minified React error #321/.test(mensagem)) {
+    return 'o useState (e todo hook) só funciona dentro do componente, direto no corpo da função. Fora dele, ou dentro de outra função, não dá.';
+  }
+  if (/Rendered (more|fewer) hooks|Minified React error #(300|310)/.test(mensagem)) {
+    return 'os hooks precisam ser chamados sempre, na mesma ordem. Não coloque useState dentro de if, de loop ou depois de um return.';
+  }
+  if (/The `style` prop expects a mapping|Minified React error #62/.test(mensagem)) {
+    return "no JSX, o style recebe um objeto, e não um texto: style={{ display: 'flex' }}. São duas chaves: uma do JSX e outra do objeto.";
   }
   if ((m = mensagem.match(/Cannot read properties of (undefined|null) \(reading '(.+)'\)/))) {
     return `você tentou ler .${m[2]} de algo que está vazio (${m[1]}). Confira se o nome antes do ponto está certo e se ele chega mesmo no componente.`;

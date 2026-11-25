@@ -1,4 +1,4 @@
-import { Cena, Personagem, Tela, posicao } from '../../components/Cenario';
+import { Brilhos, Cena, Personagem, Tela, posicao } from '../../components/Cenario';
 
 const TABUAS = ['#b86f50', '#a8614a', '#b86f50'];
 const PREGOS = [
@@ -43,15 +43,24 @@ function PlacaDeMadeira() {
   );
 }
 
-export function CenaPlaca({ Componente, modo, liberada }) {
+export function CenaPlaca({ Componente, modo, liberada, primeiraVez }) {
   return (
     <Cena modo={modo} fundo={<PlacaDeMadeira />}>
       <Tela modo={modo} vazio="placa em branco" className="placa__texto" style={posicao(50, 15, 92, 28)}>
         {Componente && <Componente />}
       </Tela>
 
-      <Personagem quem="guarda" x={14} y={74} lado="esquerda" fala={liberada ? 'Pode passar!' : null} />
-      <Personagem quem="lia" x={162} y={76} lado="direita" />
+      {liberada && <Brilhos x={96} y={28} />}
+
+      <Personagem
+        quem="guarda"
+        x={14}
+        y={74}
+        lado="esquerda"
+        entrada={primeiraVez ? 'esquerda' : undefined}
+        fala={liberada ? 'Pode passar!' : null}
+      />
+      <Personagem quem="lia" x={162} y={76} lado="direita" entrada={primeiraVez ? 'direita' : undefined} />
     </Cena>
   );
 }

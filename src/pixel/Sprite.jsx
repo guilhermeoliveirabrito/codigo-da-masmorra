@@ -25,18 +25,19 @@ function Camadas({ camadas }) {
   );
 }
 
-function tamanho(desenho) {
+export function tamanhoDoDesenho(desenho) {
   const camadas = desenho.camadas ?? desenho.quadros[0];
   return { largura: camadas[0][0].length, altura: camadas[0].length };
 }
 
 // recorte = [x, y, largura, altura]
-export function Sprite({ desenho, recorte, className = '', style, titulo }) {
-  const { largura, altura } = tamanho(desenho);
+export function Sprite({ desenho, recorte, className = '', style, titulo, ...resto }) {
+  const { largura, altura } = tamanhoDoDesenho(desenho);
   const viewBox = (recorte ?? [0, 0, largura, altura]).join(' ');
 
   return (
     <svg
+      {...resto}
       className={`sprite ${desenho.quadros ? 'sprite--animada' : ''} ${className}`}
       style={style}
       viewBox={viewBox}

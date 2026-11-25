@@ -156,85 +156,45 @@ pre {
   background: #46527a;
 }
 
-/* Cabeçalho */
+/* Cabeçalho do jogo */
 .cabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 6;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 12px 24px;
-  padding: 12px max(16px, 3vw);
+  gap: 16px;
+  padding: max(10px, env(safe-area-inset-top)) max(16px, 3vw) 10px;
   background: var(--pedra-escura);
   border-bottom: 2px solid var(--breu);
   box-shadow: inset 0 -2px 0 var(--pedra);
 }
 
-.cabecalho__marca {
+.cabecalho__fase {
   display: flex;
+  flex: 1;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  min-width: 0;
 }
 
-.cabecalho__marca h1 {
-  margin: 0;
-  font: 700 24px/1 var(--fonte-pixel);
-  color: var(--osso);
+.cabecalho__numero {
+  font: 600 14px/1 var(--fonte-pixel);
+  color: var(--fogo);
   white-space: nowrap;
 }
 
-.cabecalho__tocha {
-  width: 14px;
-  height: 25px;
-}
-
-.cabecalho__fases {
-  display: flex;
-  gap: 8px;
-}
-
-.fase {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border: 2px solid var(--breu);
-  background: var(--pedra);
-  font: 700 18px/1 var(--fonte-pixel);
-  cursor: pointer;
-  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.3);
-}
-
-.fase:disabled {
-  background: var(--pedra-escura);
-  color: var(--pedra-clara);
-  cursor: not-allowed;
-}
-
-.fase--atual {
-  background: var(--fogo);
-  color: var(--breu);
-}
-
-.fase--feita {
-  color: var(--musgo);
-}
-
-.fase__feita {
-  position: absolute;
-  top: -7px;
-  right: -7px;
-  height: 8px;
-  padding: 2px;
-  background: var(--musgo);
-  color: var(--breu);
-  box-sizing: content-box;
-  box-shadow: 0 0 0 2px var(--breu);
+.cabecalho__fase h1 {
+  margin: 0;
+  overflow: hidden;
+  font: 700 22px/1.1 var(--fonte-pixel);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .cabecalho__acoes {
   display: flex;
   gap: 10px;
-  margin-left: auto;
 }
 
 .modo {
@@ -259,6 +219,419 @@ pre {
   background: var(--pedra);
   color: var(--ouro);
   box-shadow: inset 0 -3px 0 var(--ouro);
+}
+
+.so-celular,
+.abas-do-celular {
+  display: none;
+}
+
+/* Menu inicial */
+.menu {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+  align-items: center;
+  gap: 40px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: max(28px, env(safe-area-inset-top)) max(16px, 3vw) max(28px, env(safe-area-inset-bottom));
+}
+
+.menu__palco {
+  position: relative;
+  container-type: inline-size;
+}
+
+.menu__titulo {
+  position: absolute;
+  top: 5cqw;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  margin: 0;
+  text-align: center;
+  font: 700 clamp(24px, 7.4cqw, 64px) / 1 var(--fonte-pixel);
+  color: var(--osso);
+  text-shadow:
+    0.06em 0.06em 0 var(--breu),
+    -0.03em -0.03em 0 var(--breu),
+    0.03em -0.03em 0 var(--breu),
+    -0.03em 0.03em 0 var(--breu);
+  pointer-events: none;
+}
+
+.menu__painel {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.menu__chamada {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--osso);
+}
+
+.menu__acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu__acoes .botao {
+  justify-content: flex-start;
+  min-height: 48px;
+}
+
+.botao--grande {
+  min-height: 56px;
+  font-size: 20px;
+}
+
+.menu__onde {
+  margin-left: auto;
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+.menu__modo {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.menu__modo .modo {
+  justify-self: start;
+}
+
+.menu__modo p {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 15px;
+  color: var(--neblina);
+}
+
+.menu__rodape {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding-top: 16px;
+  border-top: 2px solid var(--pedra);
+  font-size: 14px;
+  color: var(--neblina);
+}
+
+.menu__links {
+  display: flex;
+  gap: 16px;
+}
+
+.menu__link {
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--osso);
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.menu__dica {
+  flex-basis: 100%;
+}
+
+/* Mapa de fases */
+.mapa {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: max(20px, env(safe-area-inset-top)) max(16px, 3vw) max(40px, env(safe-area-inset-bottom));
+}
+
+.mapa__topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 20px;
+  margin-bottom: 26px;
+}
+
+.mapa__topo h1 {
+  flex: 1;
+  margin: 0;
+  font: 700 30px/1.1 var(--fonte-pixel);
+}
+
+.mapa__salas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: sala;
+}
+
+.sala {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  height: 100%;
+  padding: 14px;
+  border: 2px solid var(--pedra-clara);
+  text-align: left;
+  background: var(--pedra-escura);
+  cursor: pointer;
+  box-shadow:
+    0 0 0 2px var(--breu),
+    4px 4px 0 2px var(--breu);
+}
+
+button.sala:hover:not(:disabled) {
+  background: var(--pedra);
+}
+
+button.sala:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow:
+    0 0 0 2px var(--breu),
+    2px 2px 0 2px var(--breu);
+}
+
+.sala:focus-visible {
+  outline: 2px solid var(--ouro);
+  outline-offset: 4px;
+}
+
+.sala--atual {
+  border-color: var(--fogo);
+}
+
+.sala:disabled,
+.sala--em-breve {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.sala__retrato {
+  width: 56px;
+  height: 56px;
+  background: var(--breu);
+  box-shadow: 0 0 0 2px var(--pedra-clara);
+}
+
+.sala__retrato--vazio {
+  background: repeating-linear-gradient(45deg, var(--breu) 0 6px, var(--pedra-escura) 6px 12px);
+}
+
+.sala__texto {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.sala__numero {
+  font: 600 13px/1 var(--fonte-pixel);
+  color: var(--fogo);
+}
+
+.sala__texto strong {
+  font: 700 19px/1.15 var(--fonte-pixel);
+  color: var(--osso);
+}
+
+.sala__selos {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+}
+
+.selo {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  color: var(--pedra-clara);
+  background: var(--breu);
+}
+
+.selo--feito {
+  color: var(--breu);
+  background: var(--musgo);
+}
+
+.selo .icone {
+  height: 10px;
+}
+
+.sala__tranca,
+.sala__breve {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  color: var(--neblina);
+  font: 600 13px/1 var(--fonte-pixel);
+}
+
+/* Transição entre telas: a tela fecha num círculo e abre de novo */
+.transicao {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.transicao__iris {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 200vmax var(--breu);
+}
+
+.transicao--fechando .transicao__iris {
+  animation: iris-fechar 0.45s steps(9) both;
+}
+
+.transicao--abrindo .transicao__iris {
+  animation: iris-abrir 0.45s steps(9) both;
+}
+
+@keyframes iris-fechar {
+  from {
+    width: 170vmax;
+    height: 170vmax;
+  }
+}
+
+@keyframes iris-abrir {
+  to {
+    width: 170vmax;
+    height: 170vmax;
+  }
+}
+
+.transicao__cartao {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+  animation: aparecer 0.3s steps(3);
+}
+
+.transicao__numero {
+  font: 600 18px/1 var(--fonte-pixel);
+  color: var(--fogo);
+}
+
+.transicao__titulo {
+  font: 700 clamp(34px, 7vw, 56px) / 1.05 var(--fonte-pixel);
+  color: var(--osso);
+}
+
+.transicao__trilha {
+  position: relative;
+  width: min(320px, 70vw);
+  height: 48px;
+  margin-top: 6px;
+  border-bottom: 2px solid var(--pedra-clara);
+}
+
+.transicao__lia {
+  position: absolute;
+  bottom: 0;
+  width: 32px;
+  height: 48px;
+  animation:
+    caminhar 1.6s linear both,
+    respirar 0.3s steps(1) infinite;
+}
+
+@keyframes caminhar {
+  from {
+    left: 0;
+  }
+  to {
+    left: calc(100% - 32px);
+  }
+}
+
+.transicao__modo {
+  font-size: 15px;
+  color: var(--neblina);
+}
+
+/* Como jogar */
+.como-jogar {
+  width: min(560px, 100%);
+  padding: 26px 28px;
+}
+
+.como-jogar h2 {
+  margin: 0 0 18px;
+  font: 700 28px/1.1 var(--fonte-pixel);
+}
+
+.como-jogar ol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.como-jogar li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.como-jogar__numero {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  font: 700 18px/1 var(--fonte-pixel);
+  color: var(--breu);
+  background: var(--fogo);
+}
+
+.como-jogar strong {
+  font: 600 17px/1.2 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.como-jogar p {
+  margin: 4px 0 0;
+  line-height: 1.5;
+}
+
+.como-jogar__modos {
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  line-height: 1.5;
+  background: var(--breu);
 }
 
 /* Layout */
@@ -347,6 +720,79 @@ pre {
 
 .personagem--andando {
   transition: left 1.6s linear;
+}
+
+.personagem--devagar {
+  transition-duration: 2.2s;
+}
+
+.personagem--pulando {
+  transition:
+    left 0.38s linear,
+    top 0.38s linear;
+}
+
+.personagem--pulo-a .personagem__sprite {
+  animation: pulo-a 0.38s ease-out;
+}
+
+.personagem--pulo-b .personagem__sprite {
+  animation: pulo-b 0.38s ease-out;
+}
+
+@keyframes pulo-a {
+  50% { transform: translateY(-35%); }
+}
+
+@keyframes pulo-b {
+  50% { transform: translateY(-35%); }
+}
+
+.personagem--entra-esquerda {
+  animation: entra-esquerda 1.1s steps(12) both;
+}
+
+.personagem--entra-direita {
+  animation: entra-direita 1.1s steps(12) both;
+}
+
+@keyframes entra-esquerda {
+  from { transform: translateX(-70cqw); }
+}
+
+@keyframes entra-direita {
+  from { transform: translateX(70cqw); }
+}
+
+.brilhos {
+  position: absolute;
+  z-index: 4;
+  width: 0;
+  height: 0;
+}
+
+.brilhos span {
+  position: absolute;
+  width: 1.3cqw;
+  height: 1.3cqw;
+  background: var(--ouro);
+  box-shadow: 0 0 0 0.35cqw rgba(254, 231, 97, 0.35);
+  animation: brilho 0.9s steps(7) both;
+}
+
+.brilhos span:nth-child(3n) {
+  background: #fff;
+}
+
+@keyframes brilho {
+  from {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 1;
+  }
+  to {
+    transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.4);
+    opacity: 0;
+  }
 }
 
 .personagem--saindo {
@@ -486,8 +932,8 @@ pre {
   font: 600 clamp(10px, 3.2cqw, 18px) / 1.1 var(--fonte-pixel);
 }
 
-.painel__tela button:not(.rn-pressable),
-.painel__tela .rn-pressable {
+.cena .tela button:not(.rn-pressable),
+.cena .tela .rn-pressable {
   padding: 0.5em 0.8em 0.4em;
   border: 0;
   color: #fff;
@@ -500,8 +946,8 @@ pre {
     inset 0 0.15em 0 rgba(255, 255, 255, 0.3);
 }
 
-.painel__tela button:not(.rn-pressable):active,
-.painel__tela .rn-pressable:active {
+.cena .tela button:not(.rn-pressable):active,
+.cena .tela .rn-pressable:active {
   translate: 0 2px;
 }
 
@@ -522,6 +968,123 @@ pre {
 
 .porta--aberta .porta__claridade {
   opacity: 0.22;
+}
+
+/* Peças da masmorra (import { ... } from 'masmorra') */
+.masmorra {
+  flex: none;
+}
+
+.masmorra--chama {
+  width: 2.4em;
+  height: 4.2em;
+  margin: 0 auto;
+}
+
+.masmorra--chave {
+  width: 2.2em;
+  height: 1em;
+  margin: 0.2em auto 0;
+}
+
+.masmorra--portao {
+  width: 3em;
+  height: 3.75em;
+  margin: 0 auto;
+}
+
+.masmorra--tabua {
+  width: 2.6em;
+  height: 1em;
+}
+
+.masmorra--pedra {
+  width: 2.4em;
+  height: 1.2em;
+}
+
+/* Fase 4: a tocha */
+.cena__escuridao {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #0a0812;
+  opacity: 0.78;
+  transition: opacity 0.6s steps(4);
+}
+
+.cena--iluminada .cena__escuridao {
+  opacity: 0;
+}
+
+.tocha__clarao {
+  position: absolute;
+  z-index: 1;
+  width: 70cqw;
+  height: 70cqw;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(247, 118, 34, 0.32), rgba(247, 118, 34, 0) 60%);
+  opacity: 0;
+  transition: opacity 0.6s steps(4);
+  pointer-events: none;
+}
+
+.cena--iluminada .tocha__clarao {
+  opacity: 1;
+}
+
+.tocha__tela {
+  flex-direction: column;
+  font: 600 clamp(8px, 2.9cqw, 17px) / 1.1 var(--fonte-pixel);
+  color: var(--osso);
+}
+
+.tocha__tela > * {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+}
+
+/* Fase 5: os portões */
+.portao__tela {
+  align-items: flex-end;
+  font-size: 5.6cqw;
+}
+
+/* Fase 6: a ponte */
+.ponte__tela {
+  align-items: stretch;
+  justify-content: stretch;
+  font-size: 3cqw;
+}
+
+.cena .ponte__tela > * {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.ponte__tela .masmorra--tabua {
+  flex: 1 1 0;
+  width: auto;
+  height: 100%;
+}
+
+/* Fase 7: pedras no rio */
+.cena .rio__tela {
+  display: block;
+  font-size: 4.2cqw;
+}
+
+.rio__ondas {
+  animation: correnteza 1.2s steps(4) infinite;
+}
+
+@keyframes correnteza {
+  to {
+    transform: translateX(4px);
+  }
 }
 
 /* Imitação do React Native */
@@ -933,12 +1496,12 @@ pre {
   color: #fff;
 }
 
-.livro__nota--projeto {
+.livro__nota--pratica {
   background: rgba(99, 199, 77, 0.09);
   box-shadow: inset 0 0 0 2px rgba(99, 199, 77, 0.4);
 }
 
-.livro__nota--projeto .etiqueta {
+.livro__nota--pratica .etiqueta {
   background: var(--musgo);
   color: var(--breu);
 }
@@ -994,21 +1557,138 @@ pre {
   margin-top: 20px;
 }
 
-@media (max-width: 900px) {
-  .jogo {
+@media (max-width: 960px) {
+  .menu {
     grid-template-columns: minmax(0, 1fr);
-    gap: 22px;
-    padding-top: 18px;
+    align-content: start;
+    gap: 24px;
   }
 
-  .cabecalho__acoes {
+  .menu__palco {
+    max-width: 720px;
     width: 100%;
-    margin-left: 0;
-    justify-content: space-between;
+    margin: 0 auto;
+  }
+
+  .menu__painel {
+    max-width: 560px;
+    width: 100%;
+    margin: 0 auto;
+  }
+}
+
+/* No celular: uma parte da fase por vez, com abas e o Rodar fixo embaixo */
+@media (max-width: 760px) {
+  .so-tela-grande {
+    display: none !important;
+  }
+
+  .so-celular {
+    display: block;
+  }
+
+  span.so-celular {
+    display: inline;
+  }
+
+  .modal {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .cabecalho {
+    gap: 10px;
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+
+  .cabecalho .botao {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+
+  .cabecalho__fase {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .cabecalho__numero {
+    font-size: 12px;
+  }
+
+  .cabecalho__fase h1 {
+    max-width: 100%;
+    font-size: 18px;
+  }
+
+  .jogo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 14px max(12px, env(safe-area-inset-left)) calc(84px + env(safe-area-inset-bottom));
+  }
+
+  .jogo--aba-missao .jogo__codigo,
+  .jogo--aba-codigo .jogo__mundo {
+    display: none;
+  }
+
+  .jogo__mundo,
+  .jogo__codigo {
+    gap: 16px;
+  }
+
+  .jogo__barra {
+    margin-bottom: -16px;
+  }
+
+  .jogo__botoes {
+    padding-bottom: 8px;
   }
 
   .editor__area {
-    height: 280px;
+    height: 46vh;
+    height: 46dvh;
+  }
+
+  .abas-do-celular {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 8;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 8px;
+    padding: 10px max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    background: var(--pedra-escura);
+    border-top: 2px solid var(--breu);
+    box-shadow: inset 0 2px 0 var(--pedra);
+  }
+
+  .abas-do-celular > button:not(.botao) {
+    min-height: 48px;
+    border: 2px solid var(--breu);
+    font: 600 16px/1 var(--fonte-pixel);
+    color: var(--neblina);
+    background: var(--breu);
+  }
+
+  .abas-do-celular .aba--ativa {
+    color: var(--ouro);
+    background: var(--pedra);
+    box-shadow: inset 0 -3px 0 var(--ouro);
+  }
+
+  .abas-do-celular .botao {
+    min-height: 48px;
+  }
+
+  .mapa__topo h1 {
+    flex-basis: 100%;
+    order: -1;
+    font-size: 26px;
   }
 }
 
@@ -1060,18 +1740,6 @@ pre {
     font-size: 26px;
   }
 
-  .cabecalho {
-    gap: 12px;
-  }
-
-  .cabecalho__marca h1 {
-    font-size: 18px;
-  }
-
-  .fase {
-    width: 36px;
-    height: 36px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

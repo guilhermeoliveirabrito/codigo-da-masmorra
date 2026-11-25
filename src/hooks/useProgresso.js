@@ -55,6 +55,7 @@ export function useProgresso() {
         if (lista.includes(id)) return {};
         return { concluidas: { ...atual.concluidas, [modo]: [...lista, id] } };
       }),
+    apagarTudo: () => setProgresso({ ...INICIAL, modo: progresso.modo }),
     marcarLivroVisto: (id) =>
       atualizar((atual) =>
         atual.livrosVistos.includes(id) ? {} : { livrosVistos: [...atual.livrosVistos, id] }

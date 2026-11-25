@@ -45,10 +45,10 @@ function Bloco({ bloco, modo }) {
   const texto = doModo(bloco.texto, modo);
   if (!texto) return null;
 
-  if (bloco.tipo === 'alerta' || bloco.tipo === 'projeto') {
+  if (bloco.tipo === 'alerta' || bloco.tipo === 'pratica') {
     return (
       <div className={`livro__nota livro__nota--${bloco.tipo}`}>
-        <span className="etiqueta">{bloco.tipo === 'alerta' ? 'Atenção' : 'Nos seus projetos'}</span>
+        <span className="etiqueta">{bloco.tipo === 'alerta' ? 'Atenção' : 'Na prática'}</span>
         <TextoRico texto={texto} />
       </div>
     );

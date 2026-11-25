@@ -63,7 +63,7 @@ function montarChao() {
 const PAREDE = montarParede();
 const PISO = montarChao();
 
-export function Cena({ modo, tochas = [12, 172], children, fundo, className = '' }) {
+export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children, fundo, className = '' }) {
   return (
     <div className={`cena ${className}`}>
       <svg
@@ -91,30 +91,35 @@ export function Cena({ modo, tochas = [12, 172], children, fundo, className = ''
         ))}
         {fundo}
         {tochas.map((x) => (
-          <circle key={x} cx={x + 4} cy={20} r={44} fill="url(#luz-da-tocha)" />
+          <circle key={x} cx={x + 4} cy={alturaDasTochas + 6} r={44} fill="url(#luz-da-tocha)" />
         ))}
         <rect width={LARGURA} height={ALTURA} fill="url(#sombra-da-cena)" />
       </svg>
 
       {tochas.map((x) => (
-        <Sprite key={x} desenho={TOCHA} className="tocha" style={posicao(x, 14, 8, 14)} />
+        <Sprite key={x} desenho={TOCHA} className="tocha" style={posicao(x, alturaDasTochas, 8, 14)} />
       ))}
 
       {children}
 
-      <span className="cena__modo">{modo === 'web' ? 'Modo Web' : 'Modo Mobile'}</span>
+      {modo && <span className="cena__modo">{modo === 'web' ? 'Modo Web' : 'Modo Mobile'}</span>}
     </div>
   );
 }
 
-export function Personagem({ quem, x, y, fala, lado = 'centro', className = '', style }) {
+// entrada: 'esquerda' ou 'direita', de onde o personagem chega andando
+export function Personagem({ quem, x, y, fala, lado = 'centro', entrada, className = '', style }) {
   const { nome, desenho } = PERSONAGENS[quem];
   const camadas = desenho.camadas;
   const largura = camadas[0][0].length;
   const altura = camadas[0].length;
+  const classeDeEntrada = entrada ? `personagem--entra-${entrada}` : '';
 
   return (
-    <div className={`personagem ${className}`} style={{ ...posicao(x, y, largura, altura), ...style }}>
+    <div
+      className={`personagem ${classeDeEntrada} ${className}`}
+      style={{ ...posicao(x, y, largura, altura), ...style }}
+    >
       {fala && <span className={`balao balao--${lado}`}>{fala}</span>}
       <Sprite desenho={desenho} titulo={nome} className="personagem__sprite" />
     </div>
@@ -125,6 +130,26 @@ export function Tela({ modo, vazio, className = '', style, children }) {
   return (
     <div className={`tela tela--${modo} ${className}`} style={style}>
       {children ? <Seguro>{children}</Seguro> : <span className="tela__vazia">{vazio}</span>}
+    </div>
+  );
+}
+
+const DIRECOES_DOS_BRILHOS = Array.from({ length: 10 }, (_, i) => {
+  const angulo = (i / 10) * Math.PI * 2;
+  const distancia = 7 + (i % 3) * 2;
+  return [Math.cos(angulo) * distancia, Math.sin(angulo) * distancia];
+});
+
+// faíscas que saem de um ponto da cena quando a fase dá certo
+export function Brilhos({ x, y }) {
+  return (
+    <div className="brilhos" style={posicao(x, y)} aria-hidden="true">
+      {DIRECOES_DOS_BRILHOS.map(([dx, dy], i) => (
+        <span
+          key={i}
+          style={{ '--dx': `${dx.toFixed(1)}cqw`, '--dy': `${dy.toFixed(1)}cqw`, animationDelay: `${(i % 3) * 70}ms` }}
+        />
+      ))}
     </div>
   );
 }

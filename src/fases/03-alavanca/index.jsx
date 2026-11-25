@@ -13,6 +13,7 @@ export const faseAlavanca = {
   id: 'alavanca',
   numero: 3,
   titulo: 'A alavanca',
+  conceito: 'eventos',
   componente: 'Alavanca',
   arquivo: 'Alavanca.jsx',
   Cena: CenaAlavanca,
@@ -102,11 +103,11 @@ export function Sino({ tocar }) {
         legenda: 'A arrow function () => ... só roda quando o evento acontece.',
       },
       {
-        tipo: 'projeto',
+        tipo: 'pratica',
         texto: {
-          web: 'No MeuCine, a `Pagination.jsx` usa `onClick={() => onChange(page + 1)}`: a arrow function deixa passar o número da próxima página, e só roda no clique.',
+          web: 'Um componente de botão costuma receber a função pronta e só repassar: `<button onClick={aoClicar}>`. Quem usa o botão é que decide o que acontece, igual o jogo decidiu o que o `abrirPorta` faz.',
           mobile:
-            'No Mentor, o `Button.tsx` recebe `onPress` como prop e repassa para o `Pressable`: `onPress={onPress}`. É exatamente o que a alavanca faz com o `abrirPorta`.',
+            'Um componente de botão costuma receber a função pronta e só repassar: `<Pressable onPress={aoTocar}>`. Quem usa o botão é que decide o que acontece, igual o jogo decidiu o que o `abrirPorta` faz.',
         },
       },
     ],

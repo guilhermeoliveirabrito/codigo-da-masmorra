@@ -1,10 +1,22 @@
 # Código da Masmorra
 
-Jogo de fases pra praticar React e React Native. Cada fase pede um componente: a placa da entrada precisa de texto, os aventureiros precisam de crachás, a porta só abre com uma alavanca. O código roda no próprio navegador e o jogo aponta o que está errado.
+Jogo de fases pra praticar React e React Native. Cada fase pede um componente: a placa da entrada precisa de texto, a tocha precisa de um interruptor, a ponte precisa de uma tábua pra cada item da lista. O código roda no próprio navegador e o jogo aponta o que está errado.
 
 Cada fase pode ser jogada em dois modos: Web, com tags do HTML e `onClick`, e Mobile, com os componentes do React Native e `onPress`. Antes de cada fase abre uma página do livro explicando o assunto.
 
 Inspirado no The Farmer Was Replaced.
+
+## Fases
+
+1. A placa da entrada: componentes e JSX
+2. Crachás: props
+3. A alavanca: eventos
+4. A tocha: estado com `useState`
+5. Os portões: renderização condicional
+6. A ponte: listas com `map` e `key`
+7. Pedras no rio: layout com flexbox
+
+Próximas: `useEffect`, chamada de API e uma fase final juntando tudo.
 
 ## Rodando
 
@@ -13,23 +25,24 @@ npm install
 npm run dev
 ```
 
-Pra abrir no celular, use `npm run dev -- --host` e acesse o endereço de rede que aparece no terminal (os dois na mesma rede).
+Pra abrir no celular durante o desenvolvimento, use `npm run dev -- --host` e acesse o endereço de rede que aparece no terminal (os dois na mesma rede).
 
-## Fases
+## No celular
 
-1. A placa da entrada: componentes e JSX
-2. Crachás: props
-3. A alavanca: eventos
+No celular, a fase fica dividida em duas abas (Missão e Código), com o botão Rodar sempre embaixo. Publicado no GitHub Pages, o jogo pode ser instalado na tela inicial e abre mesmo sem internet:
 
-Próximas: estado com `useState`, renderização condicional, listas, layout com flexbox, `useEffect` e chamadas à API.
+- Android: menu do Chrome, Instalar app (ou o botão Instalar no celular, no menu do jogo).
+- iPhone: no Safari, Compartilhar e Adicionar à Tela de Início.
+
+Pra publicar, ative o GitHub Pages em Settings, Pages, com a opção GitHub Actions. O workflow em `.github/workflows/deploy.yml` faz o build a cada push na `main`.
 
 ## Como funciona
 
-O código do jogador é lido com o [acorn](https://github.com/acornjs/acorn) e o JSX vira chamadas de função (`src/motor/compilar.js`). Depois ele roda com `new Function`, recebendo o React e, no modo Mobile, uma imitação de `View`, `Text`, `Pressable` e `StyleSheet` feita com HTML (`src/motor/reactNative.jsx`). É essa imitação que permite checar regras do React Native, como texto fora de `<Text>`.
+O código do jogador é lido com o [acorn](https://github.com/acornjs/acorn) e o JSX vira chamadas de função (`src/motor/compilar.js`). Depois ele roda com `new Function`, recebendo o React, as peças do jogo (`import { Chama } from 'masmorra'`) e, no modo Mobile, uma imitação de `View`, `Text`, `Pressable` e `StyleSheet` feita com HTML (`src/motor/reactNative.jsx`). É essa imitação que permite checar regras do React Native, como texto fora de `<Text>`.
 
 Cada fase fica numa pasta em `src/fases`, com a cena, o texto do livro, as dicas e uma função `verificar`, que desenha o componente fora da tela e confere o resultado. Pra criar uma fase nova, dá pra copiar uma das pastas e adicionar ela em `src/fases/index.js`.
 
-Os personagens e o cenário são pixel art desenhada no código (`src/pixel`), com a paleta Endesga 32.
+Os personagens, o cenário e os ícones são pixel art desenhada no código (`src/pixel`), com a paleta Endesga 32.
 
 ## Licença
 

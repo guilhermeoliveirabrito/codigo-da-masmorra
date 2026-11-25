@@ -41,6 +41,7 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
   const [tentativas, setTentativas] = useState(0);
   const [venceu, setVenceu] = useState(false);
   const [confirmarRecomeco, setConfirmarRecomeco] = useState(false);
+  const [aba, setAba] = useState('missao'); // só no celular: 'missao' ou 'codigo'
 
   const vencer = useCallback(() => {
     setVenceu(true);
@@ -62,19 +63,19 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
     } catch (erro) {
       setExecucao(null);
       falhar('erro', traduzir(erro));
-      return;
+      return 'erro';
     }
 
     const { Componente, problema } = pegarComponente(modulo, fase.componente);
     if (!Componente) {
       setExecucao(null);
       falhar('erro', problema);
-      return;
+      return 'erro';
     }
 
     let veredito;
     try {
-      veredito = fase.verificar({ Componente, modo, traduzir, avisos });
+      veredito = fase.verificar({ Componente, modo, traduzir, avisos, codigo });
     } catch (erro) {
       veredito = { tipo: 'erro', mensagem: traduzir(erro) };
     }
@@ -83,13 +84,19 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
     setExecucao({ Componente, versao: Date.now(), liberada: passou });
 
     if (!passou) {
-      falhar(veredito.tipo, veredito.mensagem, [...avisos]);
-      return;
+      falhar(veredito.tipo, veredito.mensagem, veredito.esconderAvisos ? [] : [...avisos]);
+      return veredito.tipo;
     }
 
     setResultado({ ...veredito, avisos: [...avisos] });
-    // a fase da alavanca espera o jogador clicar na cena
-    if (!veredito.esperarInteracao) setTimeout(vencer, 1200);
+    // algumas fases esperam o jogador mexer na cena
+    if (!veredito.esperarInteracao) setTimeout(vencer, fase.atrasoDaVitoria ?? 1400);
+    return 'ok';
+  }
+
+  // no celular, acertou vai pra cena; errou mostra o código e a mensagem
+  function rodarNoCelular() {
+    setAba(rodar() === 'ok' ? 'missao' : 'codigo');
   }
 
   function recomecar() {
@@ -107,15 +114,21 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
   const { Cena } = fase;
 
   return (
-    <main className="jogo">
+    <main className={`jogo jogo--aba-${aba}`}>
       <section className="jogo__mundo" aria-label="Cena">
         <Cena
           key={execucao?.versao ?? 'vazia'}
           Componente={execucao?.Componente}
           liberada={execucao?.liberada ?? false}
+          primeiraVez={!execucao}
           modo={modo}
           aoVencer={vencer}
         />
+        {resultado && (
+          <div className="so-celular">
+            <Resultado resultado={resultado} />
+          </div>
+        )}
         <Dialogo falas={fase.falas} objetivo={doModo(fase.objetivo, modo)} />
       </section>
 
@@ -126,7 +139,7 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
             <button type="button" className="botao botao--pedra" onClick={recomecar}>
               {confirmarRecomeco ? 'Apagar tudo?' : 'Recomeçar'}
             </button>
-            <button type="button" className="botao botao--fogo" onClick={rodar}>
+            <button type="button" className="botao botao--fogo so-tela-grande" onClick={rodar}>
               <Icone nome="rodar" />
               Rodar
             </button>
@@ -141,6 +154,29 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
           tentativas={tentativas}
         />
       </section>
+
+      <nav className="abas-do-celular" aria-label="Partes da fase">
+        <button
+          type="button"
+          className={aba === 'missao' ? 'aba--ativa' : ''}
+          aria-pressed={aba === 'missao'}
+          onClick={() => setAba('missao')}
+        >
+          Missão
+        </button>
+        <button
+          type="button"
+          className={aba === 'codigo' ? 'aba--ativa' : ''}
+          aria-pressed={aba === 'codigo'}
+          onClick={() => setAba('codigo')}
+        >
+          Código
+        </button>
+        <button type="button" className="botao botao--fogo" onClick={rodarNoCelular}>
+          <Icone nome="rodar" />
+          Rodar
+        </button>
+      </nav>
 
       {venceu && (
         <Vitoria

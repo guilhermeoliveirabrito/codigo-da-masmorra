@@ -6,13 +6,18 @@ export function Resultado({ resultado }) {
   if (!resultado) {
     return (
       <div className="resultado resultado--vazio">
-        Escreva o código e clique em <strong>Rodar</strong> (ou Ctrl + Enter).
+        <span className="so-tela-grande">
+          Escreva o código e clique em <strong>Rodar</strong> (ou Ctrl + Enter).
+        </span>
+        <span className="so-celular">
+          Escreva o código e toque em <strong>Rodar</strong>, lá embaixo.
+        </span>
       </div>
     );
   }
 
   const { tipo, mensagem, avisos = [] } = resultado;
-  const outrosAvisos = avisos.filter((aviso) => aviso !== mensagem);
+  const outrosAvisos = avisos.filter((aviso) => !mensagem.includes(aviso));
 
   return (
     <div className={`resultado resultado--${tipo}`} role="status">

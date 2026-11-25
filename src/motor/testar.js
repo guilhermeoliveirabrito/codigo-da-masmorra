@@ -19,9 +19,10 @@ class Capturador extends Component {
 }
 
 // desenha fora da tela e na hora (flushSync), pra dar pra conferir logo em seguida
-export function desenharEscondido(elemento, espiao) {
+export function desenharEscondido(elemento, espiao, { largura } = {}) {
   const container = document.createElement('div');
   container.className = 'teste-escondido';
+  if (largura) container.style.width = `${largura}px`;
   document.body.appendChild(container);
 
   const silencio = () => {};
@@ -93,6 +94,14 @@ export function acharTextoSolto(container) {
 
 export function mensagemTextoSolto(texto) {
   return `O texto "${texto}" está solto. No React Native, todo texto precisa estar dentro de um \`<Text>\`. Num celular de verdade, isso fecha o app com o erro "Text strings must be rendered within a <Text> component".`;
+}
+
+export function acharPecas(container, tipo) {
+  return [...container.querySelectorAll(`[data-masmorra="${tipo}"]`)];
+}
+
+export function acharBotao(container, modo) {
+  return container.querySelector(modo === 'web' ? 'button' : '[data-rn="Pressable"]');
 }
 
 export const ok = (mensagem, extra) => ({ tipo: 'ok', mensagem, ...extra });

@@ -15,6 +15,7 @@ export const fasePlaca = {
   id: 'placa',
   numero: 1,
   titulo: 'A placa da entrada',
+  conceito: 'JSX',
   componente: 'Placa',
   arquivo: 'Placa.jsx',
   Cena: CenaPlaca,
@@ -89,12 +90,9 @@ export function Saudacao() {
           'A palavra `export` na frente da função deixa outros arquivos usarem o componente. É assim que o jogo consegue pegar a sua `Placa` e pendurar ela na parede.',
       },
       {
-        tipo: 'projeto',
-        texto: {
-          web: 'No seu MeuCine, o `Footer.jsx` é um componente assim: uma função com `export` que devolve um `<footer>` com um `<p>` dentro.',
-          mobile:
-            'No seu Mentor, o `Button.tsx` usa `<Text>` para o texto do botão, e o import do topo pega `Pressable`, `StyleSheet` e `Text` do `react-native`.',
-        },
+        tipo: 'pratica',
+        texto:
+          'Uma tela de verdade é um componente grande feito de vários pequenos: um `Cabecalho`, uma `Lista`, um `Rodape`. Cada um deles é uma função igual à sua `Placa`, só que com mais coisa dentro.',
       },
     ],
   },

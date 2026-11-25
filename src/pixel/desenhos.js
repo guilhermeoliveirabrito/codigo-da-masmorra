@@ -218,6 +218,68 @@ export const TOCHA = {
   ],
 };
 
+export const TOCHA_APAGADA = {
+  camadas: [
+    [
+      '........',
+      '....n...',
+      '...n....',
+      '....n...',
+      '..kOOk..',
+      '.kOBOOk.',
+      '..kkkk..',
+      ...SUPORTE_DA_TOCHA,
+    ],
+  ],
+};
+
+export const CHAVE = {
+  camadas: [
+    [
+      '.kkk.........',
+      'kyYyk........',
+      'kY.ykkkkkkkkk',
+      'kyyyyyyyyyyyk',
+      '.kkkkkkykkyk.',
+      '.......kk.kk.',
+    ],
+  ],
+};
+
+export const PEDRA = {
+  camadas: [
+    [
+      '.....kkkkkk.....',
+      '...kkwwwmmmkk...',
+      '..kwwmmmmmmnnk..',
+      '.kmmmmmmmmnnnnk.',
+      '.kNmmmmmnnnnNNk.',
+      '..kNNnnnnnNNNk..',
+      '...kkkkkkkkkk...',
+      '..CCccCCCCccCC..',
+    ],
+  ],
+};
+
+export const BAU_FECHADO = {
+  camadas: [
+    [
+      '................',
+      '................',
+      '..kkkkkkkkkkkk..',
+      '.kBbbbbbbbbbbBk.',
+      '.kbBBBBBBBBBBbk.',
+      'kkkkkkkkkkkkkkkk',
+      'kbnnnnnyynnnnnbk',
+      'kbBBbBBkkBBbBBbk',
+      'kbBBbBByyBBbBBbk',
+      'kbBBbBBBBBBbBBbk',
+      'kbBBbBBBBBBbBBbk',
+      'kkkkkkkkkkkkkkkk',
+    ],
+  ],
+};
+
 export const ALAVANCA_CIMA = {
   camadas: [
     [
@@ -284,4 +346,6 @@ export const ICONES = {
   livro: ['.xxx.xxx.', 'x...x...x', 'x...x...x', 'x...x...x', 'x...x...x', 'xxxxxxxxx'],
   web: ['xxxxxxxxx', 'x.......x', 'x.......x', 'x.......x', 'xxxxxxxxx', '....x....', '..xxxxx..'],
   mobile: ['xxxxx', 'x...x', 'x...x', 'x...x', 'x...x', 'xxxxx', 'xx.xx', 'xxxxx'],
+  menu: ['xxxxxxx', '.......', 'xxxxxxx', '.......', 'xxxxxxx'],
+  voltar: ['...x...', '..xx...', '.xxxxxx', 'xxxxxxx', '.xxxxxx', '..xx...', '...x...'],
 };
