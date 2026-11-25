@@ -72,21 +72,29 @@ export function Tocha() {
 `,
   },
 
+  passos: {
+    web: [
+      'Troque a `const acesa = false` por um estado: `const [acesa, setAcesa] = useState(false);`.',
+      'No `<button>`, use o `onClick` com uma arrow function que chama o `setAcesa`.',
+      'Pra acender e apagar, passe o contrário do valor atual: `!acesa`.',
+      'Aperte **Rodar** e clique no botão da tocha, lá na cena.',
+    ],
+    mobile: [
+      'Troque a `const acesa = false` por um estado: `const [acesa, setAcesa] = useState(false);`.',
+      'No `<Pressable>`, use o `onPress` com uma arrow function que chama o `setAcesa`.',
+      'Pra acender e apagar, passe o contrário do valor atual: `!acesa`.',
+      'Aperte **Rodar** e toque no botão da tocha, lá na cena.',
+    ],
+  },
+
   livro: {
     titulo: 'Estado: a memória do componente',
-    blocos: [
-      {
-        texto:
-          'Até agora, os componentes só mostravam o que recebiam. Mas às vezes um componente precisa **lembrar** de alguma coisa que muda com o tempo: se a tocha está acesa, quantas vezes alguém clicou, o que foi digitado num campo. Isso se chama **estado**.',
-      },
-      {
-        texto:
-          'Uma variável comum não serve. Mudar `acesa = true` não avisa o React, então a tela não é desenhada de novo. Pra ter estado de verdade, use o hook `useState`:',
-      },
-      {
-        tipo: 'codigo',
-        codigo: {
-          web: `import { useState } from 'react';
+    resumo: 'O `useState` dá memória ao componente: ele guarda um valor e desenha a tela de novo sempre que o valor muda.',
+    ideia:
+      'Até aqui, os componentes só mostravam o que recebiam. Mas uma tocha precisa **lembrar** se está acesa, e a tela precisa mudar quando ela acende.\nUma variável comum não serve: mudar `acesa = true` não avisa o React, então a tela continua igual. Pra isso existe o **estado**, criado com o `useState`.',
+    exemplo: {
+      codigo: {
+        web: `import { useState } from 'react';
 
 export function Contador() {
   const [cliques, setCliques] = useState(0);
@@ -97,7 +105,7 @@ export function Contador() {
     </button>
   );
 }`,
-          mobile: `import { useState } from 'react';
+        mobile: `import { useState } from 'react';
 import { Pressable, Text } from 'react-native';
 
 export function Contador() {
@@ -109,34 +117,40 @@ export function Contador() {
     </Pressable>
   );
 }`,
+      },
+      notas: [
+        { marca: "from 'react'", texto: 'O `useState` vem do React e precisa ser importado.' },
+        {
+          marca: 'useState(0)',
+          texto:
+            '`useState(0)` cria o estado, começando em `0`. Ele devolve duas coisas: o valor atual (`cliques`) e a função que troca o valor (`setCliques`). Os colchetes pegam as duas.',
         },
-      },
-      {
-        texto:
-          '**1.** `useState(0)` cria o estado, começando com `0`.\n**2.** Ele devolve duas coisas: o valor atual (`cliques`) e a função que troca o valor (`setCliques`). Os colchetes pegam as duas, parecido com as chaves das props.\n**3.** Quando você chama `setCliques(...)`, o React guarda o valor novo e desenha o componente de novo, já com ele.',
-      },
-      {
-        texto:
-          'Pra inverter um verdadeiro ou falso, use o `!`, que quer dizer "o contrário de": `!true` é `false` e `!false` é `true`. Então `setAcesa(!acesa)` acende se estiver apagada e apaga se estiver acesa.',
-      },
-      {
-        tipo: 'alerta',
-        texto: {
-          web: 'Repare na arrow function: `onClick={() => setCliques(cliques + 1)}`. Sem ela, `onClick={setCliques(cliques + 1)}` muda o estado na hora de desenhar, o que desenha de novo, que muda de novo... e a tela entra num loop.',
-          mobile:
-            'Repare na arrow function: `onPress={() => setCliques(cliques + 1)}`. Sem ela, `onPress={setCliques(cliques + 1)}` muda o estado na hora de desenhar, o que desenha de novo, que muda de novo... e a tela entra num loop.',
+        {
+          marca: 'setCliques(cliques + 1)',
+          texto: 'No clique, o `setCliques` guarda o valor novo, e o React desenha o componente de novo, já com ele.',
         },
-      },
+        { marca: 'Cliquei', texto: 'A tela sempre mostra o valor atual do estado.' },
+      ],
+    },
+    extras: [
       {
         texto:
-          'Hooks como o `useState` sempre ficam no começo do componente, direto no corpo da função. Nunca dentro de um `if`, de um loop ou de outra função.',
-      },
-      {
-        tipo: 'pratica',
-        texto:
-          'Estado está em todo lugar: um menu aberto ou fechado, o texto de um campo de busca, o item selecionado numa lista, o coração de curtir que fica vermelho.',
+          'Pra inverter verdadeiro e falso, use o `!`, que quer dizer "o contrário de": `!true` é `false`. Então `setAcesa(!acesa)` acende quando está apagada e apaga quando está acesa.',
       },
     ],
+    experimente: 'estado',
+    diferencas: {
+      igual: 'O `useState` é igual nos dois modos. Ele vem do `react`, e não do `react-native`.',
+      web: 'O botão é um `<button onClick={...}>`.',
+      mobile: 'O botão é um `<Pressable onPress={...}>`, com um `<Text>` dentro.',
+    },
+    cuidado: {
+      web: 'Repare na arrow function: `onClick={() => setAcesa(!acesa)}`. Sem ela, `onClick={setAcesa(!acesa)}` muda o estado na hora de desenhar, o que desenha de novo, que muda de novo... e a tela trava num loop.\nE o `useState` fica sempre no começo do componente, nunca dentro de um `if` ou de um loop.',
+      mobile:
+        'Repare na arrow function: `onPress={() => setAcesa(!acesa)}`. Sem ela, `onPress={setAcesa(!acesa)}` muda o estado na hora de desenhar, o que desenha de novo, que muda de novo... e a tela trava num loop.\nE o `useState` fica sempre no começo do componente, nunca dentro de um `if` ou de um loop.',
+    },
+    pratica:
+      'Estado está em todo lugar: um menu aberto ou fechado, o texto de um campo de busca, o item escolhido numa lista, o coração de curtir que fica vermelho.',
   },
 
   dicas: [

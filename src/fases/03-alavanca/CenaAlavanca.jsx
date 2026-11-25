@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Brilhos, Cena, Personagem, Tela, posicao } from '../../components/Cenario';
 import { Porta } from '../../components/Porta';
-import { ALAVANCA_BAIXO, ALAVANCA_CIMA } from '../../pixel/desenhos';
-import { Sprite } from '../../pixel/Sprite';
+import { ALAVANCA_BAIXO, ALAVANCA_CIMA, CAIXOTE, CORRENTE } from '../../pixel/desenhos';
+import { NoFundo, Sprite } from '../../pixel/Sprite';
 
 function Painel() {
   return (
@@ -33,7 +33,7 @@ export function CenaAlavanca({ Componente, modo, liberada, primeiraVez, aoVencer
   useEffect(() => {
     if (!aberta || !liberada) return;
     const andar = setTimeout(() => setAtravessou(true), 700);
-    const fim = setTimeout(() => aoVencerRef.current(), 2400);
+    const fim = setTimeout(() => aoVencerRef.current(), 3000);
     return () => {
       clearTimeout(andar);
       clearTimeout(fim);
@@ -48,8 +48,11 @@ export function CenaAlavanca({ Componente, modo, liberada, primeiraVez, aoVencer
   return (
     <Cena
       modo={modo}
+      className={aberta ? 'cena--tremer' : ''}
       fundo={
         <>
+          <NoFundo desenho={CORRENTE} x={24} y={0} />
+          <NoFundo desenho={CAIXOTE} x={127} y={69} />
           <Painel />
           <Porta x={160} y={34} largura={20} altura={46} aberta={aberta} />
         </>
@@ -74,7 +77,9 @@ export function CenaAlavanca({ Componente, modo, liberada, primeiraVez, aoVencer
         y={76}
         lado="esquerda"
         fala={fala}
-        className={`personagem--andando ${atravessou ? 'personagem--saindo' : ''}`}
+        velocidade={72}
+        some={atravessou}
+        viajante
       />
     </Cena>
   );

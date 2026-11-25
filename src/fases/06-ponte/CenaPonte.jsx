@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Brilhos, CHAO, Cena, Personagem, Tela, posicao } from '../../components/Cenario';
+import { CORRENTE } from '../../pixel/desenhos';
+import { NoFundo } from '../../pixel/Sprite';
 
 export const TABUAS_DA_CENA = [
   { id: 1, madeira: 'carvalho' },
@@ -44,7 +46,16 @@ export function CenaPonte({ Componente, modo, liberada, primeiraVez }) {
   }, [liberada]);
 
   return (
-    <Cena modo={modo} fundo={<Abismo />}>
+    <Cena
+      modo={modo}
+      fundo={
+        <>
+          <NoFundo desenho={CORRENTE} x={74} y={0} />
+          <NoFundo desenho={CORRENTE} x={116} y={0} />
+          <Abismo />
+        </>
+      }
+    >
       <Tela
         modo={modo}
         vazio=""
@@ -63,7 +74,8 @@ export function CenaPonte({ Componente, modo, liberada, primeiraVez }) {
         lado="esquerda"
         fala={Componente ? null : 'Sem ponte não dá...'}
         entrada={primeiraVez ? 'esquerda' : undefined}
-        className="personagem--andando personagem--devagar"
+        velocidade={52}
+        viajante
       />
     </Cena>
   );

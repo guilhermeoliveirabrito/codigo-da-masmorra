@@ -2,17 +2,26 @@ import { useState } from 'react';
 import { Cena, Personagem } from '../components/Cenario';
 import { Porta } from '../components/Porta';
 import { useInstalacao } from '../hooks/useInstalacao';
-import { Icone } from '../pixel/Sprite';
+import { semAnimacao } from '../hooks/useTransicao';
+import { BARRIL, ESTANDARTE } from '../pixel/desenhos';
+import { Icone, NoFundo } from '../pixel/Sprite';
 
 export function Menu({ faseAtual, comecou, modo, resumo, aoJogar, aoMapa, aoLivro, aoComoJogar, aoTrocarModo, aoApagarProgresso }) {
   const [abrindo, setAbrindo] = useState(false);
+  const [entrando, setEntrando] = useState(false);
   const [confirmarApagar, setConfirmarApagar] = useState(false);
   const instalacao = useInstalacao();
 
+  // a porta abre, a Lia e o Tom entram nela e começa a viagem
   function jogar() {
     if (abrindo) return;
     setAbrindo(true);
-    setTimeout(aoJogar, 700);
+    if (semAnimacao()) {
+      aoJogar();
+      return;
+    }
+    setTimeout(() => setEntrando(true), 250);
+    setTimeout(aoJogar, 1300);
   }
 
   function apagar() {
@@ -31,11 +40,27 @@ export function Menu({ faseAtual, comecou, modo, resumo, aoJogar, aoMapa, aoLivr
         <Cena
           tochas={[66, 118]}
           alturaDasTochas={42}
-          fundo={<Porta x={96} y={30} largura={28} altura={50} aberta={abrindo} />}
+          className={abrindo ? 'cena--tremer' : ''}
+          fundo={
+            <>
+              <NoFundo desenho={ESTANDARTE} x={22} y={28} />
+              <NoFundo desenho={ESTANDARTE} x={158} y={28} />
+              <NoFundo desenho={BARRIL} x={20} y={68} />
+              <Porta x={96} y={30} largura={28} altura={50} aberta={abrindo} />
+            </>
+          }
         >
           <Personagem quem="guarda" x={40} y={74} />
-          <Personagem quem="lia" x={128} y={76} />
-          <Personagem quem="tom" x={146} y={76} fala={abrindo ? 'Vamos!' : null} lado="direita" />
+          <Personagem quem="lia" x={entrando ? 90 : 128} y={76} velocidade={64} some={entrando} />
+          <Personagem
+            quem="tom"
+            x={entrando ? 90 : 146}
+            y={76}
+            velocidade={64}
+            some={entrando}
+            fala={abrindo && !entrando ? 'Vamos!' : null}
+            lado="direita"
+          />
         </Cena>
         <h1 className="menu__titulo">Código da Masmorra</h1>
       </div>

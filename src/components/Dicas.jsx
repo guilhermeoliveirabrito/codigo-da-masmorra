@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { CodigoColorido } from './CodigoColorido';
 import { TextoRico } from './TextoRico';
 
 const TENTATIVAS_PARA_SOLUCAO = 3;
@@ -35,7 +36,9 @@ export function Dicas({ dicas, solucao, tentativas }) {
       {mostrarSolucao && (
         <div className="dicas__solucao">
           <p>Digite em vez de copiar, é assim que fixa.</p>
-          <pre>{solucao}</pre>
+          <pre>
+            <CodigoColorido codigo={solucao} />
+          </pre>
         </div>
       )}
     </div>

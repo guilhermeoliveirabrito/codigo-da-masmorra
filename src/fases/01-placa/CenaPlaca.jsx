@@ -1,4 +1,6 @@
 import { Brilhos, Cena, Personagem, Tela, posicao } from '../../components/Cenario';
+import { BARRIL, CORRENTE } from '../../pixel/desenhos';
+import { NoFundo } from '../../pixel/Sprite';
 
 const TABUAS = ['#b86f50', '#a8614a', '#b86f50'];
 const PREGOS = [
@@ -45,7 +47,16 @@ function PlacaDeMadeira() {
 
 export function CenaPlaca({ Componente, modo, liberada, primeiraVez }) {
   return (
-    <Cena modo={modo} fundo={<PlacaDeMadeira />}>
+    <Cena
+      modo={modo}
+      fundo={
+        <>
+          <NoFundo desenho={CORRENTE} x={30} y={0} />
+          <NoFundo desenho={BARRIL} x={32} y={68} />
+          <PlacaDeMadeira />
+        </>
+      }
+    >
       <Tela modo={modo} vazio="placa em branco" className="placa__texto" style={posicao(50, 15, 92, 28)}>
         {Componente && <Componente />}
       </Tela>
@@ -54,13 +65,13 @@ export function CenaPlaca({ Componente, modo, liberada, primeiraVez }) {
 
       <Personagem
         quem="guarda"
-        x={14}
+        x={164}
         y={74}
-        lado="esquerda"
-        entrada={primeiraVez ? 'esquerda' : undefined}
+        lado="direita"
+        entrada={primeiraVez ? 'direita' : undefined}
         fala={liberada ? 'Pode passar!' : null}
       />
-      <Personagem quem="lia" x={162} y={76} lado="direita" entrada={primeiraVez ? 'direita' : undefined} />
+      <Personagem quem="lia" x={12} y={76} lado="esquerda" entrada={primeiraVez ? 'esquerda' : undefined} viajante />
     </Cena>
   );
 }

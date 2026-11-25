@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Brilhos, Cena, Personagem, Tela, posicao } from '../../components/Cenario';
+import { ESTANDARTE } from '../../pixel/desenhos';
+import { NoFundo } from '../../pixel/Sprite';
 
 export function CenaPortoes({ Componente, modo, liberada, primeiraVez }) {
   const [entrou, setEntrou] = useState(false);
@@ -11,7 +13,7 @@ export function CenaPortoes({ Componente, modo, liberada, primeiraVez }) {
   }, [liberada]);
 
   return (
-    <Cena modo={modo} tochas={[12, 172]}>
+    <Cena modo={modo} tochas={[12, 172]} fundo={<NoFundo desenho={ESTANDARTE} x={92} y={2} />}>
       <Tela modo={modo} vazio="sem portão" className="portao__tela" style={posicao(52, 26, 40, 56)}>
         {Componente && <Componente temChave />}
       </Tela>
@@ -28,7 +30,8 @@ export function CenaPortoes({ Componente, modo, liberada, primeiraVez }) {
         lado="esquerda"
         fala={liberada && !entrou ? 'Tenho a chave!' : null}
         entrada={primeiraVez ? 'esquerda' : undefined}
-        className={`personagem--andando ${entrou ? 'personagem--saindo' : ''}`}
+        some={entrou}
+        viajante
       />
       <Personagem
         quem="tom"
@@ -37,6 +40,7 @@ export function CenaPortoes({ Componente, modo, liberada, primeiraVez }) {
         lado="direita"
         fala={liberada ? 'Esqueci a minha...' : null}
         entrada={primeiraVez ? 'direita' : undefined}
+        viajante
       />
     </Cena>
   );

@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
-import { BAU } from '../pixel/desenhos';
+import { BAU, BAU_FECHADO } from '../pixel/desenhos';
 import { Sprite } from '../pixel/Sprite';
 import { TextoRico } from './TextoRico';
+
+// pra onde cada moeda pula quando o baú abre
+const MOEDAS = [-34, 22, -12, 40, 6, -26, 30];
 
 export function Vitoria({ fase, modo, temProxima, outroModoFeito, aoProxima, aoTrocarModo, aoFechar }) {
   const aprendeu = typeof fase.aprendeu === 'object' ? fase.aprendeu[modo] : fase.aprendeu;
@@ -18,7 +21,13 @@ export function Vitoria({ fase, modo, temProxima, outroModoFeito, aoProxima, aoT
   return (
     <div className="modal" role="dialog" aria-modal="true" aria-label="Fase concluída">
       <div className="vitoria janela">
-        <Sprite desenho={BAU} className="vitoria__bau" />
+        <div className="vitoria__bau" aria-hidden="true">
+          <Sprite desenho={BAU_FECHADO} className="vitoria__bau-fechado" />
+          <Sprite desenho={BAU} className="vitoria__bau-aberto" />
+          {MOEDAS.map((dx, i) => (
+            <span key={i} className="vitoria__moeda" style={{ '--dx': `${dx}px`, animationDelay: `${0.6 + i * 0.05}s` }} />
+          ))}
+        </div>
         <h2>Fase {fase.numero} concluída</h2>
         <div className="vitoria__aprendeu">
           <span className="etiqueta">O que você aprendeu</span>

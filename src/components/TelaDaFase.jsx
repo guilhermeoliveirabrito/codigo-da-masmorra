@@ -9,7 +9,7 @@ import { Resultado } from './Resultado';
 import { Vitoria } from './Vitoria';
 
 function doModo(valor, modo) {
-  return typeof valor === 'object' ? valor[modo] : valor;
+  return valor && typeof valor === 'object' && !Array.isArray(valor) ? valor[modo] : valor;
 }
 
 function pegarComponente(modulo, nome) {
@@ -35,7 +35,19 @@ function pegarComponente(modulo, nome) {
   };
 }
 
-export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoMudarCodigo, aoRecomecar, aoConcluir, aoProxima, aoTrocarModo }) {
+export function TelaDaFase({
+  fase,
+  modo,
+  codigo,
+  temProxima,
+  outroModoFeito,
+  saindo,
+  aoMudarCodigo,
+  aoRecomecar,
+  aoConcluir,
+  aoProxima,
+  aoTrocarModo,
+}) {
   const [execucao, setExecucao] = useState(null); // { Componente, versao, liberada }
   const [resultado, setResultado] = useState(null);
   const [tentativas, setTentativas] = useState(0);
@@ -46,6 +58,8 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
   // erros dentro de cliques: durante o teste vão pra uma lista, depois aparecem na tela
   const errosDeCliqueRef = useRef(null);
   const codigoRodadoRef = useRef(codigo);
+  const contadorRef = useRef(0);
+  const mostrar = useCallback((novo) => setResultado({ ...novo, id: ++contadorRef.current }), []);
 
   const vencer = useCallback(() => {
     setVenceu(true);
@@ -56,6 +70,14 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
     carregarMotor().catch(() => {});
   }, []);
 
+  // indo pra próxima fase: mostra a cena, que é de onde os personagens saem andando
+  useEffect(() => {
+    if (!saindo) return;
+    setVenceu(false);
+    setAba('missao');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [saindo]);
+
   const relatarErroDeClique = useCallback(
     (erro) => {
       if (errosDeCliqueRef.current) {
@@ -63,13 +85,13 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
         return;
       }
       const mensagem = traduzirErro(erro, codigoRodadoRef.current, modo);
-      setResultado({ tipo: 'erro', mensagem: `${mensagem} (Isso aconteceu no clique.)`, avisos: [] });
+      mostrar({ tipo: 'erro', mensagem: `${mensagem} (Isso aconteceu no clique.)`, avisos: [] });
     },
-    [modo]
+    [modo, mostrar]
   );
 
   function falhar(tipo, mensagem, avisos = []) {
-    setResultado({ tipo, mensagem, avisos });
+    mostrar({ tipo, mensagem, avisos });
     setTentativas((t) => t + 1);
   }
 
@@ -126,7 +148,7 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
       return veredito.tipo;
     }
 
-    setResultado({ ...veredito, avisos: [...avisos] });
+    mostrar({ ...veredito, avisos: [...avisos] });
     // algumas fases esperam o jogador mexer na cena
     if (!veredito.esperarInteracao) setTimeout(vencer, fase.atrasoDaVitoria ?? 1400);
     return 'ok';
@@ -168,15 +190,15 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
   );
 
   return (
-    <main className={`jogo jogo--aba-${aba}`}>
+    <main className={`jogo jogo--aba-${aba} ${saindo ? 'jogo--saindo' : ''}`}>
       <section className="jogo__mundo" aria-label="Cena">
         {cena}
         {resultado && (
           <div className="so-celular">
-            <Resultado resultado={resultado} />
+            <Resultado key={resultado.id} resultado={resultado} />
           </div>
         )}
-        <Dialogo falas={fase.falas} objetivo={doModo(fase.objetivo, modo)} />
+        <Dialogo falas={fase.falas} objetivo={doModo(fase.objetivo, modo)} passos={doModo(fase.passos, modo)} />
       </section>
 
       <section className="jogo__codigo" aria-label="Código">
@@ -194,7 +216,7 @@ export function TelaDaFase({ fase, modo, codigo, temProxima, outroModoFeito, aoM
         </div>
 
         <Editor valor={codigo} aoMudar={aoMudarCodigo} aoRodar={rodar} />
-        <Resultado resultado={resultado} />
+        <Resultado key={resultado?.id ?? 'vazio'} resultado={resultado} />
         <Dicas
           dicas={fase.dicas.map((dica) => doModo(dica, modo))}
           solucao={doModo(fase.solucao, modo)}

@@ -45,56 +45,70 @@ export function Placa() {
 `,
   },
 
+  passos: {
+    web: [
+      'Ache o `return null;` dentro da função `Placa`.',
+      'Troque o `null` por uma tag de parágrafo com o texto dentro: `<p>...</p>`.',
+      'O texto tem que ser exatamente: Bem-vindo à masmorra',
+      'Aperte **Rodar**.',
+    ],
+    mobile: [
+      'Ache o `return null;` dentro da função `Placa`.',
+      'Troque o `null` por um `<Text>` com o texto dentro: `<Text>...</Text>`. O import já está pronto.',
+      'O texto tem que ser exatamente: Bem-vindo à masmorra',
+      'Aperte **Rodar**.',
+    ],
+  },
+
   livro: {
     titulo: 'Componentes e JSX',
-    blocos: [
-      {
-        texto:
-          'Toda tela feita com React é montada com **componentes**. Um componente é só uma **função** que devolve, com `return`, o que deve aparecer na tela.',
-      },
-      {
-        texto:
-          'O que vem depois do `return` parece HTML, mas se chama **JSX**: um jeito de descrever a tela dentro do JavaScript. Ele é escrito com **tags**, que abrem e fecham. `<p>` abre, `</p>` fecha, e o texto fica no meio.',
-      },
-      {
-        tipo: 'codigo',
-        codigo: {
-          web: `export function Saudacao() {
+    resumo: 'Um componente é uma função que devolve, no `return`, o pedaço de tela que deve aparecer.',
+    ideia:
+      'Pense num carimbo: você desenha uma vez e usa quantas vezes quiser. No React, cada pedaço de tela é um carimbo desses, chamado **componente**.\nPor dentro, ele é uma função comum do JavaScript. A diferença é o que ela devolve: a tela, escrita em **JSX**, que são tags parecidas com as do HTML, só que dentro do JavaScript.',
+    exemplo: {
+      codigo: {
+        web: `export function Saudacao() {
   return <p>Olá, aventureiro!</p>;
 }`,
-          mobile: `import { Text } from 'react-native';
+        mobile: `import { Text } from 'react-native';
 
 export function Saudacao() {
   return <Text>Olá, aventureiro!</Text>;
 }`,
+      },
+      notas: [
+        {
+          marca: 'import',
+          texto: 'No celular, as peças de tela vêm da biblioteca `react-native`. O import pega o `Text` emprestado de lá.',
         },
-        legenda: 'Clique nas abas para comparar os dois modos.',
-      },
-      {
-        texto: {
-          web: 'No navegador, as tags são as do HTML: `<p>` para um parágrafo, `<h1>` para um título, `<div>` para uma caixa que agrupa outras coisas. Elas não precisam de import.',
-          mobile:
-            "No celular **não existe HTML**. No lugar das tags, você usa componentes prontos do React Native: `<Text>` para qualquer texto e `<View>` para caixas. Eles precisam ser **importados** no topo do arquivo: `import { Text } from 'react-native';` quer dizer \"pega o Text emprestado da biblioteca react-native\".",
+        {
+          marca: 'export function',
+          texto:
+            '`export` deixa outros arquivos (e o jogo) usarem o componente. O nome começa com **letra maiúscula**: é assim que o React sabe que é um componente seu.',
         },
-      },
-      {
-        tipo: 'alerta',
-        texto: {
-          web: 'O nome de um componente sempre começa com **letra maiúscula** (`Placa`, e não `placa`). É assim que o React sabe que é um componente seu, e não uma tag do HTML.',
-          mobile:
-            'Regra de ouro do mobile: **todo texto precisa estar dentro de um `<Text>`**. Texto solto fecha o app com o erro *Text strings must be rendered within a Text component*.',
+        {
+          marca: 'return',
+          texto: {
+            web: 'Depois do `return` vem o que aparece na tela. A tag abre com `<p>`, o texto fica no meio e ela fecha com uma barra: `</p>`.',
+            mobile: 'Depois do `return` vem o que aparece na tela. A tag abre com `<Text>`, o texto fica no meio e ela fecha com uma barra: `</Text>`.',
+          },
         },
-      },
-      {
-        texto:
-          'A palavra `export` na frente da função deixa outros arquivos usarem o componente. É assim que o jogo consegue pegar a sua `Placa` e pendurar ela na parede.',
-      },
-      {
-        tipo: 'pratica',
-        texto:
-          'Uma tela de verdade é um componente grande feito de vários pequenos: um `Cabecalho`, uma `Lista`, um `Rodape`. Cada um deles é uma função igual à sua `Placa`, só que com mais coisa dentro.',
-      },
-    ],
+      ],
+      legenda: 'Clique nas abas pra comparar os dois modos.',
+    },
+    experimente: 'jsx',
+    diferencas: {
+      web: 'Usa as tags do HTML: `<p>` pra parágrafo, `<h1>` pra título, `<div>` pra uma caixa que agrupa coisas. Não precisa de import.',
+      mobile:
+        'Não existe HTML. No lugar, vêm os componentes do React Native: `<Text>` pra qualquer texto e `<View>` pra caixas. Eles precisam de import no topo do arquivo.',
+    },
+    cuidado: {
+      web: 'Toda tag que abre precisa fechar. `<p>Olá` sem o `</p>` é erro, e aí nada aparece na tela.',
+      mobile:
+        '**Todo texto precisa estar dentro de um `<Text>`.** Texto solto fecha o app com o erro *Text strings must be rendered within a Text component*.',
+    },
+    pratica:
+      'Uma tela de verdade é um componente grande feito de vários pequenos: um `Cabecalho`, uma `Lista`, um `Rodape`. Cada um é uma função igual à sua `Placa`, só que com mais coisa dentro.',
   },
 
   dicas: [

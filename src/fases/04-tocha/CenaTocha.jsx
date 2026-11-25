@@ -33,7 +33,7 @@ export function CenaTocha({ Componente, modo, liberada, primeiraVez, aoVencer })
       <Cena
         modo={modo}
         tochas={[]}
-        className={`cena--escura ${luz ? 'cena--iluminada' : ''}`}
+        className={`cena--escura ${luz ? 'cena--iluminada' : ''} ${luz && liberada ? 'cena--tremer' : ''}`}
         fundo={<Porta x={156} y={36} largura={18} altura={44} aberta={luz && liberada} />}
       >
         <div className="cena__escuridao" />
@@ -52,6 +52,7 @@ export function CenaTocha({ Componente, modo, liberada, primeiraVez, aoVencer })
           lado="esquerda"
           fala={fala}
           entrada={primeiraVez ? 'esquerda' : undefined}
+          viajante
         />
       </Cena>
     </ContextoDaCena.Provider>

@@ -50,27 +50,34 @@ export function Alavanca({ abrirPorta }) {
 `,
   },
 
+  passos: {
+    web: [
+      'Troque o `<p>` por uma tag que dá pra clicar: o `<button>`.',
+      'Use o evento `onClick` do botão pra chamar a função `abrirPorta`, que chega pelas props.',
+      'Aperte **Rodar** e depois clique na alavanca, lá na cena.',
+    ],
+    mobile: [
+      'Coloque o `Pressable` no import, junto do `Text`.',
+      'Envolva o `<Text>` com um `<Pressable>`, que é o que recebe toque.',
+      'Use o evento `onPress` do Pressable pra chamar a função `abrirPorta`, que chega pelas props.',
+      'Aperte **Rodar** e depois toque na alavanca, lá na cena.',
+    ],
+  },
+
   livro: {
     titulo: 'Eventos: fazendo algo acontecer',
-    blocos: [
-      {
-        texto:
-          'Props não servem só para textos. Você também pode passar uma **função**. Aqui o jogo te entrega a função `abrirPorta`: quando ela roda, a porta abre. O seu trabalho é fazer ela rodar na hora certa, quando alguém usar a alavanca.',
-      },
-      {
-        texto: {
-          web: 'No navegador, o elemento clicável é o `<button>`, e o evento de clique se chama `onClick`. Você entrega a função pra ele entre chaves.',
-          mobile:
-            'No celular, o que recebe toque é o `<Pressable>`, e o evento de toque se chama `onPress`. O `Pressable` não mostra nada sozinho: o texto vai num `<Text>` dentro dele. E ele também precisa entrar no import.',
-        },
-      },
-      {
-        tipo: 'codigo',
-        codigo: {
-          web: `export function Sino({ tocar }) {
+    resumo: {
+      web: 'Pra algo acontecer no clique, entregue uma função pro `onClick` do botão, sem parênteses.',
+      mobile: 'Pra algo acontecer no toque, entregue uma função pro `onPress` do `Pressable`, sem parênteses.',
+    },
+    ideia:
+      'Props também podem levar **funções**. O jogo te entrega a `abrirPorta`, uma função que abre a porta quando roda.\nO seu componente não abre a porta sozinho. Ele só avisa: "quando alguém usar a alavanca, chame essa função". Esse "quando alguém usar" é um **evento**.',
+    exemplo: {
+      codigo: {
+        web: `export function Sino({ tocar }) {
   return <button onClick={tocar}>Tocar o sino</button>;
 }`,
-          mobile: `import { Pressable, Text } from 'react-native';
+        mobile: `import { Pressable, Text } from 'react-native';
 
 export function Sino({ tocar }) {
   return (
@@ -79,38 +86,47 @@ export function Sino({ tocar }) {
     </Pressable>
   );
 }`,
-        },
-        legenda: 'O sino recebe a função tocar como prop e liga ela ao evento.',
       },
-      {
-        tipo: 'alerta',
-        texto: {
-          web: '**Sem parênteses!** `onClick={tocar}` entrega a função para o botão chamar *quando* alguém clicar. Já `onClick={tocar()}` chama a função *na hora*, enquanto a tela ainda está sendo desenhada. É a diferença entre entregar o controle remoto e já sair apertando o botão.',
-          mobile:
-            '**Sem parênteses!** `onPress={tocar}` entrega a função para o Pressable chamar *quando* alguém tocar. Já `onPress={tocar()}` chama a função *na hora*, enquanto a tela ainda está sendo desenhada. É a diferença entre entregar o controle remoto e já sair apertando o botão.',
+      notas: [
+        { marca: 'import', texto: 'O `Pressable` é a área que recebe toque no React Native. Ele também entra no import.' },
+        { marca: '({ tocar })', texto: 'A função chega pelas props, do mesmo jeito que um texto chegaria.' },
+        {
+          marca: 'onClick',
+          texto: 'O `<button>` é o elemento clicável do navegador. `onClick={tocar}` entrega a função pra ele chamar **quando** alguém clicar.',
         },
-      },
+        { marca: 'onPress', texto: '`onPress={tocar}` entrega a função pro Pressable chamar **quando** alguém tocar.' },
+        { marca: '<Text>', texto: 'O Pressable não mostra nada sozinho: o texto vai num `<Text>` dentro dele.' },
+      ],
+    },
+    extras: [
       {
         tipo: 'codigo',
         codigo: {
-          web: `// Precisa passar alguma informação? Use uma arrow function:
+          web: `// precisa passar uma informação? use uma arrow function:
 <button onClick={() => tocar('forte')}>Tocar forte</button>`,
-          mobile: `// Precisa passar alguma informação? Use uma arrow function:
+          mobile: `// precisa passar uma informação? use uma arrow function:
 <Pressable onPress={() => tocar('forte')}>
   <Text>Tocar forte</Text>
 </Pressable>`,
         },
-        legenda: 'A arrow function () => ... só roda quando o evento acontece.',
-      },
-      {
-        tipo: 'pratica',
-        texto: {
-          web: 'Um componente de botão costuma receber a função pronta e só repassar: `<button onClick={aoClicar}>`. Quem usa o botão é que decide o que acontece, igual o jogo decidiu o que o `abrirPorta` faz.',
-          mobile:
-            'Um componente de botão costuma receber a função pronta e só repassar: `<Pressable onPress={aoTocar}>`. Quem usa o botão é que decide o que acontece, igual o jogo decidiu o que o `abrirPorta` faz.',
-        },
+        legenda: 'A arrow function `() => ...` também só roda quando o evento acontece.',
       },
     ],
+    experimente: 'eventos',
+    diferencas: {
+      web: 'O que se clica é o `<button>`, e o evento é o `onClick`.',
+      mobile: 'O que se toca é o `<Pressable>`, com um `<Text>` dentro, e o evento é o `onPress`.',
+    },
+    cuidado: {
+      web: '**Sem parênteses!** `onClick={tocar}` entrega a função pro botão chamar depois. `onClick={tocar()}` chama a função na hora, enquanto a tela ainda está sendo desenhada. É a diferença entre entregar o controle remoto e já sair apertando o botão.',
+      mobile:
+        '**Sem parênteses!** `onPress={tocar}` entrega a função pro Pressable chamar depois. `onPress={tocar()}` chama a função na hora, enquanto a tela ainda está sendo desenhada. É a diferença entre entregar o controle remoto e já sair apertando o botão.',
+    },
+    pratica: {
+      web: 'Um componente de botão costuma receber a função pronta e só repassar: `<button onClick={aoClicar}>`. Quem usa o botão decide o que acontece, igual o jogo decidiu o que a `abrirPorta` faz.',
+      mobile:
+        'Um componente de botão costuma receber a função pronta e só repassar: `<Pressable onPress={aoTocar}>`. Quem usa o botão decide o que acontece, igual o jogo decidiu o que a `abrirPorta` faz.',
+    },
   },
 
   dicas: [

@@ -96,62 +96,71 @@ export function Cracha() {
 `,
   },
 
+  passos: [
+    'Receba as duas props nos parênteses da função, entre chaves: `({ nome, classe })`.',
+    'No JSX, troque o "Nome aqui" pelas props, cada uma entre chaves: `{nome}` e `{classe}`.',
+    'Aperte **Rodar**. O jogo testa com a Lia, com o Tom e com uma aventureira surpresa.',
+  ],
+
   livro: {
     titulo: 'Props: passando informações',
-    blocos: [
-      {
-        texto:
-          'Um componente fica muito mais útil quando dá pra reaproveitar. Pra isso existem as **props**: informações que você entrega ao componente na hora de usar, do mesmo jeito que se passa argumentos para uma função.',
-      },
-      {
-        tipo: 'codigo',
-        codigo: `// Usando o componente: as props parecem atributos
-<Saudacao nome="Lia" />
-<Saudacao nome="Tom" />`,
-        legenda: 'Esse jeito de usar é igual na Web e no Mobile.',
-      },
-      {
-        tipo: 'codigo',
-        codigo: {
-          web: `export function Saudacao({ nome }) {
+    resumo: 'Props são as informações que você entrega pro componente na hora de usar, como os argumentos de uma função.',
+    ideia:
+      'Um crachá em branco serve pra qualquer pessoa: o que muda é o que está escrito nele. Com componentes é igual. Você escreve o `Cracha` uma vez, e quem usa entrega o nome e a classe pelas **props**.\nNa hora de usar, elas parecem atributos do HTML: `<Cracha nome="Lia" />`.',
+    exemplo: {
+      codigo: {
+        web: `// usando: <Saudacao nome="Lia" />
+
+export function Saudacao({ nome }) {
   return <p>Olá, {nome}!</p>;
 }`,
-          mobile: `import { Text } from 'react-native';
+        mobile: `import { Text } from 'react-native';
+
+// usando: <Saudacao nome="Lia" />
 
 export function Saudacao({ nome }) {
   return <Text>Olá, {nome}!</Text>;
 }`,
+      },
+      notas: [
+        { marca: 'usando', texto: 'Quem usa o componente passa as props como atributos. Aqui, `nome` vale `"Lia"`.' },
+        {
+          marca: '({ nome })',
+          texto:
+            'As props chegam todas juntas, num objeto. As chaves `{ nome }` pegam uma prop pelo nome. Pra pegar duas, separe com vírgula: `({ nome, classe })`.',
         },
-        legenda: 'Uma função só desenha a saudação da Lia e a do Tom.',
-      },
-      {
-        texto:
-          '**1. `({ nome })`:** as props chegam todas juntas, num objeto. As chaves dentro dos parênteses pegam cada prop pelo nome (isso se chama *desestruturação*). Pra receber mais de uma, separe com vírgula: `({ nome, classe })`.\n**2. `{nome}` dentro do JSX:** as chaves querem dizer "aqui entra JavaScript". Sem elas, aparece a palavra nome escrita, e não o valor.',
-      },
+        {
+          marca: '{nome}',
+          texto: 'No JSX, as chaves querem dizer "aqui entra JavaScript". Aparece o **valor** da prop (Lia), e não a palavra nome.',
+        },
+      ],
+    },
+    extras: [
       {
         tipo: 'codigo',
         codigo: {
-          web: `// Também funciona, sem desestruturar:
+          web: `// também funciona, sem as chaves nos parênteses:
 export function Saudacao(props) {
   return <p>Olá, {props.nome}!</p>;
 }`,
-          mobile: `// Também funciona, sem desestruturar:
+          mobile: `// também funciona, sem as chaves nos parênteses:
 export function Saudacao(props) {
   return <Text>Olá, {props.nome}!</Text>;
 }`,
         },
-      },
-      {
-        tipo: 'alerta',
-        texto:
-          'Erro comum: escrever `function Cracha(nome, classe)`, sem as chaves. Aí `nome` recebe o objeto inteiro das props, e o React reclama que não sabe mostrar um objeto na tela.',
-      },
-      {
-        tipo: 'pratica',
-        texto:
-          "Numa loja, um único `CartaoDeProduto` recebe nome, preço e foto pelas props e desenha todos os produtos da tela. Dá até pra ter valor padrão: `({ preco = 0 })` usa `0` quando ninguém passa o preço.",
+        legenda: 'As duas formas fazem a mesma coisa. A com chaves é a mais usada.',
       },
     ],
+    experimente: 'props',
+    diferencas: {
+      igual: 'Passar e receber props é igual nos dois modos. Só muda a tag que mostra o texto.',
+      web: '`<p>{nome}</p>`',
+      mobile: '`<Text>{nome}</Text>`',
+    },
+    cuidado:
+      'Erro comum: esquecer as chaves nos parênteses, `function Cracha(nome, classe)`. Aí `nome` recebe o objeto inteiro das props, e o React reclama que não sabe mostrar um objeto na tela.',
+    pratica:
+      'Numa loja, um único `CartaoDeProduto` recebe nome, preço e foto pelas props e desenha todos os produtos da tela. Dá até pra ter valor padrão: `({ preco = 0 })` usa `0` quando ninguém passa o preço.',
   },
 
   dicas: [

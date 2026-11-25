@@ -67,49 +67,78 @@ export function Travessia() {
 `,
   },
 
+  passos: {
+    web: [
+      'O estilo vai na `<div>` de fora, a que embrulha as pedras: `<div style={{ ... }}>`.',
+      "Ligue o flexbox com `display: 'flex'`. As pedras ficam em fila.",
+      'Espalhe as pedras com o `justifyContent`. Qual valor encosta as pontas nas margens e divide o resto do espaço?',
+      'Aperte **Rodar**.',
+    ],
+    mobile: [
+      'O estilo vai na `<View>` de fora, a que embrulha as pedras: `<View style={{ ... }}>`.',
+      "Coloque as pedras em fila com `flexDirection: 'row'`.",
+      'Espalhe as pedras com o `justifyContent`. Qual valor encosta as pontas nas margens e divide o resto do espaço?',
+      'Aperte **Rodar**.',
+    ],
+  },
+
   livro: {
     titulo: 'Layout com flexbox',
-    blocos: [
-      {
-        texto:
-          'Pra organizar elementos lado a lado, espalhar ou centralizar, usa-se o **flexbox**. Ele é ligado no elemento de fora (o container) e organiza os filhos diretos dele.',
-      },
-      {
-        texto: {
-          web: 'No navegador, uma `<div>` vira flexbox com `display: \'flex\'`. A partir daí, os filhos ficam **em linha**, um do lado do outro.',
-          mobile:
-            'No React Native, **toda `View` já é flexbox**, mas a direção padrão é **coluna**: um embaixo do outro. Pra deixar lado a lado, use `flexDirection: \'row\'`.',
-        },
-      },
-      {
-        tipo: 'codigo',
-        codigo: {
-          web: `<div style={{ display: 'flex', justifyContent: 'center' }}>
+    resumo: {
+      web: "Pra arrumar elementos lado a lado, ligue o flexbox na caixa de fora (`display: 'flex'`) e use o `justifyContent` pra espalhar.",
+      mobile:
+        "No React Native toda `View` já é flexbox, mas em coluna. Pra arrumar lado a lado, use `flexDirection: 'row'` e o `justifyContent` pra espalhar.",
+    },
+    ideia:
+      'O **flexbox** diz como os filhos de uma caixa se arrumam: em linha ou em coluna, juntos ou espalhados. Ele é ligado na caixa de fora (o **container**) e vale pros filhos diretos dela.\nÉ como arrumar pedras numa prateleira: você escolhe a direção e o espaço entre elas.',
+    exemplo: {
+      codigo: {
+        web: `<div
+  style={{
+    display: 'flex',
+    justifyContent: 'center',
+  }}
+>
   <Pedra />
   <Pedra />
 </div>`,
-          mobile: `<View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+        mobile: `<View
+  style={{
+    flexDirection: 'row',
+    justifyContent: 'center',
+  }}
+>
   <Pedra />
   <Pedra />
 </View>`,
+      },
+      notas: [
+        {
+          marca: 'style={{',
+          texto:
+            'O `style` recebe um **objeto**: as chaves de fora dizem "aqui entra JavaScript" e as de dentro são o objeto. Os nomes vão em camelCase: `justifyContent`, e não `justify-content`.',
         },
-      },
-      {
-        texto:
-          'O `style` no JSX recebe um **objeto**, por isso as chaves duplas: as de fora dizem "aqui entra JavaScript" e as de dentro são o objeto. Os nomes vão em camelCase: `justifyContent`, e não `justify-content`.',
-      },
-      {
-        texto:
-          "O `justifyContent` distribui os filhos ao longo da linha:\n`'flex-start'`: todos no começo (é o padrão).\n`'center'`: todos juntos no meio.\n`'space-between'`: o primeiro encosta no começo, o último no fim, e o espaço que sobra é dividido igualmente entre eles.\n`'space-around'` e `'space-evenly'`: também espalham, mas deixam espaço nas pontas.",
-      },
+        { marca: "display: 'flex'", texto: 'Liga o flexbox. No navegador, os filhos passam a ficar **em linha**, um do lado do outro.' },
+        {
+          marca: "flexDirection: 'row'",
+          texto: "No React Native toda View já é flexbox, mas em **coluna**. O `'row'` coloca os filhos em linha.",
+        },
+        {
+          marca: 'justifyContent',
+          texto:
+            "Decide como os filhos se espalham:\n`'flex-start'`: todos no começo (é o padrão).\n`'center'`: todos juntos no meio.\n`'space-between'`: as pontas encostam nas bordas e o espaço que sobra é dividido entre eles.\n`'space-around'` e `'space-evenly'`: espalham, mas deixam espaço também nas pontas.",
+        },
+      ],
+    },
+    extras: [
       {
         tipo: 'codigo',
         codigo: {
-          web: `// Dá pra guardar o estilo numa constante
+          web: `// dá pra guardar o estilo numa constante
 const fila = { display: 'flex', justifyContent: 'space-between' };
 
 <div style={fila}>...</div>`,
-          mobile: `// No React Native é comum usar o StyleSheet
+          mobile: `// no React Native é comum usar o StyleSheet
 const estilos = StyleSheet.create({
   fila: { flexDirection: 'row', justifyContent: 'space-between' },
 });
@@ -117,17 +146,16 @@ const estilos = StyleSheet.create({
 <View style={estilos.fila}>...</View>`,
         },
       },
-      {
-        tipo: 'alerta',
-        texto:
-          'A diferença que mais engana: no navegador, o flexbox começa em linha (`row`); no React Native, começa em coluna (`column`). O mesmo layout pode sair diferente nas duas plataformas.',
-      },
-      {
-        tipo: 'pratica',
-        texto:
-          'Barra de navegação, linha de ícones, cartões lado a lado, botões espalhados no rodapé: quase todo layout de app é feito com flexbox.',
-      },
     ],
+    experimente: 'flex',
+    diferencas: {
+      web: "A `<div>` só vira flexbox com `display: 'flex'`, e aí começa **em linha**.",
+      mobile: "Toda `View` já é flexbox, mas começa **em coluna**. Pra ficar em linha: `flexDirection: 'row'`.",
+    },
+    cuidado:
+      'A diferença que mais engana: no navegador o flexbox começa em linha (`row`); no React Native, em coluna (`column`). O mesmo estilo pode sair diferente nas duas plataformas.',
+    pratica:
+      'Barra de navegação, linha de ícones, cartões lado a lado, botões espalhados no rodapé: quase todo layout de app é feito com flexbox.',
   },
 
   dicas: [

@@ -79,6 +79,7 @@ export function CenaRio({ Componente, modo, liberada, primeiraVez }) {
         lado="esquerda"
         fala={Componente ? null : 'Não sei nadar...'}
         entrada={primeiraVez ? 'esquerda' : undefined}
+        viajante
         className={`personagem--pulando ${passo >= 0 ? `personagem--pulo-${passo % 2 ? 'b' : 'a'}` : ''}`}
       />
     </Cena>

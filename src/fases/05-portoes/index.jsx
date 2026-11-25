@@ -102,59 +102,71 @@ export function Portao({ temChave }) {
 `,
   },
 
+  passos: [
+    'Troque a `<PortaFechada />` fixa por uma escolha com `? :`. Com chave, `<PortaAberta />`; sem chave, `<PortaFechada />`.',
+    'Logo abaixo, mostre a `<Chave />` só pra quem tem chave. Pra isso serve o `&&`.',
+    'Aperte **Rodar**. A Lia (com chave) e o Tom (sem chave) precisam ver portões diferentes.',
+  ],
+
   livro: {
     titulo: 'Mostrando uma coisa ou outra',
-    blocos: [
-      {
-        texto:
-          'Muitas telas mudam conforme uma condição: usuário logado ou não, lista vazia ou cheia, porta aberta ou fechada. No JSX, você escolhe o que aparece usando JavaScript dentro das chaves. Isso se chama **renderização condicional**.',
+    resumo:
+      'Dentro das chaves do JSX dá pra escolher o que aparece: `condição ? A : B` mostra um ou outro, e `condição && A` mostra ou esconde.',
+    ideia:
+      'Muita tela muda conforme a situação: logado ou não, lista vazia ou cheia, porta aberta ou fechada. Em vez de criar um componente pra cada caso, você usa JavaScript dentro das chaves do JSX pra escolher o que aparece.\nIsso se chama **renderização condicional**.',
+    exemplo: {
+      codigo: {
+        web: `export function Entrada({ logado }) {
+  return (
+    <div>
+      {logado ? <p>Bem-vindo de volta!</p> : <button>Entrar</button>}
+      {logado && <button>Sair</button>}
+    </div>
+  );
+}`,
+        mobile: `import { Pressable, Text, View } from 'react-native';
+
+export function Entrada({ logado }) {
+  return (
+    <View>
+      {logado ? <Text>Bem-vindo de volta!</Text> : <Text>Faça login</Text>}
+      {logado && (
+        <Pressable>
+          <Text>Sair</Text>
+        </Pressable>
+      )}
+    </View>
+  );
+}`,
       },
-      {
-        texto:
-          '**Uma coisa ou outra:** o `? :` (operador ternário). Se a condição for verdadeira, aparece o que vem depois do `?`; se for falsa, o que vem depois do `:`.',
-      },
-      {
-        tipo: 'codigo',
-        codigo: {
-          web: `{logado ? <p>Bem-vindo de volta!</p> : <button>Entrar</button>}`,
-          mobile: `{logado ? (
-  <Text>Bem-vindo de volta!</Text>
-) : (
-  <Pressable>
-    <Text>Entrar</Text>
-  </Pressable>
-)}`,
+      notas: [
+        {
+          marca: ' ? ',
+          texto:
+            '**Um ou outro:** se `logado` for verdadeiro, aparece o que vem depois do `?`. Se for falso, aparece o que vem depois do `:`.',
         },
-      },
+        { marca: '&&', texto: '**Mostrar ou esconder:** se `logado` for verdadeiro, aparece o botão de sair. Se for falso, não aparece nada.' },
+      ],
+    },
+    extras: [
       {
         texto:
-          '**Mostrar ou não mostrar:** o `&&`. Se a condição for verdadeira, aparece o que vem depois; se for falsa, não aparece nada.',
-      },
-      {
-        tipo: 'codigo',
-        codigo: {
-          web: `{temMensagem && <p>Você tem mensagens novas</p>}`,
-          mobile: `{temMensagem && <Text>Você tem mensagens novas</Text>}`,
-        },
-      },
-      {
-        tipo: 'alerta',
-        texto: {
-          web: 'Cuidado com números no `&&`: `{quantidade && <p>...</p>}` mostra um `0` solto na tela quando a quantidade é zero. Prefira uma comparação: `{quantidade > 0 && ...}`.',
-          mobile:
-            'Cuidado com números no `&&`: `{quantidade && <Text>...</Text>}` deixa um `0` solto quando a quantidade é zero, e no React Native texto fora de `<Text>` fecha o app. Prefira uma comparação: `{quantidade > 0 && ...}`.',
-        },
-      },
-      {
-        texto:
-          'Também dá pra usar `if` normal antes do `return`, pra devolver telas inteiras diferentes. Mas dentro das chaves do JSX só cabem expressões, por isso o `? :` e o `&&`.',
-      },
-      {
-        tipo: 'pratica',
-        texto:
-          'Tela de carregando ou lista pronta (`{carregando ? <Carregando /> : <Lista />}`), mensagem de erro que só aparece quando dá erro, botão de sair que só aparece pra quem entrou.',
+          'Também dá pra usar um `if` normal antes do `return`, pra devolver telas inteiras diferentes. Mas dentro das chaves do JSX só cabem expressões, e por isso existem o `? :` e o `&&`.',
       },
     ],
+    experimente: 'condicional',
+    diferencas: {
+      igual: 'O `? :` e o `&&` são JavaScript puro, então funcionam igual nos dois modos.',
+      web: 'As peças ficam dentro de uma `<div>`.',
+      mobile: 'As peças ficam dentro de uma `<View>`.',
+    },
+    cuidado: {
+      web: 'Cuidado com números no `&&`: `{quantidade && <p>...</p>}` mostra um `0` solto na tela quando a quantidade é zero. Prefira uma comparação: `{quantidade > 0 && ...}`.',
+      mobile:
+        'Cuidado com números no `&&`: `{quantidade && <Text>...</Text>}` deixa um `0` solto quando a quantidade é zero, e no React Native texto fora de `<Text>` fecha o app. Prefira uma comparação: `{quantidade > 0 && ...}`.',
+    },
+    pratica:
+      'Tela de carregando ou lista pronta (`{carregando ? <Carregando /> : <Lista />}`), mensagem de erro que só aparece quando dá erro, botão de sair que só aparece pra quem entrou.',
   },
 
   dicas: [

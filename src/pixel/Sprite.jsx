@@ -35,14 +35,17 @@ export function tamanhoDoDesenho(desenho) {
 }
 
 // recorte = [x, y, largura, altura]
+// Desenhos com "quadros" viram animação: o CSS mostra um quadro de cada vez.
+// "piscada" é uma camada que aparece um instante de vez em quando, por cima dos olhos.
 export function Sprite({ desenho, recorte, className = '', style, titulo, ...resto }) {
   const { largura, altura } = tamanhoDoDesenho(desenho);
   const viewBox = (recorte ?? [0, 0, largura, altura]).join(' ');
+  const animada = desenho.quadros ? `sprite--animada sprite--quadros-${desenho.quadros.length}` : '';
 
   return (
     <svg
       {...resto}
-      className={`sprite ${desenho.quadros ? 'sprite--animada' : ''} ${className}`}
+      className={`sprite ${animada} ${className}`}
       style={style}
       viewBox={viewBox}
       shapeRendering="crispEdges"
@@ -59,7 +62,32 @@ export function Sprite({ desenho, recorte, className = '', style, titulo, ...res
       ) : (
         <Camadas camadas={desenho.camadas} />
       )}
+      {desenho.piscada && (
+        <g className="sprite__piscada">
+          <Camadas camadas={[desenho.piscada]} />
+        </g>
+      )}
     </svg>
+  );
+}
+
+// desenho dentro do <svg> da cena, em x e y de pixels de jogo
+export function NoFundo({ desenho, x, y }) {
+  if (!desenho.quadros) {
+    return (
+      <g transform={`translate(${x} ${y})`}>
+        <Camadas camadas={desenho.camadas} />
+      </g>
+    );
+  }
+  return (
+    <g transform={`translate(${x} ${y})`} className={`sprite--animada sprite--quadros-${desenho.quadros.length}`}>
+      {desenho.quadros.map((camadas, i) => (
+        <g key={i} className={`sprite__quadro sprite__quadro--${i + 1}`}>
+          <Camadas camadas={camadas} />
+        </g>
+      ))}
+    </g>
   );
 }
 

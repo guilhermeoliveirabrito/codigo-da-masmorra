@@ -65,7 +65,7 @@ export const fasePonte = {
   componente: 'Ponte',
   arquivo: 'Ponte.jsx',
   Cena: CenaPonte,
-  atrasoDaVitoria: 2600,
+  atrasoDaVitoria: 3200,
 
   falas: [
     { quem: 'lia', texto: 'Um abismo! Do outro lado está a saída, e temos uma pilha de tábuas.' },
@@ -108,21 +108,21 @@ export function Ponte({ tabuas }) {
 `,
   },
 
+  passos: [
+    'Apague a `<Tabua>` escrita na mão.',
+    'No lugar dela, abra chaves e passe pela lista com o `map`: `{tabuas.map((tabua) => ...)}`.',
+    'Pra cada item, devolva uma `<Tabua />` com a madeira daquele item e uma `key` com o id dele.',
+    'Aperte **Rodar**. O jogo também testa com outra lista, então nada de tábua escrita fixa.',
+  ],
+
   livro: {
     titulo: 'Listas: um componente para cada item',
-    blocos: [
-      {
-        texto:
-          'Quase todo app mostra listas: mensagens, produtos, tarefas. Em vez de escrever cada item na mão, você pega a lista de dados e transforma cada item num componente com o `map`.',
-      },
-      {
-        texto:
-          'O `map` passa por cada item de um array e devolve um array novo com o que você retornar. Com JSX, ele vira uma lista de elementos:',
-      },
-      {
-        tipo: 'codigo',
-        codigo: {
-          web: `const tarefas = [
+    resumo: 'O `lista.map(...)` transforma cada item de uma lista num componente. Cada um precisa de uma `key` única.',
+    ideia:
+      'Quase todo app mostra listas: mensagens, produtos, tarefas. Não dá pra escrever cada item na mão, porque a lista muda.\nEntão você pega os dados e passa cada item por uma "fábrica", o `map`: entra um item, sai um componente.',
+    exemplo: {
+      codigo: {
+        web: `const tarefas = [
   { id: 1, titulo: 'Comprar pão' },
   { id: 2, titulo: 'Estudar React' },
 ];
@@ -136,7 +136,7 @@ export function Lista() {
     </ul>
   );
 }`,
-          mobile: `const tarefas = [
+        mobile: `const tarefas = [
   { id: 1, titulo: 'Comprar pão' },
   { id: 2, titulo: 'Estudar React' },
 ];
@@ -150,30 +150,36 @@ export function Lista() {
     </View>
   );
 }`,
+      },
+      notas: [
+        { marca: 'const tarefas', texto: 'Os dados: uma lista (um array) de objetos. Cada objeto tem um `id` diferente.' },
+        {
+          marca: '.map(',
+          texto: 'O `map` passa por cada item e devolve o que a função retornar. Aqui, cada `tarefa` vira um elemento na tela.',
         },
-      },
-      {
-        texto:
-          'Repare na `key`. Ela é obrigatória em listas: o React usa a key pra saber qual item é qual quando a lista muda (um item novo, um apagado, a ordem trocada). Ela precisa ser **única** entre os itens, e o melhor é usar um id que já venha nos dados.',
-      },
-      {
-        tipo: 'alerta',
-        texto:
-          'Evite usar como key um valor que pode se repetir, tipo o nome. Duas tábuas de pinho teriam a mesma key, e o React se confunde na hora de atualizar.',
-      },
-      {
-        texto:
-          'O `<>` e `</>` em volta são um **fragment**: um embrulho que não aparece na tela. Ele serve quando o componente precisa devolver vários elementos sem criar uma caixa a mais.',
-      },
-      {
-        tipo: 'pratica',
-        texto: {
-          web: 'Num app de mensagens, o histórico inteiro é um `mensagens.map(...)` que transforma cada mensagem num balão. Quando chega uma nova, a key evita que o React redesenhe todas as outras.',
-          mobile:
-            'Num app de mensagens, o histórico inteiro é um `mensagens.map(...)` que transforma cada mensagem num balão. Em listas grandes, o React Native costuma usar a `FlatList`, que só desenha o que aparece na tela, mas a ideia da key é a mesma.',
+        {
+          marca: 'key=',
+          texto: 'A `key` diz pro React qual item é qual quando a lista muda. Ela precisa ser **única**, e o melhor é usar o `id`.',
         },
+      ],
+    },
+    extras: [
+      {
+        texto:
+          'O `<>` e `</>` que aparecem no código da ponte são um **fragment**: um embrulho que não aparece na tela. Serve pra devolver vários elementos sem criar uma caixa a mais.',
       },
     ],
+    experimente: 'lista',
+    diferencas: {
+      igual: 'O `map` e a `key` são iguais nos dois modos.',
+      web: 'Listas costumam usar `<ul>` e `<li>`.',
+      mobile:
+        'Listas pequenas usam o `map` dentro de uma `View`. Listas grandes usam a `FlatList`, que só desenha o que aparece na tela, mas a ideia da key é a mesma.',
+    },
+    cuidado:
+      'Não use como key um valor que pode se repetir, tipo a madeira: duas tábuas de pinho teriam a mesma key, e o React se confunde na hora de atualizar.',
+    pratica:
+      'Num app de mensagens, o histórico inteiro é um `mensagens.map(...)` que transforma cada mensagem num balão. Quando chega uma nova, a key evita que o React desenhe todas as outras de novo.',
   },
 
   dicas: [

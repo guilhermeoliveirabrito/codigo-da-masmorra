@@ -2,7 +2,7 @@
 
 Jogo de fases pra praticar React e React Native. Cada fase pede um componente: a placa da entrada precisa de texto, a tocha precisa de um interruptor, a ponte precisa de uma tábua pra cada item da lista. O código roda no próprio navegador e o jogo aponta o que está errado.
 
-Cada fase pode ser jogada em dois modos: Web, com tags do HTML e `onClick`, e Mobile, com os componentes do React Native e `onPress`. Antes de cada fase abre uma página do livro explicando o assunto.
+Cada fase pode ser jogada em dois modos: Web, com tags do HTML e `onClick`, e Mobile, com os componentes do React Native e `onPress`. Antes de cada fase abre uma página do livro com a ideia do assunto, um exemplo comentado linha a linha, uma demonstração pra mexer e o passo a passo da fase.
 
 Inspirado no The Farmer Was Replaced.
 
@@ -46,7 +46,9 @@ Como o código do jogador roda na própria página, algumas proteções ficam em
 
 Cada fase fica numa pasta em `src/fases`, com a cena, o texto do livro, as dicas e uma função `verificar`, que desenha o componente fora da tela e confere o resultado. Pra criar uma fase nova, dá pra copiar uma das pastas e adicionar ela em `src/fases/index.js`.
 
-Os personagens, o cenário e os ícones são pixel art desenhada no código (`src/pixel`), com a paleta Endesga 32.
+Os personagens, o cenário e os ícones são pixel art desenhada no código (`src/pixel`), com a paleta Endesga 32. Quando um personagem muda de lugar, ele troca pro desenho de lado e anda no ritmo dos passos; entre uma fase e outra, a turma atravessa um corredor (`src/components/Viagem.jsx`).
+
+O editor colore o código com um leitor simples de JavaScript e JSX (`src/components/realce.js`). No iPhone e no iPad ele fica sem cor: o Safari desloca o texto do campo uns pixels, e o cursor não bateria com o texto colorido.
 
 ## Licença
 

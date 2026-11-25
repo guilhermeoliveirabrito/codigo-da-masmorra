@@ -4,12 +4,16 @@ import { ComoJogar } from './components/ComoJogar';
 import { Livro } from './components/Livro';
 import { TelaDaFase } from './components/TelaDaFase';
 import { Transicao } from './components/Transicao';
+import { Viagem } from './components/Viagem';
 import { fases, proximasFases } from './fases';
 import { carregarMotorDepois } from './motor/carregarMotor';
 import { useProgresso } from './hooks/useProgresso';
-import { useTransicao } from './hooks/useTransicao';
+import { semAnimacao, useTransicao } from './hooks/useTransicao';
 import { Mapa } from './telas/Mapa';
 import { Menu } from './telas/Menu';
+
+// tempo pros personagens entrarem na sala antes do livro abrir sozinho
+const ESPERA_DO_LIVRO = 1300;
 
 export default function App() {
   const {
@@ -22,10 +26,11 @@ export default function App() {
     marcarLivroVisto,
     apagarTudo,
   } = useProgresso();
-  const { transicao, navegar } = useTransicao();
+  const { transicao, navegar, viajar, pular } = useTransicao();
   const [tela, setTela] = useState('menu');
   const [livroAberto, setLivroAberto] = useState(false);
   const [comoJogarAberto, setComoJogarAberto] = useState(false);
+  const [faseApresentada, setFaseApresentada] = useState(null);
 
   useEffect(carregarMotorDepois, []);
 
@@ -40,8 +45,21 @@ export default function App() {
   const liberadas = fases.filter((_, i) => estaLiberada(i)).length;
   const comecou = progresso.livrosVistos.length > 0 || concluidas.web.length + concluidas.mobile.length > 0;
 
-  // na primeira vez em cada fase o livro abre sozinho
-  const mostrarIntroducao = tela === 'jogo' && !progresso.livrosVistos.includes(fase.id);
+  const viajando = transicao?.tipo === 'viagem';
+  // enquanto a câmera está no corredor, quem vai entrar na sala nova espera do lado de fora
+  const esperando = viajando && (transicao.etapa === 'cobrindo' || transicao.etapa === 'corredor');
+  // quem sai da sala continua andando até o corredor cobrir a tela toda
+  const saindo = viajando && transicao.saida && (transicao.etapa === 'saindo' || transicao.etapa === 'cobrindo');
+
+  // na primeira vez em cada fase o livro abre sozinho, depois que todo mundo chegou
+  useEffect(() => {
+    if (tela !== 'jogo' || transicao) return;
+    const espera = setTimeout(() => setFaseApresentada(fase.id), semAnimacao() ? 0 : ESPERA_DO_LIVRO);
+    return () => clearTimeout(espera);
+  }, [tela, transicao, fase.id]);
+
+  const mostrarIntroducao =
+    tela === 'jogo' && !transicao && faseApresentada === fase.id && !progresso.livrosVistos.includes(fase.id);
 
   // se a fase não estiver liberada no outro modo, volta pra última liberada
   function faseLiberadaNoModo(novoModo, desejada = indice) {
@@ -55,21 +73,22 @@ export default function App() {
     trocarModo(novoModo, faseLiberadaNoModo(novoModo));
   }
 
-  function jogarFase(i, emModo = modo) {
-    navegar(
-      () => {
-        if (emModo !== modo) trocarModo(emModo, i);
-        else irParaFase(i);
-        setTela('jogo');
-      },
-      { fase: fases[i], modo: emModo }
-    );
+  // trocar de modo na mesma sala é um piscar de olhos; ir pra uma sala é uma viagem pelo corredor
+  function jogarFase(i, emModo = modo, { saida = false } = {}) {
+    const acao = () => {
+      if (emModo !== modo) trocarModo(emModo, i);
+      else irParaFase(i);
+      setTela('jogo');
+    };
+    const destino = { fase: fases[i], modo: emModo };
+    if (emModo !== modo) navegar(acao, destino);
+    else viajar(acao, destino, { saida });
   }
 
   const concluir = useCallback(() => concluirFase(fase.id, modo), [concluirFase, fase.id, modo]);
 
   return (
-    <>
+    <div className={`app ${esperando ? 'app--esperando' : ''}`}>
       {tela === 'menu' && (
         <Menu
           faseAtual={fase}
@@ -116,10 +135,11 @@ export default function App() {
             codigo={codigo}
             temProxima={indice < fases.length - 1}
             outroModoFeito={concluidas[outroModo].includes(fase.id)}
+            saindo={saindo}
             aoMudarCodigo={(novo) => salvarCodigo(chaveDoCodigo, novo)}
             aoRecomecar={() => apagarCodigo(chaveDoCodigo)}
             aoConcluir={concluir}
-            aoProxima={() => jogarFase(indice + 1)}
+            aoProxima={() => jogarFase(indice + 1, modo, { saida: true })}
             aoTrocarModo={() => jogarFase(faseLiberadaNoModo(outroModo), outroModo)}
           />
         </>
@@ -142,7 +162,8 @@ export default function App() {
 
       {comoJogarAberto && <ComoJogar aoFechar={() => setComoJogarAberto(false)} />}
 
-      <Transicao transicao={transicao} />
-    </>
+      <Transicao transicao={transicao?.tipo === 'iris' ? transicao : null} />
+      <Viagem transicao={viajando ? transicao : null} aoPular={pular} />
+    </div>
   );
 }

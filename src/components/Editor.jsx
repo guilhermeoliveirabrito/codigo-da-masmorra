@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef } from 'react';
+import { CodigoColorido } from './CodigoColorido';
 
 // símbolos chatos de achar no teclado do celular
 const SIMBOLOS = ['<', '>', '/', '{', '}', '(', ')', '=', '"', "'", ';', '.'];
@@ -21,6 +22,7 @@ function desfazerTrocasDoTeclado(texto) {
 export function Editor({ valor, aoMudar, aoRodar }) {
   const areaRef = useRef(null);
   const numerosRef = useRef(null);
+  const realceRef = useRef(null);
   const cursorPendenteRef = useRef(null);
 
   // quando o texto é corrigido, o navegador joga o cursor pro fim; volta ele pro lugar
@@ -59,6 +61,14 @@ export function Editor({ valor, aoMudar, aoRodar }) {
     aoMudar(corrigido);
   }
 
+  // o texto colorido fica embaixo do campo de digitar e rola junto com ele
+  function aoRolar(evento) {
+    const { scrollTop, scrollLeft } = evento.currentTarget;
+    numerosRef.current.scrollTop = scrollTop;
+    realceRef.current.scrollTop = scrollTop;
+    realceRef.current.scrollLeft = scrollLeft;
+  }
+
   function aoApertarTecla(evento) {
     if (evento.key === 'Enter' && (evento.ctrlKey || evento.metaKey)) {
       evento.preventDefault();
@@ -92,22 +102,26 @@ export function Editor({ valor, aoMudar, aoRodar }) {
         <pre className="editor__numeros" ref={numerosRef} aria-hidden="true">
           {Array.from({ length: totalDeLinhas }, (_, i) => i + 1).join('\n')}
         </pre>
-        <textarea
-          ref={areaRef}
-          value={valor}
-          onChange={aoDigitar}
-          onKeyDown={aoApertarTecla}
-          onScroll={(evento) => {
-            numerosRef.current.scrollTop = evento.currentTarget.scrollTop;
-          }}
-          spellCheck={false}
-          autoCapitalize="off"
-          autoComplete="off"
-          autoCorrect="off"
-          enterKeyHint="enter"
-          wrap="off"
-          aria-label="Editor de código"
-        />
+        <div className="editor__campo">
+          <pre className="editor__realce" ref={realceRef} aria-hidden="true">
+            <CodigoColorido codigo={valor} />
+            {'\n'}
+          </pre>
+          <textarea
+            ref={areaRef}
+            value={valor}
+            onChange={aoDigitar}
+            onKeyDown={aoApertarTecla}
+            onScroll={aoRolar}
+            spellCheck={false}
+            autoCapitalize="off"
+            autoComplete="off"
+            autoCorrect="off"
+            enterKeyHint="enter"
+            wrap="off"
+            aria-label="Editor de código"
+          />
+        </div>
       </div>
 
       <div className="editor__simbolos" aria-label="Símbolos">

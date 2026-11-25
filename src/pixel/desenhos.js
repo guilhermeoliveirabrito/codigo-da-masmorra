@@ -1,6 +1,12 @@
 // Cada letra é uma cor de paleta.js e ponto é transparente.
 // "quadros" são as versões de um desenho animado.
 
+function palpebras(largura, altura, linha, colunas, cor = 's') {
+  return Array.from({ length: altura }, (_, y) =>
+    Array.from({ length: largura }, (_, x) => (y === linha && colunas.includes(x) ? cor : '.')).join('')
+  );
+}
+
 export const GUARDA = {
   camadas: [
     [
@@ -61,6 +67,7 @@ export const GUARDA = {
     ],
   ],
   rosto: [2, 1, 11, 11],
+  piscada: palpebras(16, 26, 8, [6, 9]),
 };
 
 export const LIA = {
@@ -119,6 +126,7 @@ export const LIA = {
     ],
   ],
   rosto: [2, 0, 12, 12],
+  piscada: palpebras(16, 24, 6, [6, 9]),
 };
 
 export const TOM = {
@@ -177,6 +185,7 @@ export const TOM = {
     ],
   ],
   rosto: [2, 2, 12, 12],
+  piscada: palpebras(16, 24, 8, [6, 9]),
 };
 
 const SUPORTE_DA_TOCHA = [
@@ -348,4 +357,258 @@ export const ICONES = {
   mobile: ['xxxxx', 'x...x', 'x...x', 'x...x', 'x...x', 'xxxxx', 'xx.xx', 'xxxxx'],
   menu: ['xxxxxxx', '.......', 'xxxxxxx', '.......', 'xxxxxxx'],
   voltar: ['...x...', '..xx...', '.xxxxxx', 'xxxxxxx', '.xxxxxx', '..xx...', '...x...'],
+};
+
+// Personagens andando de lado, virados pra direita (pra esquerda a cena espelha).
+// Quatro quadros: passo, pernas juntas, outro passo, pernas juntas. Nos passos o corpo
+// desce um pixel, que é o balanço de quem anda.
+function andando(largura, partes) {
+  const vazia = '.'.repeat(largura);
+  return partes.map(({ cima, baixo, passo }) => [[...(passo ? [vazia] : []), ...cima, ...baixo]]);
+}
+
+const CABECA_DA_LIA = [
+  '......kkkk......',
+  '.....kgllgk.....',
+  '....kgglllgk....',
+  '...kGggggyyyk...',
+  '...kGgggyyyyyk..',
+  '...kGggyysssk...',
+  '...kGggysskssk..',
+  '...kGGgsssssk...',
+  '....kGGksSSk....',
+];
+
+const CORPO_DA_LIA = {
+  bracoNaFrente: [
+    '...kGGgkkkkk....',
+    '..kGgggbBgk.....',
+    '..kGggbbbggk....',
+    '.kGgggbbbkgsk...',
+    '.kGggkbbbbkssk..',
+    '.kGggkByyBBkk...',
+    '..kGgkbbbbk.....',
+    '..kGggbbbbk.....',
+    '..kGgggggggk....',
+    '...kGGgggGGk....',
+  ],
+  bracoNoMeio: [
+    '...kGGgkkkkk....',
+    '..kGgggbBBbk....',
+    '..kGggbbgggk....',
+    '.kGgggbbgggk....',
+    '.kGggkbbgggk....',
+    '.kGggkByksskk...',
+    '..kGgkbbkssk....',
+    '..kGggbbbkk.....',
+    '..kGgggggggk....',
+    '...kGGgggGGk....',
+  ],
+  bracoAtras: [
+    '...kGGgkkkkk....',
+    '..kGgggbBBbk....',
+    '.kgkggbbbbbk....',
+    'kgggkgbbbbbk....',
+    'ksskGkbbbbbk....',
+    'kssGgkByyBBk....',
+    '.kkGgkbbbbk.....',
+    '..kGggbbbbk.....',
+    '..kGgggggggk....',
+    '...kGGgggGGk....',
+  ],
+};
+
+const PERNAS_DA_LIA = {
+  passo: [
+    '....kBBkBBk.....',
+    '...kBBk.kBBk....',
+    '..kbbBk..kbbBk..',
+    '..kkkkk..kkkkk..',
+  ],
+  juntas: [
+    '....kBBBBk......',
+    '....kBkBBk......',
+    '...kOk.kBk......',
+    '..kOOk.kbbBk....',
+    '..kkk..kkkkk....',
+  ],
+};
+
+export const LIA_ANDANDO = {
+  quadros: andando(16, [
+    { cima: [...CABECA_DA_LIA, ...CORPO_DA_LIA.bracoNaFrente], baixo: PERNAS_DA_LIA.passo, passo: true },
+    { cima: [...CABECA_DA_LIA, ...CORPO_DA_LIA.bracoNoMeio], baixo: PERNAS_DA_LIA.juntas },
+    { cima: [...CABECA_DA_LIA, ...CORPO_DA_LIA.bracoAtras], baixo: PERNAS_DA_LIA.passo, passo: true },
+    { cima: [...CABECA_DA_LIA, ...CORPO_DA_LIA.bracoNoMeio], baixo: PERNAS_DA_LIA.juntas },
+  ]),
+};
+
+const TOM_DE_LADO = [
+  '..............c.',
+  '..kk.........cCc',
+  '.kpqk.........c.',
+  '..kpqkk.......B.',
+  '...kppqpk.....b.',
+  '...kppYppkk...b.',
+  '.kPPPPPPPPPPPkb.',
+  '....kssssssk..b.',
+  '....kssssksk..b.',
+  '....kWwsssssk.b.',
+  '....kWwwwwwk..b.',
+  '...kpWwwwwwwk.b.',
+  '..kppkWwwwwk..b.',
+  '..kpppkWwwwkksbk',
+  '..kpppkkWwkppssk',
+];
+
+// o roupão esconde as pernas: só os pés aparecem embaixo
+const ROUPAO_DO_TOM = {
+  passo: [
+    '..kpppyyyyyk..b.',
+    '..kPpppppppk..b.',
+    '..kPppqppppk..b.',
+    '.kPPPppqpppPk.b.',
+    '.kPPPPPPPPPPk.B.',
+    '.kkBBkkkkBBkk.B.',
+    '..kkk....kkk..k.',
+    '................',
+  ],
+  juntas: [
+    '..kpppyyyyyk..b.',
+    '..kPpppppppk..b.',
+    '..kPppqppppk..b.',
+    '..kPPppqpppk..b.',
+    '...kPPppppPk..b.',
+    '...kPPPPPPPk..B.',
+    '....kkBBBkk...B.',
+    '.....kkkkk....k.',
+    '................',
+  ],
+};
+
+export const TOM_ANDANDO = {
+  quadros: andando(16, [
+    { cima: TOM_DE_LADO, baixo: ROUPAO_DO_TOM.passo, passo: true },
+    { cima: TOM_DE_LADO, baixo: ROUPAO_DO_TOM.juntas },
+    { cima: TOM_DE_LADO, baixo: ROUPAO_DO_TOM.passo, passo: true },
+    { cima: TOM_DE_LADO, baixo: ROUPAO_DO_TOM.juntas },
+  ]),
+};
+
+const GUARDA_DE_LADO = [
+  '..............w.',
+  '.............mwm',
+  '.......krk...kwk',
+  '......krRrk...n.',
+  '.....kkkkkkk..b.',
+  '....kwwwWwmmk.b.',
+  '...kwwwwwwwmnkb.',
+  '...knnnnnnnnnkb.',
+  '...knmmsssssk.b.',
+  '...knmmssskskkb.',
+  '...knmmsssssskb.',
+  '....kmmSSSSSk.b.',
+  '...kwwmkkkkk..b.',
+  '..kwwmmkrrrk..b.',
+  '..kmmnkrrrrrk.b.',
+  '..kmmnkrrrrrkksk',
+  '..kkkkrryyrrkssk',
+  '...kkrrryyrrk.b.',
+  '...kRrrrrrrRk.b.',
+  '...kBBBBBBBBk.b.',
+  '...kRrrrrrrRk.b.',
+];
+
+const PERNAS_DO_GUARDA = {
+  passo: [
+    '...knnkkkknk..b.',
+    '..kmnk..kmnk..b.',
+    '.kBBBk..kBBBk.B.',
+    '.kkkkk..kkkkk.B.',
+  ],
+  juntas: [
+    '...knnkkkknk..b.',
+    '....kmnkmnk...b.',
+    '....kNnkmnk...b.',
+    '...kBBkkBBBk..b.',
+    '...kkkkkkkkk..B.',
+  ],
+};
+
+export const GUARDA_ANDANDO = {
+  quadros: andando(16, [
+    { cima: GUARDA_DE_LADO, baixo: PERNAS_DO_GUARDA.passo, passo: true },
+    { cima: GUARDA_DE_LADO, baixo: PERNAS_DO_GUARDA.juntas },
+    { cima: GUARDA_DE_LADO, baixo: PERNAS_DO_GUARDA.passo, passo: true },
+    { cima: GUARDA_DE_LADO, baixo: PERNAS_DO_GUARDA.juntas },
+  ]),
+};
+
+// Enfeites das salas, desenhados dentro do fundo da cena
+export const ESTANDARTE = {
+  camadas: [
+    [
+      'kmmmmmmmmmmk',
+      'kwwwwwwwwwwk',
+      '.kRrrrrrrRk.',
+      '.kRrrrrrrRk.',
+      '.kRrrYYrrRk.',
+      '.kRryYYyrRk.',
+      '.kRrrYYrrRk.',
+      '.kRrrYYrrRk.',
+      '.kRryyyyrRk.',
+      '.kRrrYYrrRk.',
+      '.kRrrrrrrRk.',
+      '.kRrrrrrrRk.',
+      '.kRrrrrrrRk.',
+      '.kRrrRRrrRk.',
+      '.kRrRkkRrRk.',
+      '.kRRk..kRRk.',
+      '.kRk....kRk.',
+      '.kk......kk.',
+    ],
+  ],
+};
+
+export const BARRIL = {
+  camadas: [
+    [
+      '..kkkkkkkk..',
+      '.kOBBBBBBOk.',
+      'kBbbbbbbbbBk',
+      'knmmmmmmmmnk',
+      'kBbbTbbbbbBk',
+      'kBbbTbbbbbBk',
+      'kBbbbbbbbbBk',
+      'kBbbbbbbbbBk',
+      'knmmmmmmmmnk',
+      'kBbbbbbbbbBk',
+      '.kBbbbbbbBk.',
+      '..kkkkkkkk..',
+    ],
+  ],
+};
+
+export const CAIXOTE = {
+  camadas: [
+    [
+      'kkkkkkkkkkkk',
+      'kTbbbbbbbbTk',
+      'kbkbbbbbbkbk',
+      'kbbkbbbbkbbk',
+      'kbbbkbbkbbbk',
+      'kbbbbkkbbbbk',
+      'kbbbkbbkbbbk',
+      'kbbkbbbbkbbk',
+      'kbkbbbbbbkbk',
+      'kTbbbbbbbbTk',
+      'kkkkkkkkkkkk',
+    ],
+  ],
+};
+
+export const CORRENTE = {
+  camadas: [
+    ['.n.', 'n.n', '.n.', '.m.', 'm.m', '.m.', '.n.', 'n.n', '.n.', '.m.', 'm.m', '.m.', '.n.', 'nkn', 'k.k', 'nkn'],
+  ],
 };

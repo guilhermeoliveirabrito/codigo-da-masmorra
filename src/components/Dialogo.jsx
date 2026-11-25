@@ -1,8 +1,9 @@
 import { PERSONAGENS } from '../pixel/personagens';
 import { Sprite } from '../pixel/Sprite';
+import { Passos } from './Livro';
 import { TextoRico } from './TextoRico';
 
-export function Dialogo({ falas, objetivo }) {
+export function Dialogo({ falas, objetivo, passos }) {
   return (
     <div className="dialogo">
       {falas.map((fala, i) => {
@@ -20,6 +21,7 @@ export function Dialogo({ falas, objetivo }) {
       <div className="dialogo__objetivo">
         <span className="etiqueta">Objetivo</span>
         <TextoRico texto={objetivo} />
+        {passos && <Passos passos={passos} className="passos--compacto" />}
       </div>
     </div>
   );
