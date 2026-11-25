@@ -1,8 +1,11 @@
 import { ICONES } from './desenhos';
 import { PALETA } from './paleta';
 
-// junta pixels seguidos da mesma cor num rect só
+const CACHE = new WeakMap();
+
+// junta pixels seguidos da mesma cor num rect só (e guarda, já que os desenhos não mudam)
 function retangulos(linhas) {
+  if (CACHE.has(linhas)) return CACHE.get(linhas);
   const lista = [];
   linhas.forEach((linha, y) => {
     let x = 0;
@@ -14,6 +17,7 @@ function retangulos(linhas) {
       x = fim;
     }
   });
+  CACHE.set(linhas, lista);
   return lista;
 }
 

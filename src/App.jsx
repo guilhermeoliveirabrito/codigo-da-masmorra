@@ -1,10 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Cabecalho } from './components/Cabecalho';
 import { ComoJogar } from './components/ComoJogar';
 import { Livro } from './components/Livro';
 import { TelaDaFase } from './components/TelaDaFase';
 import { Transicao } from './components/Transicao';
 import { fases, proximasFases } from './fases';
+import { carregarMotorDepois } from './motor/carregarMotor';
 import { useProgresso } from './hooks/useProgresso';
 import { useTransicao } from './hooks/useTransicao';
 import { Mapa } from './telas/Mapa';
@@ -25,6 +26,8 @@ export default function App() {
   const [tela, setTela] = useState('menu');
   const [livroAberto, setLivroAberto] = useState(false);
   const [comoJogarAberto, setComoJogarAberto] = useState(false);
+
+  useEffect(carregarMotorDepois, []);
 
   const { modo, concluidas } = progresso;
   const indice = Math.min(progresso.faseAtual, fases.length - 1);

@@ -38,8 +38,15 @@ const HTML_PARA_RN = {
   a: 'Pressable',
 };
 
+// limites por tarefa: tempo, voltas de loop e elementos criados (um componente que
+// desenha ele mesmo cria elementos sem fim e pode estourar a memória antes do tempo)
+const LIMITE_EM_MS = 1500;
+const LIMITE_DE_VOLTAS = 5_000_000;
+const LIMITE_DE_ELEMENTOS = 20_000;
+
 // avisos: coisas que não quebram o código, mas provavelmente estão erradas
-export function executar(codigo, modo, avisos) {
+// aoErroEmEvento: recebe erros que acontecem dentro de um onClick/onPress do jogador
+export function executar(codigo, modo, avisos, { aoErroEmEvento } = {}) {
   const js = compilar(codigo);
 
   const modulos = { react: { ...React, default: React }, masmorra: Masmorra };
@@ -82,14 +89,72 @@ export function executar(codigo, modo, avisos) {
     '__h',
     '__Fragment',
     '__importar',
+    '__guarda',
     ...COMPONENTES_RN,
     `return (function () {\n${js}\n})();`
   );
-  return rodar(criarH(modo, avisos), React.Fragment, importar, ...marcadores);
+  // a mesma guarda vale pros loops e pros componentes que se desenham sem fim
+  const guarda = criarGuarda();
+  return rodar(criarH(modo, avisos, aoErroEmEvento, guarda), React.Fragment, importar, guarda, ...marcadores);
 }
 
-function criarH(modo, avisos) {
+// Conta tempo e quantidade desde o começo da tarefa atual; quando a tarefa termina,
+// o microtask zera. Depois de interromper uma vez, interrompe na hora: o React tenta
+// desenhar de novo quando dá erro, e cada tentativa ficaria presa até o limite.
+const MOTIVOS = {
+  loop: 'esse loop não para nunca, e o jogo precisou interromper. Confira se a condição dele fica falsa em algum momento.',
+  desenho:
+    'o componente ficou se desenhando sem parar, e o jogo precisou interromper. Isso acontece quando um componente usa ele mesmo no return, tipo <Placa /> dentro da Placa.',
+};
+const LIMITES = { loop: LIMITE_DE_VOLTAS, desenho: LIMITE_DE_ELEMENTOS };
+
+function criarGuarda() {
+  let inicio = null;
+  let contagem = { loop: 0, desenho: 0 };
+  let estourou = null;
+  const erro = (linha, motivo) => new ErroDoJogo(`Linha ${linha}: ${MOTIVOS[motivo]}`);
+
+  return function guarda(linha, motivo = 'loop') {
+    if (estourou) throw erro(linha, estourou);
+    if (inicio === null) {
+      inicio = performance.now();
+      queueMicrotask(() => {
+        inicio = null;
+        contagem = { loop: 0, desenho: 0 };
+      });
+    }
+    contagem[motivo] += 1;
+    const passouDoTempo = contagem[motivo] % 1000 === 0 && performance.now() - inicio > LIMITE_EM_MS;
+    if (contagem[motivo] > LIMITES[motivo] || passouDoTempo) {
+      estourou = motivo;
+      throw erro(linha, motivo);
+    }
+  };
+}
+
+// erro dentro de um onClick não passa pelo error boundary do React, então a gente segura aqui
+function protegerEventos(props, aoErroEmEvento) {
+  if (!aoErroEmEvento) return props;
+  let protegidas = props;
+  for (const [nome, valor] of Object.entries(props)) {
+    if (!/^on[A-Z]/.test(nome) || typeof valor !== 'function') continue;
+    if (protegidas === props) protegidas = { ...props };
+    protegidas[nome] = function (...argumentos) {
+      try {
+        return valor.apply(this, argumentos);
+      } catch (erro) {
+        aoErroEmEvento(erro);
+        return undefined;
+      }
+    };
+  }
+  return protegidas;
+}
+
+function criarH(modo, avisos, aoErroEmEvento, guarda) {
   return function h(linha, tipo, props, ...filhos) {
+    guarda(linha, 'desenho');
+
     if (tipo?.naoImportado) {
       throw new ErroDoJogo(`Linha ${linha}: ${mensagemNaoImportado(tipo.naoImportado, modo)}`);
     }
@@ -130,7 +195,7 @@ function criarH(modo, avisos) {
       if (Array.isArray(filho)) conferirKeys(filho, linha, avisos);
     }
 
-    return React.createElement(tipo, props, ...filhos);
+    return React.createElement(tipo, props && protegerEventos(props, aoErroEmEvento), ...filhos);
   };
 }
 

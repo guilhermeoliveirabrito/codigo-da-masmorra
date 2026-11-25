@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { TOCHA } from '../pixel/desenhos';
 import { PERSONAGENS } from '../pixel/personagens';
 import { Sprite } from '../pixel/Sprite';
@@ -63,6 +64,20 @@ function montarChao() {
 const PAREDE = montarParede();
 const PISO = montarChao();
 
+const ParedeEChao = memo(function ParedeEChao() {
+  return (
+    <>
+      <rect width={LARGURA} height={CHAO} fill="#262b44" />
+      {PAREDE.map((p, i) => (
+        <rect key={i} x={p.x} y={p.y} width={p.w} height={p.h} fill={p.c} />
+      ))}
+      {PISO.map((p, i) => (
+        <rect key={`c${i}`} x={p.x} y={p.y} width={p.w} height={p.h} fill={p.c} />
+      ))}
+    </>
+  );
+});
+
 export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children, fundo, className = '' }) {
   return (
     <div className={`cena ${className}`}>
@@ -82,13 +97,7 @@ export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children,
             <stop offset="1" stopColor="#181425" stopOpacity="0.7" />
           </radialGradient>
         </defs>
-        <rect width={LARGURA} height={CHAO} fill="#262b44" />
-        {PAREDE.map((p, i) => (
-          <rect key={i} x={p.x} y={p.y} width={p.w} height={p.h} fill={p.c} />
-        ))}
-        {PISO.map((p, i) => (
-          <rect key={`c${i}`} x={p.x} y={p.y} width={p.w} height={p.h} fill={p.c} />
-        ))}
+        <ParedeEChao />
         {fundo}
         {tochas.map((x) => (
           <circle key={x} cx={x + 4} cy={alturaDasTochas + 6} r={44} fill="url(#luz-da-tocha)" />

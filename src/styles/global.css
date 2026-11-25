@@ -25,6 +25,11 @@
   min-width: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -34,6 +39,20 @@ body {
 button {
   font: inherit;
   color: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* partes de jogo: nada de selecionar texto ou abrir menu de imagem ao segurar o dedo */
+button,
+.cena,
+.cabecalho,
+.abas-do-celular,
+.menu__palco,
+.transicao {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 code {
@@ -1740,6 +1759,14 @@ button.sala:active:not(:disabled) {
     font-size: 26px;
   }
 
+}
+
+/* no celular, fonte menor que 16px faz o iPhone dar zoom quando o editor ganha foco */
+@media (pointer: coarse) {
+  .editor textarea,
+  .editor__numeros {
+    font-size: 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

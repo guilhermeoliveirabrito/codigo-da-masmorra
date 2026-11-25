@@ -49,6 +49,10 @@ export function traduzirErroDeSintaxe(erro, codigo) {
   const textoDaLinha = linha ? codigo.split('\n')[linha - 1] ?? '' : '';
   let m;
 
+  if (/[“”‘’]/.test(textoDaLinha)) {
+    return `${prefixo}tem aspas curvas (“ ” ou ‘ ’) nessa linha. No JavaScript as aspas precisam ser retas: " ou '.`;
+  }
+
   if ((m = textoDaLinha.match(/\b([a-z]+)-([a-z]+)\s*:(?=\s*['"\d])/))) {
     const certo = m[1] + m[2][0].toUpperCase() + m[2].slice(1);
     return `${prefixo}no style do JSX, os nomes são escritos em camelCase: ${certo}, e não ${m[0].replace(/\s*:$/, '')}.`;
@@ -130,6 +134,12 @@ function traduzir(erro, codigo, modo) {
   }
   if (/The `style` prop expects a mapping|Minified React error #62/.test(mensagem)) {
     return "no JSX, o style recebe um objeto, e não um texto: style={{ display: 'flex' }}. São duas chaves: uma do JSX e outra do objeto.";
+  }
+  if (/Maximum call stack size exceeded|too much recursion/i.test(mensagem)) {
+    return 'uma função chamou ela mesma sem parar (ou um componente se desenhou dentro dele mesmo). Confira se ela tem um jeito de parar.';
+  }
+  if (/[“”‘’]/.test(codigo) && /Invalid or unexpected token|Unexpected character/.test(mensagem)) {
+    return 'tem aspas curvas (“ ” ou ‘ ’) no código. No JavaScript as aspas precisam ser retas: " ou \'.';
   }
   if ((m = mensagem.match(/Cannot read properties of (undefined|null) \(reading '(.+)'\)/))) {
     return `você tentou ler .${m[2]} de algo que está vazio (${m[1]}). Confira se o nome antes do ponto está certo e se ele chega mesmo no componente.`;

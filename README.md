@@ -6,6 +6,8 @@ Cada fase pode ser jogada em dois modos: Web, com tags do HTML e `onClick`, e Mo
 
 Inspirado no The Farmer Was Replaced.
 
+Jogar: https://guilhermeoliveirabrito.github.io/codigo-da-masmorra/
+
 ## Fases
 
 1. A placa da entrada: componentes e JSX
@@ -34,11 +36,13 @@ No celular, a fase fica dividida em duas abas (Missão e Código), com o botão 
 - Android: menu do Chrome, Instalar app (ou o botão Instalar no celular, no menu do jogo).
 - iPhone: no Safari, Compartilhar e Adicionar à Tela de Início.
 
-Pra publicar, ative o GitHub Pages em Settings, Pages, com a opção GitHub Actions. O workflow em `.github/workflows/deploy.yml` faz o build a cada push na `main`.
+A cada push na `main`, o workflow em `.github/workflows/deploy.yml` faz o build e coloca o resultado na branch `gh-pages`, que é a que o GitHub Pages publica.
 
 ## Como funciona
 
 O código do jogador é lido com o [acorn](https://github.com/acornjs/acorn) e o JSX vira chamadas de função (`src/motor/compilar.js`). Depois ele roda com `new Function`, recebendo o React, as peças do jogo (`import { Chama } from 'masmorra'`) e, no modo Mobile, uma imitação de `View`, `Text`, `Pressable` e `StyleSheet` feita com HTML (`src/motor/reactNative.jsx`). É essa imitação que permite checar regras do React Native, como texto fora de `<Text>`.
+
+Como o código do jogador roda na própria página, algumas proteções ficam em volta dele: loops e componentes que não param são interrompidos com uma mensagem (em vez de travar a aba), erros dentro de cliques aparecem na tela, e a página publicada tem uma Content Security Policy que não deixa o código mandar dados pra outros sites.
 
 Cada fase fica numa pasta em `src/fases`, com a cena, o texto do livro, as dicas e uma função `verificar`, que desenha o componente fora da tela e confere o resultado. Pra criar uma fase nova, dá pra copiar uma das pastas e adicionar ela em `src/fases/index.js`.
 

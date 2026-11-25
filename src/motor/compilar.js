@@ -50,7 +50,8 @@ export function compilar(codigo) {
     }
   }
 
-  for (const raiz of acharJSX(ast)) {
+  const raizesJSX = acharJSX(ast);
+  for (const raiz of raizesJSX) {
     const original = codigo.slice(raiz.start, raiz.end);
     trocas.push({
       inicio: raiz.start,
@@ -59,8 +60,12 @@ export function compilar(codigo) {
     });
   }
 
+  // cada volta de loop passa pelo __guarda, que interrompe um loop infinito em vez
+  // de travar a aba. Os loops que estão dentro de JSX entram pelo trecho().
+  trocas.push(...guardasDosLacos(ast, raizesJSX));
+
   // de trás pra frente pra não bagunçar as posições
-  trocas.sort((a, b) => b.inicio - a.inicio);
+  ordenarTrocas(trocas);
   let js = codigo;
   for (const troca of trocas) {
     js = js.slice(0, troca.inicio) + troca.texto + js.slice(troca.fim);
@@ -113,6 +118,47 @@ function gerarImport(no) {
   return partes.join(' ');
 }
 
+const LACOS = ['WhileStatement', 'DoWhileStatement', 'ForStatement', 'ForInStatement', 'ForOfStatement'];
+
+// do fim pro começo; na mesma posição, a troca de um trecho vem antes da inserção,
+// assim o que é inserido fica na frente do trecho trocado
+function ordenarTrocas(trocas) {
+  return trocas.sort((a, b) => b.inicio - a.inicio || (a.inicio === a.fim) - (b.inicio === b.fim));
+}
+
+function guardasDosLacos(raiz, raizesJSX) {
+  const dentroDeJSX = (no) => raizesJSX.some((jsx) => no.start >= jsx.start && no.end <= jsx.end);
+  const trocas = [];
+  for (const laco of acharLacos(raiz)) {
+    if (dentroDeJSX(laco)) continue;
+    const corpo = laco.body;
+    const guarda = `__guarda(${laco.loc.start.line});`;
+    if (corpo.type === 'BlockStatement') {
+      trocas.push({ inicio: corpo.start + 1, fim: corpo.start + 1, texto: guarda });
+    } else {
+      trocas.push({ inicio: corpo.start, fim: corpo.start, texto: `{ ${guarda} ` });
+      trocas.push({ inicio: corpo.end, fim: corpo.end, texto: ' }' });
+    }
+  }
+  return trocas;
+}
+
+function acharLacos(raiz) {
+  const lacos = [];
+  function visitar(no) {
+    if (!no || typeof no.type !== 'string') return;
+    if (LACOS.includes(no.type)) lacos.push(no);
+    for (const chave of Object.keys(no)) {
+      if (chave === 'loc') continue;
+      const valor = no[chave];
+      if (Array.isArray(valor)) valor.forEach(visitar);
+      else if (valor && typeof valor === 'object') visitar(valor);
+    }
+  }
+  visitar(raiz);
+  return lacos;
+}
+
 // só os JSX de fora; os de dentro são gerados junto
 function acharJSX(raiz) {
   const achados = [];
@@ -135,14 +181,16 @@ function acharJSX(raiz) {
   return achados;
 }
 
+// código de uma expressão de dentro do JSX, com o JSX interno gerado e os loops guardados
 function trecho(no, codigo) {
+  const internos = acharJSX(no);
+  const trocas = [
+    ...internos.map((j) => ({ inicio: j.start, fim: j.end, texto: gerarJSX(j, codigo) })),
+    ...guardasDosLacos(no, internos),
+  ];
   let texto = codigo.slice(no.start, no.end);
-  const internos = acharJSX(no).sort((a, b) => b.start - a.start);
-  for (const j of internos) {
-    texto =
-      texto.slice(0, j.start - no.start) +
-      gerarJSX(j, codigo) +
-      texto.slice(j.end - no.start);
+  for (const t of ordenarTrocas(trocas)) {
+    texto = texto.slice(0, t.inicio - no.start) + t.texto + texto.slice(t.fim - no.start);
   }
   return `(${texto})`;
 }

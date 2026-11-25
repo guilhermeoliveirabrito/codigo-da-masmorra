@@ -1,11 +1,36 @@
-import { useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 
 // símbolos chatos de achar no teclado do celular
 const SIMBOLOS = ['<', '>', '/', '{', '}', '(', ')', '=', '"', "'", ';', '.'];
 
+// O teclado do iPhone troca aspas retas por curvas, ... por … e -- por —,
+// e nada disso funciona em código. Desfaz as trocas enquanto a pessoa digita.
+const TROCAS_DO_TECLADO = [
+  [/[“”„‟]/g, '"'],
+  [/[‘’‚‛]/g, "'"],
+  [/…/g, '...'],
+  [/—/g, '--'],
+  [/–/g, '-'],
+  [/\u00a0/g, ' '],
+];
+
+function desfazerTrocasDoTeclado(texto) {
+  return TROCAS_DO_TECLADO.reduce((atual, [padrao, certo]) => atual.replace(padrao, certo), texto);
+}
+
 export function Editor({ valor, aoMudar, aoRodar }) {
   const areaRef = useRef(null);
   const numerosRef = useRef(null);
+  const cursorPendenteRef = useRef(null);
+
+  // quando o texto é corrigido, o navegador joga o cursor pro fim; volta ele pro lugar
+  // antes da próxima tecla
+  useLayoutEffect(() => {
+    if (cursorPendenteRef.current === null) return;
+    const area = areaRef.current;
+    area.selectionStart = area.selectionEnd = cursorPendenteRef.current;
+    cursorPendenteRef.current = null;
+  });
   const totalDeLinhas = valor.split('\n').length;
 
   function inserir(texto) {
@@ -19,6 +44,19 @@ export function Editor({ valor, aoMudar, aoRodar }) {
         area.selectionStart = area.selectionEnd = inicio + texto.length;
       });
     }
+  }
+
+  function aoDigitar(evento) {
+    const area = evento.target;
+    const texto = area.value;
+    const corrigido = desfazerTrocasDoTeclado(texto);
+    if (corrigido === texto) {
+      aoMudar(texto);
+      return;
+    }
+    // o cursor anda junto com o que mudou de tamanho antes dele
+    cursorPendenteRef.current = desfazerTrocasDoTeclado(texto.slice(0, area.selectionStart)).length;
+    aoMudar(corrigido);
   }
 
   function aoApertarTecla(evento) {
@@ -57,7 +95,7 @@ export function Editor({ valor, aoMudar, aoRodar }) {
         <textarea
           ref={areaRef}
           value={valor}
-          onChange={(evento) => aoMudar(evento.target.value)}
+          onChange={aoDigitar}
           onKeyDown={aoApertarTecla}
           onScroll={(evento) => {
             numerosRef.current.scrollTop = evento.currentTarget.scrollTop;
@@ -66,6 +104,7 @@ export function Editor({ valor, aoMudar, aoRodar }) {
           autoCapitalize="off"
           autoComplete="off"
           autoCorrect="off"
+          enterKeyHint="enter"
           wrap="off"
           aria-label="Editor de código"
         />

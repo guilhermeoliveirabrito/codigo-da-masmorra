@@ -4,6 +4,9 @@ import App from './App';
 import { Seguro } from './components/Seguro';
 import './styles/global.css';
 
+// no iPhone, o :active dos botões só funciona se a página escutar toques
+document.addEventListener('touchstart', () => {}, { passive: true });
+
 // erros do código do jogador já aparecem na tela, não precisam ir pro console
 function aoCapturarErro(erro, info) {
   if (!(info.errorBoundary instanceof Seguro)) console.error(erro);
@@ -16,7 +19,7 @@ createRoot(document.getElementById('root'), { onCaughtError: aoCapturarErro }).r
 );
 
 // deixa o jogo instalável e abrindo sem internet (só no build publicado)
-if (import.meta.env?.PROD && 'serviceWorker' in navigator && window.top === window.self) {
+if (import.meta.env.PROD && 'serviceWorker' in navigator && window.top === window.self) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });

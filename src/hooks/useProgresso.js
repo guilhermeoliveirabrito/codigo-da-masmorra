@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const CHAVE = 'codigo-da-masmorra:progresso:v1';
+const TAMANHO_MAXIMO_DO_CODIGO = 50_000;
 
 const INICIAL = {
   modo: 'web',
@@ -10,55 +11,87 @@ const INICIAL = {
   livrosVistos: [], // páginas do livro que já abriram sozinhas no começo da fase
 };
 
+const listaDeTextos = (valor) => (Array.isArray(valor) ? valor.filter((item) => typeof item === 'string') : []);
+
+// o que vem do localStorage pode estar velho ou mexido: só aproveita o que tem o formato certo
+function validar(dados) {
+  if (!dados || typeof dados !== 'object') return INICIAL;
+  const codigos = {};
+  if (dados.codigos && typeof dados.codigos === 'object') {
+    for (const [chave, codigo] of Object.entries(dados.codigos)) {
+      if (typeof codigo === 'string' && codigo.length <= TAMANHO_MAXIMO_DO_CODIGO) codigos[chave] = codigo;
+    }
+  }
+  return {
+    modo: dados.modo === 'mobile' ? 'mobile' : 'web',
+    faseAtual: Number.isInteger(dados.faseAtual) && dados.faseAtual >= 0 ? dados.faseAtual : 0,
+    codigos,
+    concluidas: { web: listaDeTextos(dados.concluidas?.web), mobile: listaDeTextos(dados.concluidas?.mobile) },
+    livrosVistos: listaDeTextos(dados.livrosVistos),
+  };
+}
+
 // localStorage pode falhar (aba anônima, navegador bloqueando)
 function ler() {
   try {
     const salvo = localStorage.getItem(CHAVE);
-    if (!salvo) return INICIAL;
-    const dados = JSON.parse(salvo);
-    return { ...INICIAL, ...dados, concluidas: { ...INICIAL.concluidas, ...dados.concluidas } };
+    return salvo ? validar(JSON.parse(salvo)) : INICIAL;
   } catch {
     return INICIAL;
+  }
+}
+
+function salvar(progresso) {
+  try {
+    localStorage.setItem(CHAVE, JSON.stringify(progresso));
+  } catch {
+    // sem localStorage o jogo só não lembra o progresso
   }
 }
 
 export function useProgresso() {
   const [progresso, setProgresso] = useState(ler);
 
+  // salva um pouco depois da última mudança (não a cada tecla), e na hora se o app for fechado
   useEffect(() => {
-    try {
-      localStorage.setItem(CHAVE, JSON.stringify(progresso));
-    } catch {
-      // sem localStorage o jogo só não lembra o progresso
-    }
+    const espera = setTimeout(() => salvar(progresso), 400);
+    const aoEsconder = () => {
+      if (document.visibilityState === 'hidden') salvar(progresso);
+    };
+    const aoSair = () => salvar(progresso);
+    document.addEventListener('visibilitychange', aoEsconder);
+    window.addEventListener('pagehide', aoSair);
+    return () => {
+      clearTimeout(espera);
+      document.removeEventListener('visibilitychange', aoEsconder);
+      window.removeEventListener('pagehide', aoSair);
+    };
   }, [progresso]);
 
-  function atualizar(mudanca) {
-    setProgresso((atual) => ({ ...atual, ...mudanca(atual) }));
-  }
+  // as funções não mudam entre renders, então quem recebe elas não redesenha à toa
+  const acoes = useMemo(() => {
+    const atualizar = (mudanca) => setProgresso((atual) => ({ ...atual, ...mudanca(atual) }));
+    return {
+      irParaFase: (indice) => atualizar(() => ({ faseAtual: indice })),
+      trocarModo: (modo, faseAtual) => atualizar(() => ({ modo, faseAtual })),
+      salvarCodigo: (chave, codigo) => atualizar((atual) => ({ codigos: { ...atual.codigos, [chave]: codigo } })),
+      apagarCodigo: (chave) =>
+        atualizar((atual) => {
+          const codigos = { ...atual.codigos };
+          delete codigos[chave];
+          return { codigos };
+        }),
+      concluirFase: (id, modo) =>
+        atualizar((atual) => {
+          const lista = atual.concluidas[modo];
+          if (lista.includes(id)) return {};
+          return { concluidas: { ...atual.concluidas, [modo]: [...lista, id] } };
+        }),
+      apagarTudo: () => setProgresso((atual) => ({ ...INICIAL, modo: atual.modo })),
+      marcarLivroVisto: (id) =>
+        atualizar((atual) => (atual.livrosVistos.includes(id) ? {} : { livrosVistos: [...atual.livrosVistos, id] })),
+    };
+  }, []);
 
-  return {
-    progresso,
-    irParaFase: (indice) => atualizar(() => ({ faseAtual: indice })),
-    trocarModo: (modo, faseAtual) => atualizar(() => ({ modo, faseAtual })),
-    salvarCodigo: (chave, codigo) =>
-      atualizar((atual) => ({ codigos: { ...atual.codigos, [chave]: codigo } })),
-    apagarCodigo: (chave) =>
-      atualizar((atual) => {
-        const codigos = { ...atual.codigos };
-        delete codigos[chave];
-        return { codigos };
-      }),
-    concluirFase: (id, modo) =>
-      atualizar((atual) => {
-        const lista = atual.concluidas[modo];
-        if (lista.includes(id)) return {};
-        return { concluidas: { ...atual.concluidas, [modo]: [...lista, id] } };
-      }),
-    apagarTudo: () => setProgresso({ ...INICIAL, modo: progresso.modo }),
-    marcarLivroVisto: (id) =>
-      atualizar((atual) =>
-        atual.livrosVistos.includes(id) ? {} : { livrosVistos: [...atual.livrosVistos, id] }
-      ),
-  };
+  return { progresso, ...acoes };
 }
