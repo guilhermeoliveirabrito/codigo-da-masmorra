@@ -90,6 +90,8 @@ export function useConversa(elenco) {
     [dizer, elenco]
   );
 
-  const valor = useMemo(() => ({ fala, cutucar }), [fala, cutucar]);
+  const calar = useCallback((quem) => setFala((atual) => (atual?.quem === quem ? null : atual)), []);
+
+  const valor = useMemo(() => ({ fala, cutucar, calar }), [fala, cutucar, calar]);
   return { valor, reagir };
 }

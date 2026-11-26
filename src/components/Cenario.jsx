@@ -247,6 +247,17 @@ export function Personagem({
   const [movimento, setMovimento] = useState(null); // null, 'direita' ou 'esquerda'
   const conversa = useContext(ContextoDaConversa);
   const falaDaConversa = conversa?.fala?.quem === quem ? conversa.fala : null;
+  // um fala de cada vez: se outro está conversando, a fala fixa espera
+  const outroFalando = Boolean(conversa?.fala) && !falaDaConversa;
+
+  // quem sai andando para de conversar (o balão trocaria de lado no meio do caminho)
+  const xDaConversa = useRef(x);
+  const calar = conversa?.calar;
+  useLayoutEffect(() => {
+    if (xDaConversa.current === x) return;
+    xDaConversa.current = x;
+    calar?.(quem);
+  }, [x, quem, calar]);
 
   // lembra de onde ele veio, pra saber quanto tempo o passo leva e pra que lado virar
   const [rastro, setRastro] = useState({ x, tempo: 0, para: 'direita' });
@@ -309,6 +320,8 @@ export function Personagem({
   const distanciaDaSaida = LARGURA - x + 4;
   const estilo = {
     ...posicao(x, y, largura, altura),
+    // a ponta do balão mira aqui
+    '--meio': emCqw(largura / 2),
     '--tempo-de-andar': `${rastro.tempo.toFixed(2)}s`,
     '--entrada-de': entrada === 'direita' ? emCqw(distanciaDaEntrada) : `-${emCqw(distanciaDaEntrada)}`,
     '--tempo-de-entrada': `${(distanciaDaEntrada / velocidade).toFixed(2)}s`,
@@ -336,7 +349,7 @@ export function Personagem({
           {falaDaConversa.texto}
         </span>
       ) : (
-        fala && <span className={`balao balao--${lado}`}>{fala}</span>
+        fala && !outroFalando && <span className={`balao balao--${lado}`}>{fala}</span>
       )}
       {conversa ? (
         <button type="button" className="personagem__botao" aria-label={`Conversar com ${nome}`} onClick={() => conversa.cutucar(quem)}>
