@@ -35,8 +35,7 @@ export function tamanhoDoDesenho(desenho) {
 }
 
 // recorte = [x, y, largura, altura]
-// Desenhos com "quadros" viram animação: o CSS mostra um quadro de cada vez.
-// "piscada" é uma camada que aparece um instante de vez em quando, por cima dos olhos.
+// quadros: o css mostra um de cada vez | piscada: camada dos olhos fechados
 export function Sprite({ desenho, recorte, className = '', style, titulo, ...resto }) {
   const { largura, altura } = tamanhoDoDesenho(desenho);
   const viewBox = (recorte ?? [0, 0, largura, altura]).join(' ');

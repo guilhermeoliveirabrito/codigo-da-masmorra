@@ -410,6 +410,57 @@ pre {
   gap: 16px;
 }
 
+.menu__placar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+}
+
+.menu__estrelas {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 15px/1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.menu__estrelas .icone {
+  width: 14px;
+  height: 14px;
+}
+
+.menu__som {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--breu);
+  color: var(--osso);
+  background: rgba(24, 20, 37, 0.7);
+  cursor: pointer;
+}
+
+.menu__som .icone {
+  width: 20px;
+  height: 18px;
+}
+
+.menu__som:focus-visible {
+  outline: 2px solid var(--ouro);
+  outline-offset: 2px;
+}
+
+.cabecalho__som .icone {
+  width: 18px;
+  height: 16px;
+}
+
 .menu__link {
   padding: 4px 0;
   border: 0;
@@ -531,6 +582,22 @@ button.sala:active:not(:disabled) {
 .sala__texto strong {
   font: 700 19px/1.15 var(--fonte-pixel);
   color: var(--osso);
+}
+
+.sala__estrelas {
+  display: flex;
+  gap: 3px;
+  margin-top: 2px;
+  color: var(--pedra);
+}
+
+.sala__estrelas .icone {
+  width: 13px;
+  height: 13px;
+}
+
+.sala__estrelas .estrela--ganha {
+  color: var(--ouro);
 }
 
 .sala__selos {
@@ -858,6 +925,171 @@ button.sala:active:not(:disabled) {
   animation: aparecer 0.3s steps(3) 1s both;
 }
 
+.desastre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 100vh;
+  padding: 24px;
+  text-align: center;
+}
+
+.desastre h1 {
+  margin: 0;
+  font: 700 32px/1.1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+/* Aviso de conquista */
+.aviso {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(380px, calc(100vw - 24px));
+  padding: 12px 14px;
+  color: var(--osso);
+  background: var(--pedra-escura);
+  border: 2px solid var(--ouro);
+  box-shadow:
+    0 0 0 2px var(--breu),
+    4px 4px 0 2px var(--breu);
+  transform: translateX(-50%);
+  animation:
+    aviso-desce 0.35s steps(4),
+    aviso-sobe 0.35s steps(4) 3.25s forwards;
+  pointer-events: none;
+}
+
+@keyframes aviso-desce {
+  from { translate: 0 -150%; }
+}
+
+@keyframes aviso-sobe {
+  to { translate: 0 -150%; }
+}
+
+.aviso__trofeu {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  color: var(--ouro);
+}
+
+.aviso__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+  color: var(--neblina);
+}
+
+.aviso__rotulo {
+  font: 600 13px/1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.aviso__texto strong {
+  font: 700 18px/1.1 var(--fonte-pixel);
+  color: var(--osso);
+}
+
+/* Lista de conquistas */
+.conquistas {
+  width: min(560px, 100%);
+  padding: 20px;
+}
+
+.conquistas__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.conquistas__topo h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font: 700 24px/1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.conquistas__topo h2 span {
+  font-size: 15px;
+  color: var(--neblina);
+}
+
+.conquistas__lista {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.conquista {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  color: var(--pedra-clara);
+  background: var(--breu);
+}
+
+.conquista .icone {
+  width: 24px;
+  height: 24px;
+}
+
+.conquista div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+}
+
+.conquista strong {
+  font: 600 16px/1.2 var(--fonte-pixel);
+}
+
+.conquista--ganha {
+  color: var(--neblina);
+}
+
+.conquista--ganha .icone {
+  color: var(--ouro);
+}
+
+.conquista--ganha strong {
+  color: var(--osso);
+}
+
+/* comentário do personagem embaixo do resultado (só no celular) */
+.resultado__reacao {
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(139, 155, 180, 0.3);
+  font-size: 15px;
+}
+
+.resultado__reacao .sprite {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  background: var(--breu);
+}
+
 /* Como jogar */
 .como-jogar {
   width: min(560px, 100%);
@@ -1083,6 +1315,343 @@ button.sala:active:not(:disabled) {
   clip-path: polygon(14% 0, 86% 0, 100% 50%, 86% 100%, 14% 100%, 0 50%);
 }
 
+/* clicar num personagem puxa conversa */
+.personagem__botao {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.personagem__botao:focus-visible {
+  outline: 2px solid var(--ouro);
+  outline-offset: 2px;
+}
+
+.balao--conversa {
+  max-width: 42cqw;
+  line-height: 1.2;
+  animation: balao-pula 0.3s steps(3);
+}
+
+@keyframes balao-pula {
+  0% {
+    opacity: 0;
+    translate: 0 6px;
+  }
+  60% {
+    translate: 0 -2px;
+  }
+}
+
+/* deu certo: todo mundo dá uns pulinhos e volta a respirar */
+.jogo__mundo--festa .personagem:not(.personagem--anda) .personagem__sprite {
+  animation:
+    pulinho 0.4s steps(3) 3,
+    respirar 1.4s steps(1) 1.2s infinite;
+}
+
+@keyframes pulinho {
+  50% { transform: translateY(-14%); }
+}
+
+/* herói atacando o Guardião: dá um passo pra frente (vale até no meio da festa) */
+.personagem--golpe .personagem__sprite,
+.jogo__mundo--festa .personagem.personagem--golpe .personagem__sprite {
+  animation: golpe 0.32s steps(3);
+}
+
+@keyframes golpe {
+  50% { transform: translateX(30%); }
+}
+
+/* o gato que passeia de vez em quando */
+.gato {
+  position: absolute;
+  z-index: 5;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  animation: gato-anda 7s linear both;
+}
+
+.gato--para-esquerda {
+  animation-name: gato-volta;
+}
+
+.gato__sprite {
+  --ritmo: 0.44s;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.gato--para-esquerda .gato__sprite {
+  scale: -1 1;
+}
+
+@keyframes gato-anda {
+  from { transform: translateX(-10cqw); }
+  to { transform: translateX(104cqw); }
+}
+
+@keyframes gato-volta {
+  from { transform: translateX(104cqw); }
+  to { transform: translateX(-10cqw); }
+}
+
+.gato__coracao {
+  position: absolute;
+  bottom: 100%;
+  left: 30%;
+  width: 3.4cqw;
+  height: 3cqw;
+  color: var(--fogo);
+  animation: coracao 1.3s steps(8) both;
+}
+
+@keyframes coracao {
+  0% {
+    opacity: 0;
+    translate: 0 1cqw;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -5cqw;
+  }
+}
+
+/* Fase 8: a grade, a gosma e a ampulheta */
+.grade {
+  position: absolute;
+  z-index: 4;
+}
+
+.grade__barras {
+  transition: transform 0.5s steps(5);
+}
+
+.gosma {
+  position: absolute;
+  z-index: 3;
+  --ritmo: 0.7s;
+  transition: left 0.6s steps(6);
+}
+
+.gosma--blop {
+  animation: gosma-blop 0.5s steps(4);
+}
+
+@keyframes gosma-blop {
+  30% { scale: 1.25 0.75; }
+  60% { scale: 0.9 1.1; }
+}
+
+.blop {
+  position: absolute;
+  z-index: 6;
+  font: 700 clamp(10px, 3.2cqw, 20px) / 1 var(--fonte-pixel);
+  color: var(--musgo);
+  text-shadow: 2px 2px 0 var(--breu);
+  animation: blop 0.9s steps(6) both;
+  pointer-events: none;
+}
+
+@keyframes blop {
+  0% {
+    opacity: 0;
+    scale: 0.5;
+  }
+  20% {
+    opacity: 1;
+    scale: 1.2;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -6cqw;
+  }
+}
+
+.ampulheta {
+  position: absolute;
+  z-index: 2;
+  --ritmo: 1s;
+}
+
+.ampulheta__tela {
+  color: var(--osso);
+}
+
+/* Fase 9: o pergaminho e o corvo */
+.pergaminho {
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 1cqw 2cqw;
+  overflow: hidden;
+  text-align: left;
+  color: #3e2731;
+  font: 600 clamp(9px, 2.6cqw, 15px) / 1.25 var(--fonte-pixel);
+}
+
+.pergaminho ul,
+.pergaminho ol {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.pergaminho li {
+  margin: 0.15em 0;
+}
+
+.corvo {
+  position: absolute;
+  z-index: 3;
+  --ritmo: 0.24s;
+}
+
+.corvo--saindo {
+  animation: corvo-sai 0.7s steps(7) both;
+}
+
+.corvo--voltando {
+  animation: corvo-volta 0.65s steps(7) both;
+}
+
+@keyframes corvo-sai {
+  to {
+    opacity: 0;
+    transform: translate(5cqw, -9cqw) scale(0.4);
+  }
+}
+
+@keyframes corvo-volta {
+  from {
+    opacity: 0;
+    transform: translate(5cqw, -9cqw) scale(0.4);
+  }
+  to {
+    transform: translate(2cqw, 7.8cqw);
+  }
+}
+
+/* Fase 10: o Guardião */
+.batalha {
+  flex-direction: column;
+  gap: 0.4em;
+  color: #fff;
+  font: 600 clamp(9px, 2.7cqw, 16px) / 1.2 var(--fonte-pixel);
+}
+
+.energia {
+  position: absolute;
+  z-index: 4;
+  background: var(--breu);
+  box-shadow: 0 0 0 2px var(--breu);
+}
+
+.energia__barra {
+  display: block;
+  height: 100%;
+  background: linear-gradient(#e43b44 0 50%, #a22633 50%);
+  transition: width 0.3s steps(4);
+}
+
+.dragao {
+  position: absolute;
+  z-index: 2;
+  animation: dragao-respira 1.6s steps(1) infinite;
+}
+
+@keyframes dragao-respira {
+  50% { translate: 0 0.6cqw; }
+}
+
+.dragao--atingido {
+  animation:
+    dragao-apanha 0.4s steps(4),
+    dragao-respira 1.6s steps(1) 0.4s infinite;
+}
+
+@keyframes dragao-apanha {
+  0%, 50% {
+    filter: brightness(2.2);
+    translate: 1cqw 0;
+  }
+  25%, 75% {
+    translate: -1cqw 0;
+  }
+}
+
+.dragao--dormindo {
+  animation: dragao-dorme 3s steps(2) infinite;
+}
+
+@keyframes dragao-dorme {
+  50% { translate: 0 1cqw; }
+}
+
+.dano {
+  position: absolute;
+  z-index: 6;
+  font: 700 clamp(11px, 3.6cqw, 22px) / 1 var(--fonte-pixel);
+  color: #fee761;
+  text-shadow: 2px 2px 0 var(--breu);
+  animation: dano 0.9s steps(6) both;
+  pointer-events: none;
+}
+
+@keyframes dano {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -8cqw;
+  }
+}
+
+.zzz {
+  position: absolute;
+  z-index: 6;
+  font: 700 clamp(10px, 3cqw, 18px) / 1 var(--fonte-pixel);
+  color: var(--osso);
+  animation: zzz 1.8s steps(8) infinite both;
+  pointer-events: none;
+}
+
+@keyframes zzz {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    translate: 4cqw -8cqw;
+  }
+}
+
+.tesouro {
+  position: absolute;
+  z-index: 3;
+  animation: aparecer 0.4s steps(4) 0.6s both;
+}
+
 /* passou por uma porta: some quando chega */
 .personagem--some {
   opacity: 0;
@@ -1177,8 +1746,9 @@ button.sala:active:not(:disabled) {
   bottom: calc(100% + 2.4cqw);
   z-index: 4;
   padding: 0.45em 0.6em 0.35em;
-  font: 600 clamp(10px, 2.8cqw, 16px) / 1.1 var(--fonte-pixel);
-  white-space: nowrap;
+  width: max-content;
+  max-width: 52cqw;
+  font: 600 clamp(10px, 2.8cqw, 16px) / 1.15 var(--fonte-pixel);
   color: var(--breu);
   background: var(--osso);
   box-shadow: 0 0 0 2px var(--breu);
@@ -2296,6 +2866,40 @@ button.sala:active:not(:disabled) {
   margin: 0 auto;
 }
 
+.demo__ampulheta {
+  width: 36px;
+  height: 36px;
+  --ritmo: 1s;
+}
+
+.demo__contador {
+  font: 600 16px/1.2 var(--fonte-pixel);
+  color: var(--osso);
+}
+
+.demo__contador--ruim {
+  color: #f6757a;
+}
+
+.demo__carregando {
+  font-family: var(--fonte-codigo);
+  color: var(--neblina);
+}
+
+.demo__resultado--lista {
+  justify-content: flex-start;
+}
+
+.demo__tarefas {
+  margin: 0;
+  padding-left: 1.2em;
+  text-align: left;
+}
+
+.demo__resultado--treino {
+  flex-direction: column;
+}
+
 .demo__trecho {
   opacity: 0.35;
 }
@@ -2477,9 +3081,71 @@ button.sala:active:not(:disabled) {
 }
 
 .vitoria h2 {
-  margin: 14px 0 18px;
+  margin: 14px 0 10px;
   font: 700 28px/1.1 var(--fonte-pixel);
   color: var(--ouro);
+  text-wrap: balance;
+}
+
+/* estrelas: acendem uma de cada vez depois que o baú abre */
+.vitoria__estrelas {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.estrela {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  color: var(--pedra);
+}
+
+.estrela .icone {
+  width: 100%;
+  height: 100%;
+}
+
+.estrela--ganha {
+  color: var(--ouro);
+  animation: estrela-acende 0.4s steps(4) both;
+}
+
+@keyframes estrela-acende {
+  0% { color: var(--pedra); scale: 1; }
+  50% { color: #fee761; scale: 1.35; }
+  100% { color: var(--ouro); scale: 1; }
+}
+
+.vitoria__criterios {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  color: var(--neblina);
+}
+
+.vitoria__criterios li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vitoria__criterios .icone {
+  width: 12px;
+  height: 12px;
+}
+
+.vitoria__criterios .criterio--feito {
+  color: var(--osso);
+}
+
+.vitoria__criterios .criterio--feito .icone {
+  color: var(--musgo);
 }
 
 .vitoria__aprendeu {
@@ -2538,6 +3204,19 @@ button.sala:active:not(:disabled) {
 
   span.so-celular {
     display: inline;
+  }
+
+  .resultado__reacao.so-celular {
+    display: flex;
+  }
+
+  /* no celular o título ocupa a largura toda: o som vai pro canto de baixo */
+  .menu__som {
+    top: auto;
+    bottom: 8px;
+    right: 8px;
+    width: 38px;
+    height: 38px;
   }
 
   .modal {

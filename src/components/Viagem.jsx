@@ -1,10 +1,10 @@
 import { memo, useEffect } from 'react';
 import { LIA_ANDANDO, TOCHA, TOM_ANDANDO } from '../pixel/desenhos';
 import { NoFundo, Sprite } from '../pixel/Sprite';
+import { tocar } from '../som';
 import { ALTURA, LARGURA, Retangulos, montarChao, montarParede, posicao } from './Cenario';
 
-// O corredor entre uma sala e outra. A parede é desenhada um pouco mais larga que a tela
-// e se repete a cada PERIODO pixels, então dá pra rolar sem emenda (é a câmera seguindo a Lia).
+// corredor entre as salas: a parede se repete a cada PERIODO pixels, então dá pra rolar sem emenda
 const PERIODO = 96;
 const PAREDE = montarParede(LARGURA + PERIODO, PERIODO);
 const PISO = montarChao(LARGURA + PERIODO);
@@ -94,6 +94,11 @@ export function Viagem({ transicao, aoPular }) {
     window.addEventListener('keydown', aoApertarTecla);
     return () => window.removeEventListener('keydown', aoApertarTecla);
   }, [ativa, aoPular]);
+
+  const cobrindo = transicao?.etapa === 'cobrindo';
+  useEffect(() => {
+    if (cobrindo) tocar('viagem');
+  }, [cobrindo]);
 
   if (!transicao) return null;
   const { etapa, destino } = transicao;

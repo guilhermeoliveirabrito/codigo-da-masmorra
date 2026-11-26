@@ -1,3 +1,5 @@
+import { PERSONAGENS } from '../pixel/personagens';
+import { Sprite } from '../pixel/Sprite';
 import { TextoRico } from './TextoRico';
 
 const TITULOS = { ok: 'Funcionou', quase: 'Quase lá', erro: 'Erro' };
@@ -16,7 +18,7 @@ export function Resultado({ resultado }) {
     );
   }
 
-  const { tipo, mensagem, avisos = [] } = resultado;
+  const { tipo, mensagem, avisos = [], reacao } = resultado;
   const outrosAvisos = avisos.filter((aviso) => !mensagem.includes(aviso));
 
   return (
@@ -29,6 +31,15 @@ export function Resultado({ resultado }) {
             <li key={aviso}>{aviso}</li>
           ))}
         </ul>
+      )}
+      {/* no celular a cena fica em outra aba, então o comentário do personagem aparece aqui */}
+      {reacao && (
+        <p className="resultado__reacao so-celular">
+          <Sprite desenho={PERSONAGENS[reacao.quem].desenho} recorte={PERSONAGENS[reacao.quem].desenho.rosto} />
+          <span>
+            <strong>{PERSONAGENS[reacao.quem].nome}:</strong> {reacao.texto}
+          </span>
+        </p>
       )}
     </div>
   );

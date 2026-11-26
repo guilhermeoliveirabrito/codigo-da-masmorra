@@ -1,7 +1,11 @@
-import { memo, useLayoutEffect, useRef, useState } from 'react';
-import { TOCHA } from '../pixel/desenhos';
+import { memo, useContext, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { conquistar } from '../conquistas';
+import { ContextoDaConversa } from '../conversa';
+import { semAnimacao } from '../hooks/useTransicao';
+import { GATO, TOCHA } from '../pixel/desenhos';
 import { PERSONAGENS } from '../pixel/personagens';
 import { Sprite, tamanhoDoDesenho } from '../pixel/Sprite';
+import { tocar } from '../som';
 import { Seguro } from './Seguro';
 
 // 192 x 108 pixels de jogo, esticados pra largura da tela
@@ -168,17 +172,60 @@ export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children,
       <Brasas tochas={tochas} altura={alturaDasTochas} />
 
       {children}
+      <Gato />
 
       {modo && <span className="cena__modo">{modo === 'web' ? 'Modo Web' : 'Modo Mobile'}</span>}
     </div>
   );
 }
 
-// Um personagem da cena. Quando o x muda ele anda até lá, de lado e no ritmo dos passos.
-// entrada: 'esquerda' ou 'direita', de onde ele chega andando quando a cena abre
-// viajante: sai andando pela direita quando o jogador vai pra próxima fase
-// some: some na hora que chega (passou por uma porta, por exemplo)
-// children: o que o personagem carrega junto (o crachá da fase 2)
+// De vez em quando um gato atravessa a sala. Quem clicar nele ganha um amigo.
+function Gato() {
+  const [passeio, setPasseio] = useState(null);
+  const [carinho, setCarinho] = useState(false);
+
+  useEffect(() => {
+    let espera;
+    const agendar = (ms) => {
+      espera = setTimeout(() => {
+        if (!document.hidden && !semAnimacao()) {
+          setCarinho(false);
+          setPasseio({ id: Date.now(), para: Math.random() < 0.5 ? 'direita' : 'esquerda' });
+        }
+        agendar(35_000 + Math.random() * 40_000);
+      }, ms);
+    };
+    agendar(18_000 + Math.random() * 27_000);
+    return () => clearTimeout(espera);
+  }, []);
+
+  if (!passeio) return null;
+  return (
+    <button
+      key={passeio.id}
+      type="button"
+      className={`gato gato--para-${passeio.para}`}
+      style={posicao(0, 89, 15, 10)}
+      aria-label="Gato"
+      onAnimationEnd={(evento) => evento.target === evento.currentTarget && setPasseio(null)}
+      onClick={() => {
+        tocar('miau');
+        setCarinho(true);
+        conquistar('gato');
+      }}
+    >
+      <Sprite desenho={GATO} className="gato__sprite" />
+      {carinho && <span className="gato__coracao" />}
+    </button>
+  );
+}
+
+// o balão da conversa é largo: abre pro lado que tem espaço
+const ladoDaConversa = (x) => (x < 56 ? 'esquerda' : x > 120 ? 'direita' : 'centro');
+
+// quando o x muda, o personagem anda até lá
+// entrada: de que lado ele chega | viajante: sai pela direita na troca de fase
+// some: desaparece quando chega (entrou numa porta)
 export function Personagem({
   quem,
   x,
@@ -198,6 +245,8 @@ export function Personagem({
   const { largura, altura } = tamanhoDoDesenho(desenho);
   const ref = useRef(null);
   const [movimento, setMovimento] = useState(null); // null, 'direita' ou 'esquerda'
+  const conversa = useContext(ContextoDaConversa);
+  const falaDaConversa = conversa?.fala?.quem === quem ? conversa.fala : null;
 
   // lembra de onde ele veio, pra saber quanto tempo o passo leva e pra que lado virar
   const [rastro, setRastro] = useState({ x, tempo: 0, para: 'direita' });
@@ -282,8 +331,20 @@ export function Personagem({
   return (
     <div ref={ref} className={classes.filter(Boolean).join(' ')} style={estilo} data-entrada={entrada}>
       <span className="personagem__sombra" />
-      {fala && <span className={`balao balao--${lado}`}>{fala}</span>}
-      <Sprite desenho={movimento && andando ? andando : desenho} titulo={nome} className="personagem__sprite" />
+      {falaDaConversa ? (
+        <span key={falaDaConversa.id} className={`balao balao--${ladoDaConversa(x)} balao--conversa`}>
+          {falaDaConversa.texto}
+        </span>
+      ) : (
+        fala && <span className={`balao balao--${lado}`}>{fala}</span>
+      )}
+      {conversa ? (
+        <button type="button" className="personagem__botao" aria-label={`Conversar com ${nome}`} onClick={() => conversa.cutucar(quem)}>
+          <Sprite desenho={movimento && andando ? andando : desenho} className="personagem__sprite" />
+        </button>
+      ) : (
+        <Sprite desenho={movimento && andando ? andando : desenho} titulo={nome} className="personagem__sprite" />
+      )}
       {children}
     </div>
   );

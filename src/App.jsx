@@ -1,15 +1,18 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Cabecalho } from './components/Cabecalho';
 import { ComoJogar } from './components/ComoJogar';
+import { AvisoDeConquista, ListaDeConquistas } from './components/Conquistas';
 import { Livro } from './components/Livro';
 import { TelaDaFase } from './components/TelaDaFase';
 import { Transicao } from './components/Transicao';
 import { Viagem } from './components/Viagem';
+import { CONQUISTAS, conquistar, ouvirConquistas } from './conquistas';
 import { fases, proximasFases } from './fases';
 import { carregarMotorDepois } from './motor/carregarMotor';
 import { useProgresso } from './hooks/useProgresso';
 import { semAnimacao, useTransicao } from './hooks/useTransicao';
 import { Mapa } from './telas/Mapa';
+import { ligarSom, tocar } from './som';
 import { Menu } from './telas/Menu';
 
 // tempo pros personagens entrarem na sala antes do livro abrir sozinho
@@ -24,6 +27,9 @@ export default function App() {
     apagarCodigo,
     concluirFase,
     marcarLivroVisto,
+    darEstrelas,
+    ganharConquista,
+    alternarSom,
     apagarTudo,
   } = useProgresso();
   const { transicao, navegar, viajar, pular } = useTransicao();
@@ -31,8 +37,45 @@ export default function App() {
   const [livroAberto, setLivroAberto] = useState(false);
   const [comoJogarAberto, setComoJogarAberto] = useState(false);
   const [faseApresentada, setFaseApresentada] = useState(null);
+  const [conquistasAbertas, setConquistasAbertas] = useState(false);
+  const [avisos, setAvisos] = useState([]);
+  const progressoRef = useRef(progresso);
+  const avisadasRef = useRef(new Set());
+
+  useLayoutEffect(() => {
+    progressoRef.current = progresso;
+  });
 
   useEffect(carregarMotorDepois, []);
+
+  useEffect(() => ligarSom(progresso.som), [progresso.som]);
+
+  // conquistas podem vir de qualquer lugar do jogo (ver conquistas.js)
+  useEffect(
+    () =>
+      ouvirConquistas((id) => {
+        const conquista = CONQUISTAS.find((c) => c.id === id);
+        if (!conquista || progressoRef.current.conquistas.includes(id) || avisadasRef.current.has(id)) return;
+        avisadasRef.current.add(id);
+        ganharConquista(id);
+        setAvisos((fila) => [...fila, conquista]);
+      }),
+    [ganharConquista]
+  );
+
+  const avisoAtual = avisos[0];
+  useEffect(() => {
+    if (!avisoAtual) return;
+    tocar('conquista');
+    const espera = setTimeout(() => setAvisos((fila) => fila.slice(1)), 3600);
+    return () => clearTimeout(espera);
+  }, [avisoAtual]);
+
+  useEffect(() => {
+    if (new Date().getHours() >= 5) return;
+    const espera = setTimeout(() => conquistar('coruja'), 2500);
+    return () => clearTimeout(espera);
+  }, []);
 
   const { modo, concluidas } = progresso;
   const indice = Math.min(progresso.faseAtual, fases.length - 1);
@@ -44,6 +87,7 @@ export default function App() {
   const estaLiberada = (i, emModo = modo) => i === 0 || concluidas[emModo].includes(fases[i - 1].id);
   const liberadas = fases.filter((_, i) => estaLiberada(i)).length;
   const comecou = progresso.livrosVistos.length > 0 || concluidas.web.length + concluidas.mobile.length > 0;
+  const totalDeEstrelas = Object.values(progresso.estrelas).reduce((soma, n) => soma + n, 0);
 
   const viajando = transicao?.tipo === 'viagem';
   // enquanto a câmera está no corredor, quem vai entrar na sala nova espera do lado de fora
@@ -85,7 +129,28 @@ export default function App() {
     else viajar(acao, destino, { saida });
   }
 
-  const concluir = useCallback(() => concluirFase(fase.id, modo), [concluirFase, fase.id, modo]);
+  // resumo: { estrelas, tentativas, pediuDica } da rodada que passou
+  const concluir = useCallback(
+    (resumo) => {
+      const atual = progressoRef.current;
+      const chave = `${fase.id}-${modo}`;
+      const outro = modo === 'web' ? 'mobile' : 'web';
+      concluirFase(fase.id, modo);
+      darEstrelas(chave, resumo.estrelas);
+
+      if (fase.numero === 1) conquistar('primeiro-passo');
+      if (resumo.tentativas === 0) conquistar('de-primeira');
+      if (!resumo.pediuDica) conquistar('sem-ajuda');
+      if (resumo.tentativas >= 5) conquistar('teimoso');
+      if (fase.id === 'guardiao') conquistar('guardiao');
+      if (atual.concluidas[outro].includes(fase.id)) conquistar('bilingue');
+      const feitas = new Set([...atual.concluidas[modo], fase.id]);
+      if (fases.every((f) => feitas.has(f.id))) conquistar(modo);
+      const estrelas = { ...atual.estrelas, [chave]: Math.max(atual.estrelas[chave] ?? 0, resumo.estrelas) };
+      if (Object.values(estrelas).filter((n) => n === 3).length >= 5) conquistar('estrelas');
+    },
+    [concluirFase, darEstrelas, fase, modo]
+  );
 
   return (
     <div className={`app ${esperando ? 'app--esperando' : ''}`}>
@@ -95,12 +160,21 @@ export default function App() {
           comecou={comecou}
           modo={modo}
           resumo={`Web: ${concluidas.web.length} de ${fases.length} · Mobile: ${concluidas.mobile.length} de ${fases.length}`}
+          estrelas={totalDeEstrelas}
+          maximoDeEstrelas={fases.length * 6}
+          conquistas={progresso.conquistas.length}
+          som={progresso.som}
+          aoAlternarSom={alternarSom}
+          aoConquistas={() => setConquistasAbertas(true)}
           aoJogar={() => jogarFase(indice)}
           aoMapa={() => navegar(() => setTela('mapa'))}
           aoLivro={() => setLivroAberto(true)}
           aoComoJogar={() => setComoJogarAberto(true)}
           aoTrocarModo={mudarModo}
-          aoApagarProgresso={apagarTudo}
+          aoApagarProgresso={() => {
+            avisadasRef.current.clear();
+            apagarTudo();
+          }}
         />
       )}
 
@@ -110,6 +184,7 @@ export default function App() {
           proximas={proximasFases}
           modo={modo}
           concluidas={concluidas}
+          estrelas={progresso.estrelas}
           faseAtual={indice}
           estaLiberada={estaLiberada}
           aoEscolher={(i) => jogarFase(i)}
@@ -124,6 +199,8 @@ export default function App() {
             fase={fase}
             total={fases.length}
             modo={modo}
+            som={progresso.som}
+            aoAlternarSom={alternarSom}
             aoMenu={() => navegar(() => setTela('menu'))}
             aoTrocarModo={(novo) => novo !== modo && jogarFase(faseLiberadaNoModo(novo), novo)}
             aoAbrirLivro={() => setLivroAberto(true)}
@@ -161,6 +238,8 @@ export default function App() {
       )}
 
       {comoJogarAberto && <ComoJogar aoFechar={() => setComoJogarAberto(false)} />}
+      {conquistasAbertas && <ListaDeConquistas ganhas={progresso.conquistas} aoFechar={() => setConquistasAbertas(false)} />}
+      {avisoAtual && <AvisoDeConquista key={avisoAtual.id} conquista={avisoAtual} />}
 
       <Transicao transicao={transicao?.tipo === 'iris' ? transicao : null} />
       <Viagem transicao={viajando ? transicao : null} aoPular={pular} />

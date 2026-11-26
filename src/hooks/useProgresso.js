@@ -9,6 +9,9 @@ const INICIAL = {
   codigos: {}, // código de cada fase em cada modo, tipo { 'placa-web': '...' }
   concluidas: { web: [], mobile: [] },
   livrosVistos: [], // páginas do livro que já abriram sozinhas no começo da fase
+  estrelas: {}, // melhor resultado de cada fase em cada modo, tipo { 'placa-web': 3 }
+  conquistas: [],
+  som: true,
 };
 
 const listaDeTextos = (valor) => (Array.isArray(valor) ? valor.filter((item) => typeof item === 'string') : []);
@@ -22,12 +25,21 @@ function validar(dados) {
       if (typeof codigo === 'string' && codigo.length <= TAMANHO_MAXIMO_DO_CODIGO) codigos[chave] = codigo;
     }
   }
+  const estrelas = {};
+  if (dados.estrelas && typeof dados.estrelas === 'object') {
+    for (const [chave, valor] of Object.entries(dados.estrelas)) {
+      if (Number.isInteger(valor) && valor >= 1 && valor <= 3) estrelas[chave] = valor;
+    }
+  }
   return {
     modo: dados.modo === 'mobile' ? 'mobile' : 'web',
     faseAtual: Number.isInteger(dados.faseAtual) && dados.faseAtual >= 0 ? dados.faseAtual : 0,
     codigos,
     concluidas: { web: listaDeTextos(dados.concluidas?.web), mobile: listaDeTextos(dados.concluidas?.mobile) },
     livrosVistos: listaDeTextos(dados.livrosVistos),
+    estrelas,
+    conquistas: listaDeTextos(dados.conquistas),
+    som: dados.som !== false,
   };
 }
 
@@ -87,7 +99,12 @@ export function useProgresso() {
           if (lista.includes(id)) return {};
           return { concluidas: { ...atual.concluidas, [modo]: [...lista, id] } };
         }),
-      apagarTudo: () => setProgresso((atual) => ({ ...INICIAL, modo: atual.modo })),
+      darEstrelas: (chave, quantas) =>
+        atualizar((atual) => ((atual.estrelas[chave] ?? 0) >= quantas ? {} : { estrelas: { ...atual.estrelas, [chave]: quantas } })),
+      ganharConquista: (id) =>
+        atualizar((atual) => (atual.conquistas.includes(id) ? {} : { conquistas: [...atual.conquistas, id] })),
+      alternarSom: () => atualizar((atual) => ({ som: !atual.som })),
+      apagarTudo: () => setProgresso((atual) => ({ ...INICIAL, modo: atual.modo, som: atual.som })),
       marcarLivroVisto: (id) =>
         atualizar((atual) => (atual.livrosVistos.includes(id) ? {} : { livrosVistos: [...atual.livrosVistos, id] })),
     };

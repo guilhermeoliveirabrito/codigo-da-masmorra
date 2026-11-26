@@ -61,6 +61,7 @@ export const faseCrachas = {
   numero: 2,
   titulo: 'Crachás para todos',
   conceito: 'props',
+  elenco: ['lia', 'tom', 'guarda'],
   componente: 'Cracha',
   arquivo: 'Cracha.jsx',
   Cena: CenaCrachas,

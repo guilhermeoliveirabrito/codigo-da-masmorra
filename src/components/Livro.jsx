@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Icone } from '../pixel/Sprite';
+import { tocar } from '../som';
 import { CodigoColorido, CodigoComNotas, acharNotas } from './CodigoColorido';
 import { Experimente } from './Experimente';
 import { TextoRico } from './TextoRico';
@@ -176,6 +177,7 @@ export function Livro({ fases, liberadas, paginaInicial, modo, introducao, aoFec
   }, [aoFechar]);
 
   function abrirPagina(indice) {
+    tocar('pagina');
     setPagina(indice);
     document.querySelector('.modal')?.scrollTo({ top: 0 });
   }
@@ -194,6 +196,7 @@ export function Livro({ fases, liberadas, paginaInicial, modo, introducao, aoFec
               type="button"
               disabled={i >= liberadas}
               className={i === pagina ? 'livro__capitulo--ativo' : ''}
+              data-som="nenhum"
               onClick={() => abrirPagina(i)}
             >
               {i >= liberadas ? <Icone nome="cadeado" /> : <span className="livro__numero">{i + 1}</span>}

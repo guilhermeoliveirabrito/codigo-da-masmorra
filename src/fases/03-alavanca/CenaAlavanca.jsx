@@ -3,6 +3,7 @@ import { Brilhos, Cena, Personagem, Tela, posicao } from '../../components/Cenar
 import { Porta } from '../../components/Porta';
 import { ALAVANCA_BAIXO, ALAVANCA_CIMA, CAIXOTE, CORRENTE } from '../../pixel/desenhos';
 import { NoFundo, Sprite } from '../../pixel/Sprite';
+import { tocar } from '../../som';
 
 function Painel() {
   return (
@@ -29,6 +30,10 @@ export function CenaAlavanca({ Componente, modo, liberada, primeiraVez, aoVencer
   });
 
   const abrirPorta = useCallback(() => setAberta(true), []);
+
+  useEffect(() => {
+    if (aberta) tocar('porta');
+  }, [aberta]);
 
   useEffect(() => {
     if (!aberta || !liberada) return;

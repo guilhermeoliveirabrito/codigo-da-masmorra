@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Brilhos, Cena, Personagem, Tela, posicao } from '../../components/Cenario';
 import { Porta } from '../../components/Porta';
 import { ContextoDaCena } from '../../motor/contextoDaCena';
+import { tocar } from '../../som';
 
 export function CenaTocha({ Componente, modo, liberada, primeiraVez, aoVencer }) {
   const [luz, setLuz] = useState(false);
@@ -19,6 +20,7 @@ export function CenaTocha({ Componente, modo, liberada, primeiraVez, aoVencer })
 
   useEffect(() => {
     if (!luz || !liberada) return;
+    tocar('porta');
     const fim = setTimeout(() => aoVencerRef.current(), 2000);
     return () => clearTimeout(fim);
   }, [luz, liberada]);

@@ -17,8 +17,11 @@ Jogar: https://guilhermeoliveirabrito.github.io/codigo-da-masmorra/
 5. Os portões: renderização condicional
 6. A ponte: listas com `map` e `key`
 7. Pedras no rio: layout com flexbox
+8. A porta que fecha sozinha: `useEffect` com limpeza
+9. O mensageiro: buscando dados de uma API com `fetch`
+10. O guardião: uma batalha juntando tudo
 
-Próximas: `useEffect`, chamada de API e uma fase final juntando tudo.
+Cada fase dá até 3 estrelas (passar, não ver a solução, não pedir dica) e tem conquistas escondidas pelo caminho.
 
 ## Rodando
 
@@ -47,6 +50,10 @@ Como o código do jogador roda na própria página, algumas proteções ficam em
 Cada fase fica numa pasta em `src/fases`, com a cena, o texto do livro, as dicas e uma função `verificar`, que desenha o componente fora da tela e confere o resultado. Pra criar uma fase nova, dá pra copiar uma das pastas e adicionar ela em `src/fases/index.js`.
 
 Os personagens, o cenário e os ícones são pixel art desenhada no código (`src/pixel`), com a paleta Endesga 32. Quando um personagem muda de lugar, ele troca pro desenho de lado e anda no ritmo dos passos; entre uma fase e outra, a turma atravessa um corredor (`src/components/Viagem.jsx`).
+
+Nas fases 8 e 9 o código usa `setInterval` e `fetch`, mas não os do navegador: o jogo entrega versões próprias (`src/motor/ambiente.js`). Na cena elas funcionam de verdade, e no teste o tempo é controlado pelo jogo, o que permite conferir se o intervalo para quando o componente sai da tela. O `fetch` responde de um servidor de mentira, então nada sai da página.
+
+Os sons são gerados na hora com Web Audio (`src/som.js`), sem arquivo de áudio.
 
 O editor colore o código com um leitor simples de JavaScript e JSX (`src/components/realce.js`). No iPhone e no iPad ele fica sem cor: o Safari desloca o texto do campo uns pixels, e o cursor não bateria com o texto colorido.
 

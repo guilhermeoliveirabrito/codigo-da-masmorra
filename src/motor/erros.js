@@ -141,6 +141,9 @@ function traduzir(erro, codigo, modo) {
   if (/[“”‘’]/.test(codigo) && /Invalid or unexpected token|Unexpected character/.test(mensagem)) {
     return 'tem aspas curvas (“ ” ou ‘ ’) no código. No JavaScript as aspas precisam ser retas: " ou \'.';
   }
+  if ((m = mensagem.match(/Cannot read properties of null \(reading '(map|length|filter|forEach)'\)/))) {
+    return `você usou o .${m[1]} numa lista que ainda é null. Os dados não chegaram ainda: enquanto for null, mostre um Carregando antes de chegar no ${m[1]}.`;
+  }
   if ((m = mensagem.match(/Cannot read properties of (undefined|null) \(reading '(.+)'\)/))) {
     return `você tentou ler .${m[2]} de algo que está vazio (${m[1]}). Confira se o nome antes do ponto está certo e se ele chega mesmo no componente.`;
   }

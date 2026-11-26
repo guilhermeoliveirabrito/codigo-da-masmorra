@@ -20,6 +20,17 @@ const NAO_SIMULADOS = [
 
 const COMPONENTES_RN = ['View', 'Text', 'Pressable', 'StyleSheet', ...NAO_SIMULADOS];
 
+// o código do jogador usa estes no lugar dos do navegador (ver ambiente.js)
+const DO_AMBIENTE = ['setTimeout', 'setInterval', 'clearTimeout', 'clearInterval', 'fetch'];
+
+const SEM_INTERNET = {
+  setTimeout: (...argumentos) => window.setTimeout(...argumentos),
+  setInterval: (...argumentos) => window.setInterval(...argumentos),
+  clearTimeout: (id) => window.clearTimeout(id),
+  clearInterval: (id) => window.clearInterval(id),
+  fetch: () => Promise.reject(new ErroDoJogo('Aqui na masmorra não tem internet. O corvo mensageiro só aparece na fase 9.')),
+};
+
 const HTML_PARA_RN = {
   div: 'View',
   section: 'View',
@@ -46,10 +57,16 @@ const LIMITE_DE_ELEMENTOS = 20_000;
 
 // avisos: coisas que não quebram o código, mas provavelmente estão erradas
 // aoErroEmEvento: recebe erros que acontecem dentro de um onClick/onPress do jogador
-export function executar(codigo, modo, avisos, { aoErroEmEvento } = {}) {
+export function executar(codigo, modo, avisos, { aoErroEmEvento, ambiente = SEM_INTERNET } = {}) {
   const js = compilar(codigo);
 
-  const modulos = { react: { ...React, default: React }, masmorra: Masmorra };
+  const react = {
+    ...React,
+    useEffect: efeitoProtegido(React.useEffect, avisos, aoErroEmEvento),
+    useLayoutEffect: efeitoProtegido(React.useLayoutEffect, avisos, aoErroEmEvento),
+  };
+  react.default = react;
+  const modulos = { react, masmorra: Masmorra };
   if (modo === 'mobile') modulos['react-native'] = ReactNativeSimulado;
 
   function importar(nomeDoModulo, linha, nomes) {
@@ -91,11 +108,19 @@ export function executar(codigo, modo, avisos, { aoErroEmEvento } = {}) {
     '__importar',
     '__guarda',
     ...COMPONENTES_RN,
+    ...DO_AMBIENTE,
     `return (function () {\n${js}\n})();`
   );
   // a mesma guarda vale pros loops e pros componentes que se desenham sem fim
   const guarda = criarGuarda();
-  return rodar(criarH(modo, avisos, aoErroEmEvento, guarda), React.Fragment, importar, guarda, ...marcadores);
+  return rodar(
+    criarH(modo, avisos, aoErroEmEvento, guarda),
+    React.Fragment,
+    importar,
+    guarda,
+    ...marcadores,
+    ...DO_AMBIENTE.map((nome) => ambiente[nome] ?? SEM_INTERNET[nome])
+  );
 }
 
 // Conta tempo e quantidade desde o começo da tarefa atual; quando a tarefa termina,
@@ -129,6 +154,36 @@ function criarGuarda() {
       estourou = motivo;
       throw erro(linha, motivo);
     }
+  };
+}
+
+// Um efeito que devolve algo que não é função (o useEffect(async ...) devolve uma promessa)
+// ou uma limpeza que dá erro derrubariam o jogo inteiro quando a cena sai da tela.
+function efeitoProtegido(usarEfeito, avisos, aoErroEmEvento) {
+  return function (efeito, dependencias) {
+    if (typeof efeito !== 'function') {
+      throw new ErroDoJogo(
+        'o useEffect precisa receber uma função, tipo useEffect(() => { ... }, []). Do jeito que está, ele recebeu o resultado de uma chamada.'
+      );
+    }
+    return usarEfeito(() => {
+      const limpeza = efeito();
+      if (typeof limpeza === 'function') {
+        return () => {
+          try {
+            limpeza();
+          } catch (erro) {
+            aoErroEmEvento?.(erro);
+          }
+        };
+      }
+      if (typeof limpeza?.then === 'function') {
+        avisos.add(
+          'O useEffect recebeu uma função async, e ele não aceita isso direto. Crie a função async dentro do efeito e chame ela em seguida.'
+        );
+      }
+      return undefined;
+    }, dependencias);
   };
 }
 

@@ -16,6 +16,7 @@ export const fasePlaca = {
   numero: 1,
   titulo: 'A placa da entrada',
   conceito: 'JSX',
+  elenco: ['guarda', 'lia'],
   componente: 'Placa',
   arquivo: 'Placa.jsx',
   Cena: CenaPlaca,

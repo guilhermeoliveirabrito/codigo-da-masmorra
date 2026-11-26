@@ -2,11 +2,33 @@ import { useState } from 'react';
 import { Cena, Personagem } from '../components/Cenario';
 import { Porta } from '../components/Porta';
 import { useInstalacao } from '../hooks/useInstalacao';
+import { ContextoDaConversa, useConversa } from '../conversa';
 import { semAnimacao } from '../hooks/useTransicao';
 import { BARRIL, ESTANDARTE } from '../pixel/desenhos';
 import { Icone, NoFundo } from '../pixel/Sprite';
+import { tocar } from '../som';
 
-export function Menu({ faseAtual, comecou, modo, resumo, aoJogar, aoMapa, aoLivro, aoComoJogar, aoTrocarModo, aoApagarProgresso }) {
+const ELENCO_DO_MENU = ['guarda', 'lia', 'tom'];
+
+export function Menu({
+  faseAtual,
+  comecou,
+  modo,
+  resumo,
+  estrelas,
+  maximoDeEstrelas,
+  conquistas,
+  som,
+  aoAlternarSom,
+  aoConquistas,
+  aoJogar,
+  aoMapa,
+  aoLivro,
+  aoComoJogar,
+  aoTrocarModo,
+  aoApagarProgresso,
+}) {
+  const conversa = useConversa(ELENCO_DO_MENU).valor;
   const [abrindo, setAbrindo] = useState(false);
   const [entrando, setEntrando] = useState(false);
   const [confirmarApagar, setConfirmarApagar] = useState(false);
@@ -16,6 +38,7 @@ export function Menu({ faseAtual, comecou, modo, resumo, aoJogar, aoMapa, aoLivr
   function jogar() {
     if (abrindo) return;
     setAbrindo(true);
+    tocar('porta');
     if (semAnimacao()) {
       aoJogar();
       return;
@@ -37,31 +60,42 @@ export function Menu({ faseAtual, comecou, modo, resumo, aoJogar, aoMapa, aoLivr
   return (
     <main className="menu">
       <div className="menu__palco">
-        <Cena
-          tochas={[66, 118]}
-          alturaDasTochas={42}
-          className={abrindo ? 'cena--tremer' : ''}
-          fundo={
-            <>
-              <NoFundo desenho={ESTANDARTE} x={22} y={28} />
-              <NoFundo desenho={ESTANDARTE} x={158} y={28} />
-              <NoFundo desenho={BARRIL} x={20} y={68} />
-              <Porta x={96} y={30} largura={28} altura={50} aberta={abrindo} />
-            </>
-          }
+        <button
+          type="button"
+          className="menu__som"
+          onClick={aoAlternarSom}
+          aria-label={som ? 'Desligar o som' : 'Ligar o som'}
+          aria-pressed={som}
         >
-          <Personagem quem="guarda" x={40} y={74} />
-          <Personagem quem="lia" x={entrando ? 90 : 128} y={76} velocidade={64} some={entrando} />
-          <Personagem
-            quem="tom"
-            x={entrando ? 90 : 146}
-            y={76}
-            velocidade={64}
-            some={entrando}
-            fala={abrindo && !entrando ? 'Vamos!' : null}
-            lado="direita"
-          />
-        </Cena>
+          <Icone nome={som ? 'som' : 'mudo'} />
+        </button>
+        <ContextoDaConversa.Provider value={conversa}>
+          <Cena
+            tochas={[66, 118]}
+            alturaDasTochas={42}
+            className={abrindo ? 'cena--tremer' : ''}
+            fundo={
+              <>
+                <NoFundo desenho={ESTANDARTE} x={22} y={28} />
+                <NoFundo desenho={ESTANDARTE} x={158} y={28} />
+                <NoFundo desenho={BARRIL} x={20} y={68} />
+                <Porta x={96} y={30} largura={28} altura={50} aberta={abrindo} />
+              </>
+            }
+          >
+            <Personagem quem="guarda" x={40} y={74} />
+            <Personagem quem="lia" x={entrando ? 90 : 128} y={76} velocidade={64} some={entrando} />
+            <Personagem
+              quem="tom"
+              x={entrando ? 90 : 146}
+              y={76}
+              velocidade={64}
+              some={entrando}
+              fala={abrindo && !entrando ? 'Vamos!' : null}
+              lado="direita"
+            />
+          </Cena>
+        </ContextoDaConversa.Provider>
         <h1 className="menu__titulo">Código da Masmorra</h1>
       </div>
 
@@ -85,6 +119,11 @@ export function Menu({ faseAtual, comecou, modo, resumo, aoJogar, aoMapa, aoLivr
           </button>
           <button type="button" className="botao botao--pedra" onClick={aoComoJogar}>
             Como jogar
+          </button>
+          <button type="button" className="botao botao--pedra" onClick={aoConquistas}>
+            <Icone nome="trofeu" />
+            Conquistas
+            <span className="menu__onde">{conquistas}</span>
           </button>
         </div>
 
@@ -112,7 +151,13 @@ export function Menu({ faseAtual, comecou, modo, resumo, aoJogar, aoMapa, aoLivr
         </div>
 
         <footer className="menu__rodape">
-          <span>{resumo}</span>
+          <span className="menu__placar">
+            <span className="menu__estrelas">
+              <Icone nome="estrela" />
+              {estrelas} de {maximoDeEstrelas}
+            </span>
+            <span>{resumo}</span>
+          </span>
           <div className="menu__links">
             {instalacao.podeInstalar && (
               <button type="button" className="menu__link" onClick={instalacao.instalar}>

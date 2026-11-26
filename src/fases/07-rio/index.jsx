@@ -17,6 +17,7 @@ export const faseRio = {
   numero: 7,
   titulo: 'Pedras no rio',
   conceito: 'flexbox',
+  elenco: ['tom'],
   componente: 'Travessia',
   arquivo: 'Travessia.jsx',
   Cena: CenaRio,

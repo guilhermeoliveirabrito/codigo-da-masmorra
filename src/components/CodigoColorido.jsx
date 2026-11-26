@@ -21,10 +21,8 @@ export const CodigoColorido = memo(function CodigoColorido({ codigo }) {
   return <Pedacos pedacos={realcar(codigo)} />;
 });
 
-// Código com marcadores numerados no começo de algumas linhas (numa margem, pra não
-// bagunçar o recuo, e sempre à vista mesmo quando a linha é comprida).
-// notas: [{ marca, texto }]: a nota vai na primeira linha que tem o trecho "marca"
-// (assim a mesma nota serve pro código Web e pro Mobile, que têm linhas diferentes)
+// notas: [{ marca, texto }], cada nota vai na primeira linha que tem a "marca"
+// (assim a mesma nota serve pro código Web e pro Mobile)
 export function acharNotas(codigo, notas = []) {
   const linhas = codigo.split('\n');
   const usadas = new Set();

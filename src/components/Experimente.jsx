@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { conquistar } from '../conquistas';
 import { Chave, Pedra, PortaAberta, PortaFechada, Tabua } from '../motor/masmorra';
-import { TOCHA, TOCHA_APAGADA } from '../pixel/desenhos';
+import { AMPULHETA, TOCHA, TOCHA_APAGADA } from '../pixel/desenhos';
 import { Sprite } from '../pixel/Sprite';
 import { CodigoColorido } from './CodigoColorido';
 
@@ -293,6 +294,190 @@ function DemoFlex({ modo }) {
   );
 }
 
+// fase 8: mostra e esconde a ampulheta, com e sem limpeza, e conta os intervalos vivos
+function AmpulhetaDaDemo({ limpeza, aoBater, vivos, aoMudar }) {
+  useEffect(() => {
+    const id = setInterval(aoBater, 1000);
+    vivos.current.add(id);
+    aoMudar(vivos.current.size);
+    if (!limpeza) return undefined;
+    return () => {
+      clearInterval(id);
+      vivos.current.delete(id);
+      aoMudar(vivos.current.size);
+    };
+  }, [limpeza, aoBater, vivos, aoMudar]);
+
+  return <Sprite desenho={AMPULHETA} className="demo__ampulheta" />;
+}
+
+function DemoEfeito() {
+  const [naTela, setNaTela] = useState(true);
+  const [limpeza, setLimpeza] = useState(true);
+  const [batidas, setBatidas] = useState(0);
+  const [vivosAgora, setVivosAgora] = useState(0);
+  const vivos = useRef(new Set());
+
+  // os intervalos esquecidos de propósito param quando o livro fecha
+  useEffect(() => {
+    const lista = vivos.current;
+    return () => lista.forEach((id) => clearInterval(id));
+  }, []);
+
+  const bater = useCallback(() => setBatidas((n) => n + 1), []);
+
+  function pararTudo() {
+    vivos.current.forEach((id) => clearInterval(id));
+    vivos.current.clear();
+    setVivosAgora(0);
+    setNaTela(false);
+  }
+
+  const codigo = `useEffect(() => {\n  const id = setInterval(tique, 1000);${limpeza ? '\n  return () => clearInterval(id);' : ''}\n}, []);`;
+  return (
+    <>
+      <Opcoes rotulo="Ampulheta na tela" opcoes={['sim', 'não']} valor={naTela ? 'sim' : 'não'} aoEscolher={(opcao) => setNaTela(opcao === 'sim')} />
+      <Opcoes rotulo="Com limpeza" opcoes={['sim', 'não']} valor={limpeza ? 'sim' : 'não'} aoEscolher={(opcao) => setLimpeza(opcao === 'sim')} />
+      <Codigo>{codigo}</Codigo>
+      <div className="demo__resultado">
+        {naTela ? (
+          <AmpulhetaDaDemo key={String(limpeza)} limpeza={limpeza} aoBater={bater} vivos={vivos} aoMudar={setVivosAgora} />
+        ) : (
+          <span className="demo__nada">Ampulheta fora da tela</span>
+        )}
+        <span className={vivosAgora > 1 ? 'demo__contador demo__contador--ruim' : 'demo__contador'}>
+          Intervalos rodando: {vivosAgora}
+        </span>
+        <span className="demo__contador">Batidas: {batidas}</span>
+      </div>
+      <p className="demo__legenda">
+        {limpeza
+          ? 'Com limpeza, esconder a ampulheta para o intervalo. Mostre e esconda várias vezes: nunca passa de 1.'
+          : 'Sem limpeza, esconda e mostre a ampulheta algumas vezes: cada volta deixa um intervalo novo rodando, e as batidas aceleram.'}
+      </p>
+      {vivosAgora > 1 && (
+        <button type="button" className="botao botao--pedra botao--pequeno" onClick={pararTudo}>
+          Parar todos os intervalos
+        </button>
+      )}
+    </>
+  );
+}
+
+const TAREFAS = ['Comprar pão', 'Estudar React', 'Dar comida pro gato'];
+const DEMORAS = { '0,5 s': 500, '1,5 s': 1500, '3 s': 3000 };
+
+// fase 9: um pedido de mentira, com demora e defeito escolhidos na hora
+function DemoApi({ modo }) {
+  const [demora, setDemora] = useState('1,5 s');
+  const [defeito, setDefeito] = useState(false);
+  const [resposta, setResposta] = useState(null);
+  const [etapa, setEtapa] = useState('esperando');
+  const espera = useRef(null);
+
+  const buscar = useCallback(() => {
+    clearTimeout(espera.current);
+    setResposta(null);
+    setEtapa('esperando');
+    espera.current = setTimeout(() => {
+      setResposta(defeito ? 'erro' : TAREFAS);
+      setEtapa('pronto');
+    }, DEMORAS[demora]);
+  }, [defeito, demora]);
+
+  useEffect(() => {
+    buscar();
+    return () => clearTimeout(espera.current);
+  }, [buscar]);
+
+  const tag = doModo('p', 'Text', modo);
+  const codigo = `fetch('/api/tarefas')\n  .then((resposta) => resposta.json())\n  .then((dados) => setTarefas(dados))\n  .catch(() => setErro(true));\n\n// agora: tarefas = ${resposta === null ? 'null' : resposta === 'erro' ? 'null, erro = true' : '[3 tarefas]'}`;
+
+  return (
+    <>
+      <Opcoes rotulo="Demora do servidor" opcoes={Object.keys(DEMORAS)} valor={demora} aoEscolher={setDemora} />
+      <Opcoes rotulo="Servidor" opcoes={['funcionando', 'com defeito']} valor={defeito ? 'com defeito' : 'funcionando'} aoEscolher={(opcao) => setDefeito(opcao === 'com defeito')} />
+      <Codigo>{codigo}</Codigo>
+      <div className="demo__resultado demo__resultado--lista">
+        {etapa === 'esperando' && <span className="demo__carregando">{`<${tag}>Carregando...</${tag}>`}</span>}
+        {resposta === 'erro' && <span className="demo__erro">Não deu pra buscar as tarefas. Tente de novo.</span>}
+        {Array.isArray(resposta) && (
+          <ul className="demo__tarefas">
+            {resposta.map((tarefa) => (
+              <li key={tarefa}>{tarefa}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+      <button type="button" className="botao botao--pedra botao--pequeno" onClick={buscar}>
+        Buscar de novo
+      </button>
+      <p className="demo__legenda">
+        O carregando aparece enquanto a resposta não chega. Com defeito, quem segura o erro é o <code>.catch</code>.
+      </p>
+    </>
+  );
+}
+
+// fase 10: o painel de batalha pronto, contra um boneco de treino
+const TIME_DE_TREINO = [
+  { id: 1, nome: 'Lia', forca: 2 },
+  { id: 2, nome: 'Tom', forca: 3 },
+];
+
+function DemoTreino({ modo }) {
+  const [restante, setRestante] = useState(7);
+  const [ultimo, setUltimo] = useState(null);
+  const evento = doModo('onClick', 'onPress', modo);
+
+  return (
+    <>
+      <Codigo>{`const [restante, setRestante] = useState(7);\n// agora: restante = ${restante}\n\n${evento}={() => setRestante(restante - heroi.forca)}\n\nif (restante <= 0) return <Vitoria />;`}</Codigo>
+      <div className="demo__resultado demo__resultado--treino">
+        {restante <= 0 ? (
+          <span className="demo__placa">O boneco dormiu!</span>
+        ) : (
+          <>
+            <span className="demo__contador">Energia do boneco: {restante}</span>
+            <div className="demo__botoes">
+              {TIME_DE_TREINO.map((heroi) => (
+                <button
+                  key={heroi.id}
+                  type="button"
+                  className="botao botao--fogo botao--pequeno"
+                  data-som="golpe"
+                  onClick={() => {
+                    setRestante(restante - heroi.forca);
+                    setUltimo(heroi);
+                  }}
+                >
+                  {heroi.nome} (força {heroi.forca})
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+      <p className="demo__legenda">
+        {ultimo ? `${ultimo.nome} tirou ${ultimo.forca} de energia.` : 'Ataque e veja o estado mudar no código.'}{' '}
+        {restante < 0 && 'A energia passou do zero, e o <= 0 pegou mesmo assim.'}
+      </p>
+      {restante <= 0 && (
+        <button
+          type="button"
+          className="botao botao--pedra botao--pequeno"
+          onClick={() => {
+            setRestante(7);
+            setUltimo(null);
+          }}
+        >
+          Lutar de novo
+        </button>
+      )}
+    </>
+  );
+}
+
 const DEMOS = {
   jsx: DemoJsx,
   props: DemoProps,
@@ -301,13 +486,16 @@ const DEMOS = {
   condicional: DemoCondicional,
   lista: DemoLista,
   flex: DemoFlex,
+  efeito: DemoEfeito,
+  api: DemoApi,
+  treino: DemoTreino,
 };
 
 export function Experimente({ demo, modo }) {
   const Demo = DEMOS[demo];
   if (!Demo) return null;
   return (
-    <div className="demo">
+    <div className="demo" onPointerDownCapture={() => conquistar('cientista')} onInputCapture={() => conquistar('cientista')}>
       <Demo key={modo} modo={modo} />
     </div>
   );

@@ -5,6 +5,7 @@ const PASSOS = [
   ['Escreva o componente', 'O editor já vem com um começo de código. Complete o que o personagem pediu.'],
   ['Aperte Rodar', 'O jogo testa o seu código e mostra na cena o que ele faz. Se faltar algo, ele explica o quê e em qual linha.'],
   ['Travou?', 'Peça dicas: a primeira só aponta a direção. A solução aparece depois de três tentativas, pra você digitar.'],
+  ['Junte estrelas', 'Passou da fase, uma estrela. Sem ver a solução, duas. Sem pedir dica, três. Dá pra voltar e tentar de novo.'],
 ];
 
 export function ComoJogar({ aoFechar }) {
@@ -36,6 +37,7 @@ export function ComoJogar({ aoFechar }) {
           <strong>Mobile</strong>, os componentes do React Native, como num app de celular. Dá pra trocar no menu
           e comparar.
         </p>
+        <p className="como-jogar__modos">Ah, e clique nos personagens. Eles gostam de conversar.</p>
         <button type="button" className="botao botao--fogo" onClick={aoFechar} autoFocus>
           Entendi
         </button>

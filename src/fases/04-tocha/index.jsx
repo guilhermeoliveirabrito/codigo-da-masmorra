@@ -15,6 +15,7 @@ export const faseTocha = {
   numero: 4,
   titulo: 'A tocha',
   conceito: 'useState',
+  elenco: ['tom'],
   componente: 'Tocha',
   arquivo: 'Tocha.jsx',
   Cena: CenaTocha,

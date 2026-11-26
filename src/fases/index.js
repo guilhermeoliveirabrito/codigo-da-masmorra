@@ -5,12 +5,22 @@ import { faseTocha } from './04-tocha';
 import { fasePortoes } from './05-portoes';
 import { fasePonte } from './06-ponte';
 import { faseRio } from './07-rio';
+import { fasePorta } from './08-porta';
+import { faseMensageiro } from './09-mensageiro';
+import { faseGuardiao } from './10-guardiao';
 
-export const fases = [fasePlaca, faseCrachas, faseAlavanca, faseTocha, fasePortoes, fasePonte, faseRio];
+export const fases = [
+  fasePlaca,
+  faseCrachas,
+  faseAlavanca,
+  faseTocha,
+  fasePortoes,
+  fasePonte,
+  faseRio,
+  fasePorta,
+  faseMensageiro,
+  faseGuardiao,
+];
 
 // aparecem no mapa como "em breve"
-export const proximasFases = [
-  { numero: 8, titulo: 'A porta que fecha sozinha', conceito: 'useEffect' },
-  { numero: 9, titulo: 'O mensageiro', conceito: 'API' },
-  { numero: 10, titulo: 'O guardião', conceito: 'tudo junto' },
-];
+export const proximasFases = [];

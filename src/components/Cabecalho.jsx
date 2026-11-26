@@ -1,6 +1,6 @@
 import { Icone } from '../pixel/Sprite';
 
-export function Cabecalho({ fase, total, modo, aoMenu, aoTrocarModo, aoAbrirLivro }) {
+export function Cabecalho({ fase, total, modo, som, aoAlternarSom, aoMenu, aoTrocarModo, aoAbrirLivro }) {
   return (
     <header className="cabecalho">
       <button type="button" className="botao botao--pedra cabecalho__menu" onClick={aoMenu} aria-label="Voltar ao menu">
@@ -31,6 +31,15 @@ export function Cabecalho({ fase, total, modo, aoMenu, aoTrocarModo, aoAbrirLivr
             </button>
           ))}
         </div>
+        <button
+          type="button"
+          className="botao botao--pedra cabecalho__som"
+          onClick={aoAlternarSom}
+          aria-label={som ? 'Desligar o som' : 'Ligar o som'}
+          aria-pressed={som}
+        >
+          <Icone nome={som ? 'som' : 'mudo'} />
+        </button>
         <button type="button" className="botao botao--pedra" onClick={aoAbrirLivro} aria-label="Abrir o livro">
           <Icone nome="livro" />
           <span className="so-tela-grande">Livro</span>

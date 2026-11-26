@@ -4,7 +4,7 @@ import { TextoRico } from './TextoRico';
 
 const TENTATIVAS_PARA_SOLUCAO = 3;
 
-export function Dicas({ dicas, solucao, tentativas }) {
+export function Dicas({ dicas, solucao, tentativas, aoPedirDica, aoVerSolucao }) {
   const [abertas, setAbertas] = useState(0);
   const [mostrarSolucao, setMostrarSolucao] = useState(false);
 
@@ -22,12 +22,26 @@ export function Dicas({ dicas, solucao, tentativas }) {
 
       <div className="dicas__botoes">
         {!acabaram && (
-          <button type="button" className="botao botao--pedra" onClick={() => setAbertas(abertas + 1)}>
+          <button
+            type="button"
+            className="botao botao--pedra"
+            onClick={() => {
+              setAbertas(abertas + 1);
+              aoPedirDica?.();
+            }}
+          >
             {abertas === 0 ? 'Pedir uma dica' : 'Outra dica'} ({abertas + 1}/{dicas.length})
           </button>
         )}
         {liberouSolucao && !mostrarSolucao && (
-          <button type="button" className="botao botao--pedra" onClick={() => setMostrarSolucao(true)}>
+          <button
+            type="button"
+            className="botao botao--pedra"
+            onClick={() => {
+              setMostrarSolucao(true);
+              aoVerSolucao?.();
+            }}
+          >
             Ver a solução
           </button>
         )}

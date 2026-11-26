@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { conquistar } from '../conquistas';
+import { ContextoDaConversa, useConversa } from '../conversa';
+import { criarAmbienteDaCena } from '../motor/ambiente';
 import { carregarMotor } from '../motor/carregarMotor';
 import { traduzirErro } from '../motor/erros';
 import { Icone } from '../pixel/Sprite';
+import { tocar } from '../som';
 import { Dialogo } from './Dialogo';
 import { Dicas } from './Dicas';
 import { Editor } from './Editor';
 import { Resultado } from './Resultado';
 import { Vitoria } from './Vitoria';
+
+const SEM_ELENCO = [];
 
 function doModo(valor, modo) {
   return valor && typeof valor === 'object' && !Array.isArray(valor) ? valor[modo] : valor;
@@ -54,6 +60,8 @@ export function TelaDaFase({
   const [venceu, setVenceu] = useState(false);
   const [confirmarRecomeco, setConfirmarRecomeco] = useState(false);
   const [aba, setAba] = useState('missao'); // só no celular: 'missao' ou 'codigo'
+  const [rodando, setRodando] = useState(false);
+  const { valor: conversa, reagir } = useConversa(fase.elenco ?? SEM_ELENCO);
 
   // erros dentro de cliques: durante o teste vão pra uma lista, depois aparecem na tela
   const errosDeCliqueRef = useRef(null);
@@ -61,13 +69,20 @@ export function TelaDaFase({
   const contadorRef = useRef(0);
   const mostrar = useCallback((novo) => setResultado({ ...novo, id: ++contadorRef.current }), []);
 
+  // pras estrelas: pediu dica? viu a solução?
+  const ajudaRef = useRef({ pediuDica: false, viuSolucao: false });
+  const resumoRef = useRef(null);
+  // timers e o servidor que o código do jogador usa na cena (ver motor/ambiente.js)
+  const cenarioRef = useRef(null);
+
   const vencer = useCallback(() => {
     setVenceu(true);
-    aoConcluir();
+    aoConcluir(resumoRef.current ?? { estrelas: 1, tentativas: 0, pediuDica: true });
   }, [aoConcluir]);
 
   useEffect(() => {
     carregarMotor().catch(() => {});
+    return () => cenarioRef.current?.limpar();
   }, []);
 
   // indo pra próxima fase: mostra a cena, que é de onde os personagens saem andando
@@ -91,11 +106,25 @@ export function TelaDaFase({
   );
 
   function falhar(tipo, mensagem, avisos = []) {
-    mostrar({ tipo, mensagem, avisos });
+    tocar(tipo === 'quase' ? 'quase' : 'erro');
+    if (/não para nunca|se desenhando sem parar/.test(mensagem)) conquistar('loop');
+    const reacao = reagir(tipo === 'quase' ? 'quase' : 'erro');
+    mostrar({ tipo, mensagem, avisos, reacao });
     setTentativas((t) => t + 1);
   }
 
   async function rodar() {
+    if (rodando) return 'ocupado';
+    setRodando(true);
+    tocar('rodar');
+    try {
+      return await testar();
+    } finally {
+      setRodando(false);
+    }
+  }
+
+  async function testar() {
     const avisos = new Set();
     const traduzir = (erro) => traduzirErro(erro, codigo, modo);
 
@@ -107,10 +136,15 @@ export function TelaDaFase({
       return 'erro';
     }
 
+    // cada Rodar começa do zero: o que ficou rodando da vez anterior para aqui
+    cenarioRef.current?.limpar();
+    const cenario = criarAmbienteDaCena({ rotas: fase.rotas });
+    cenarioRef.current = cenario;
+
     codigoRodadoRef.current = codigo;
     let modulo;
     try {
-      modulo = executar(codigo, modo, avisos, { aoErroEmEvento: relatarErroDeClique });
+      modulo = executar(codigo, modo, avisos, { aoErroEmEvento: relatarErroDeClique, ambiente: cenario.ambiente });
     } catch (erro) {
       setExecucao(null);
       falhar('erro', traduzir(erro));
@@ -124,10 +158,15 @@ export function TelaDaFase({
       return 'erro';
     }
 
+    // algumas fases testam com um relógio ou um servidor de mentira: montam o código de novo com eles
+    const montar = (ambiente) =>
+      pegarComponente(executar(codigo, modo, avisos, { aoErroEmEvento: relatarErroDeClique, ambiente }), fase.componente)
+        .Componente;
+
     let veredito;
     errosDeCliqueRef.current = [];
     try {
-      veredito = fase.verificar({ Componente, modo, traduzir, avisos, codigo });
+      veredito = await fase.verificar({ Componente, modo, traduzir, avisos, codigo, montar });
     } catch (erro) {
       veredito = { tipo: 'erro', mensagem: traduzir(erro) };
     }
@@ -141,13 +180,16 @@ export function TelaDaFase({
     }
 
     const passou = veredito.tipo === 'ok';
-    setExecucao({ Componente, versao: Date.now(), liberada: passou });
+    setExecucao({ Componente, versao: Date.now(), liberada: passou, eventos: cenario });
 
     if (!passou) {
       falhar(veredito.tipo, veredito.mensagem, veredito.esconderAvisos ? [] : [...avisos]);
       return veredito.tipo;
     }
 
+    const { pediuDica, viuSolucao } = ajudaRef.current;
+    resumoRef.current = { estrelas: 1 + (viuSolucao ? 0 : 1) + (pediuDica ? 0 : 1), tentativas, pediuDica, viuSolucao };
+    tocar('acerto');
     mostrar({ ...veredito, avisos: [...avisos] });
     // algumas fases esperam o jogador mexer na cena
     if (!veredito.esperarInteracao) setTimeout(vencer, fase.atrasoDaVitoria ?? 1400);
@@ -157,7 +199,7 @@ export function TelaDaFase({
   // no celular, acertou vai pra cena; errou mostra o código e a mensagem
   async function rodarNoCelular() {
     const tipo = await rodar();
-    setAba(tipo === 'ok' ? 'missao' : 'codigo');
+    if (tipo !== 'ocupado') setAba(tipo === 'ok' ? 'missao' : 'codigo');
   }
 
   function recomecar() {
@@ -168,6 +210,7 @@ export function TelaDaFase({
     }
     setConfirmarRecomeco(false);
     aoRecomecar();
+    cenarioRef.current?.limpar();
     setExecucao(null);
     setResultado(null);
   }
@@ -182,6 +225,7 @@ export function TelaDaFase({
         Componente={execucao?.Componente}
         liberada={execucao?.liberada ?? false}
         primeiraVez={!execucao}
+        eventos={execucao?.eventos}
         modo={modo}
         aoVencer={vencer}
       />
@@ -191,8 +235,8 @@ export function TelaDaFase({
 
   return (
     <main className={`jogo jogo--aba-${aba} ${saindo ? 'jogo--saindo' : ''}`}>
-      <section className="jogo__mundo" aria-label="Cena">
-        {cena}
+      <section className={`jogo__mundo ${execucao?.liberada ? 'jogo__mundo--festa' : ''}`} aria-label="Cena">
+        <ContextoDaConversa.Provider value={conversa}>{cena}</ContextoDaConversa.Provider>
         {resultado && (
           <div className="so-celular">
             <Resultado key={resultado.id} resultado={resultado} />
@@ -208,7 +252,7 @@ export function TelaDaFase({
             <button type="button" className="botao botao--pedra" onClick={recomecar}>
               {confirmarRecomeco ? 'Apagar tudo?' : 'Recomeçar'}
             </button>
-            <button type="button" className="botao botao--fogo so-tela-grande" onClick={rodar}>
+            <button type="button" className="botao botao--fogo so-tela-grande" onClick={rodar} disabled={rodando} data-som="nenhum">
               <Icone nome="rodar" />
               Rodar
             </button>
@@ -221,6 +265,8 @@ export function TelaDaFase({
           dicas={fase.dicas.map((dica) => doModo(dica, modo))}
           solucao={doModo(fase.solucao, modo)}
           tentativas={tentativas}
+          aoPedirDica={() => (ajudaRef.current.pediuDica = true)}
+          aoVerSolucao={() => (ajudaRef.current.viuSolucao = true)}
         />
       </section>
 
@@ -241,7 +287,7 @@ export function TelaDaFase({
         >
           Código
         </button>
-        <button type="button" className="botao botao--fogo" onClick={rodarNoCelular}>
+        <button type="button" className="botao botao--fogo" onClick={rodarNoCelular} disabled={rodando} data-som="nenhum">
           <Icone nome="rodar" />
           Rodar
         </button>
@@ -251,6 +297,7 @@ export function TelaDaFase({
         <Vitoria
           fase={fase}
           modo={modo}
+          resumo={resumoRef.current}
           temProxima={temProxima}
           outroModoFeito={outroModoFeito}
           aoProxima={aoProxima}

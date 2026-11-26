@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-// Dois jeitos de trocar de tela:
-// - iris: a tela fecha num círculo, troca, mostra o cartão da fase (se tiver) e abre de novo
-// - viagem: quem está na sala sai andando, a câmera passa por um corredor e chega na próxima sala
+// iris: fecha num círculo, troca e abre (com o cartão da fase, se tiver)
+// viagem: a turma sai da sala, passa pelo corredor e chega na próxima
 const ETAPAS = {
   iris: { fechando: 450, cartao: 1500, abrindo: 450 },
   viagem: { saindo: 950, cobrindo: 520, corredor: 2000, revelando: 560 },

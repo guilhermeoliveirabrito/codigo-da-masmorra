@@ -1,6 +1,5 @@
-// Separa o código em pedaços coloridos: palavra-chave, texto, tag do JSX, atributo...
-// Não precisa entender o código inteiro, só o bastante pra colorir. Por isso nunca falha:
-// código pela metade (enquanto a pessoa digita) também sai colorido, do jeito que der.
+// pinta o código por pedaços (palavra-chave, texto, tag, atributo...)
+// não entende o código todo, então código pela metade também sai colorido
 
 const PALAVRAS = new Set([
   'import', 'from', 'export', 'default', 'function', 'return', 'const', 'let', 'var', 'if', 'else',
