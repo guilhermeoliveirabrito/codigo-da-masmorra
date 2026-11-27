@@ -21,15 +21,17 @@ Jogar: https://guilhermeoliveirabrito.github.io/codigo-da-masmorra/
 9. O mensageiro: buscando dados de uma API com `fetch`
 10. O guardião: uma batalha juntando tudo
 
-Cada fase dá até 3 estrelas (passar, não ver a solução, não pedir dica) e tem conquistas escondidas pelo caminho.
+Cada fase dá até 3 estrelas (passar, não ver a solução, não pedir dica) e tem conquistas escondidas pelo caminho. As fases ficam num mapa da masmorra, com a trilha do que já foi feito em cada modo.
 
 ## Moedas, segredos e loja
 
-Passar de fase dá moedas: 20 na primeira vez mais 10 por estrela, e depois só as estrelas novas valem. Cada sala também esconde um segredo (um vaso, um tijolo solto, uma garrafa boiando no rio...), e a tela inicial tem mais um. Na loja, as moedas compram acessórios pra turma, um gatinho e uma gosminha que acompanham as viagens e tochas azuis.
+Passar de fase dá moedas: 20 na primeira vez mais 10 por estrela, e depois só as estrelas novas valem. Cada sala também esconde um segredo (um vaso, um tijolo solto, uma garrafa boiando no rio...), e a tela inicial tem mais um. Na loja, as moedas compram acessórios pra turma, um gatinho e uma gosminha que acompanham as viagens, tochas azuis e temas pro editor (pergaminho, neon e musgo).
 
 ## Caça aos bugs
 
-Modo arcade liberado depois da primeira fase: o goblin Bugado quebra componentes e você tem 3 minutos pra consertar o máximo que conseguir. São 18 bugs (`src/caca/bugs.jsx`), e só entram os das fases que você já passou no modo escolhido. Consertos seguidos aumentam o combo, pular zera, e o recorde fica salvo por modo.
+Modo arcade liberado depois da primeira fase: o goblin Bugado quebra componentes e você tem 3 minutos pra consertar o máximo que conseguir. São 18 bugs (`src/caca/bugs.jsx`), e só entram os das fases que você já passou no modo escolhido. Consertos seguidos aumentam o combo, pular zera, e o recorde fica salvo por modo. Se travar, a lupa mostra a linha do problema e uma pista, mas aí o conserto vale metade.
+
+Tem também o bug do dia: um bug por dia, sorteado pela data entre os das fases que você já passou, e sem relógio. Consertar dá moedas e conta numa sequência de dias seguidos, que vale mais a cada dia. O resultado da caça, do bug do dia e do fim do jogo dá pra compartilhar: no celular abre a janela de compartilhar do sistema, no computador o texto vai pra área de transferência.
 
 ## Rodando
 
@@ -61,9 +63,9 @@ Os personagens, o cenário e os ícones são pixel art desenhada no código (`sr
 
 Nas fases 8 e 9 o código usa `setInterval` e `fetch`, mas não os do navegador: o jogo entrega versões próprias (`src/motor/ambiente.js`). Na cena elas funcionam de verdade, e no teste o tempo é controlado pelo jogo, o que permite conferir se o intervalo para quando o componente sai da tela. O `fetch` responde de um servidor de mentira, então nada sai da página.
 
-Os sons são gerados na hora com Web Audio (`src/som.js`), sem arquivo de áudio.
+Os sons e as músicas são gerados na hora com Web Audio (`src/som.js` e `src/musica.js`), sem arquivo de áudio: uma música calma pros menus e as fases, e uma mais rápida pra caça aos bugs, que acelera nos últimos 10 segundos.
 
-O editor colore o código com um leitor simples de JavaScript e JSX (`src/components/realce.js`). No iPhone e no iPad ele fica sem cor: o Safari desloca o texto do campo uns pixels, e o cursor não bateria com o texto colorido.
+O editor colore o código com um leitor simples de JavaScript e JSX (`src/components/realce.js`). No iPhone e no iPad ele fica sem cor: o Safari desloca o texto do campo uns pixels, e o cursor não bateria com o texto colorido. As cores do editor são variáveis do CSS, então cada tema da loja só troca as variáveis.
 
 ## Licença
 
