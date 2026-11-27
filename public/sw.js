@@ -1,6 +1,6 @@
 // Guarda o jogo no aparelho pra abrir mesmo sem internet.
 // A página sempre tenta a versão nova primeiro; o resto (scripts, fontes, ícones) vem do cache.
-const CACHE = 'masmorra-v3';
+const CACHE = 'masmorra-v4';
 const ESSENCIAIS = ['./', './index.html', './manifest.webmanifest', './icones/icone-192.png'];
 
 self.addEventListener('install', (evento) => {
