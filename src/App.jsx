@@ -26,6 +26,7 @@ export default function App() {
     salvarCodigo,
     apagarCodigo,
     concluirFase,
+    ganharMoedas,
     marcarLivroVisto,
     darEstrelas,
     ganharConquista,
@@ -129,7 +130,7 @@ export default function App() {
     else viajar(acao, destino, { saida });
   }
 
-  // resumo: { estrelas, tentativas, pediuDica } da rodada que passou
+  // resumo: { estrelas, tentativas, pediuDica } da rodada que passou. Devolve quantas moedas ganhou.
   const concluir = useCallback(
     (resumo) => {
       const atual = progressoRef.current;
@@ -137,6 +138,12 @@ export default function App() {
       const outro = modo === 'web' ? 'mobile' : 'web';
       concluirFase(fase.id, modo);
       darEstrelas(chave, resumo.estrelas);
+
+      // primeira vez: 20 + 10 por estrela. Depois, só as estrelas novas valem moeda
+      const primeiraVez = !atual.concluidas[modo].includes(fase.id);
+      const estrelasNovas = Math.max(0, resumo.estrelas - (atual.estrelas[chave] ?? 0));
+      const moedas = primeiraVez ? 20 + 10 * resumo.estrelas : 10 * estrelasNovas;
+      if (moedas) ganharMoedas(moedas);
 
       if (fase.numero === 1) conquistar('primeiro-passo');
       if (resumo.tentativas === 0) conquistar('de-primeira');
@@ -148,8 +155,9 @@ export default function App() {
       if (fases.every((f) => feitas.has(f.id))) conquistar(modo);
       const estrelas = { ...atual.estrelas, [chave]: Math.max(atual.estrelas[chave] ?? 0, resumo.estrelas) };
       if (Object.values(estrelas).filter((n) => n === 3).length >= 5) conquistar('estrelas');
+      return moedas;
     },
-    [concluirFase, darEstrelas, fase, modo]
+    [concluirFase, darEstrelas, ganharMoedas, fase, modo]
   );
 
   return (
@@ -163,6 +171,7 @@ export default function App() {
           totalDeFases={fases.length}
           estrelas={totalDeEstrelas}
           maximoDeEstrelas={fases.length * 6}
+          moedas={progresso.moedas}
           conquistas={progresso.conquistas.length}
           totalDeConquistas={CONQUISTAS.length}
           som={progresso.som}

@@ -1,8 +1,41 @@
-import { useEffect } from 'react';
-import { BAU, BAU_FECHADO } from '../pixel/desenhos';
+import { useEffect, useState } from 'react';
+import { semAnimacao } from '../hooks/useTransicao';
+import { BAU, BAU_FECHADO, MOEDA } from '../pixel/desenhos';
 import { Icone, Sprite } from '../pixel/Sprite';
 import { tocar } from '../som';
 import { TextoRico } from './TextoRico';
+
+// as moedas ganhas sobem de pouco em pouco, cada passo com um plim
+function ContadorDeMoedas({ quantas, atraso }) {
+  const [mostradas, setMostradas] = useState(() => (semAnimacao() ? quantas : 0));
+
+  useEffect(() => {
+    if (semAnimacao()) return;
+    let contadas = 0;
+    let intervalo;
+    const passo = Math.max(1, Math.ceil(quantas / 10));
+    const comeco = setTimeout(() => {
+      intervalo = setInterval(() => {
+        contadas = Math.min(quantas, contadas + passo);
+        setMostradas(contadas);
+        tocar('contar');
+        if (contadas >= quantas) clearInterval(intervalo);
+      }, 70);
+    }, atraso);
+    return () => {
+      clearTimeout(comeco);
+      clearInterval(intervalo);
+    };
+  }, [quantas, atraso]);
+
+  return (
+    <p className={`vitoria__moedas ${mostradas === quantas ? 'vitoria__moedas--fim' : ''}`} aria-label={`Ganhou ${quantas} moedas`}>
+      <Sprite desenho={MOEDA} />
+      <span aria-hidden="true">+{mostradas}</span>
+      <small aria-hidden="true">moedas</small>
+    </p>
+  );
+}
 
 // pra onde cada moeda pula quando o baú abre
 const MOEDAS = [-34, 22, -12, 40, 6, -26, 30];
@@ -10,7 +43,7 @@ const MOEDAS = [-34, 22, -12, 40, 6, -26, 30];
 export function Vitoria({ fase, modo, resumo, temProxima, outroModoFeito, aoProxima, aoTrocarModo, aoFechar }) {
   const aprendeu = typeof fase.aprendeu === 'object' ? fase.aprendeu[modo] : fase.aprendeu;
   const outroModo = modo === 'web' ? 'Mobile' : 'Web';
-  const { estrelas = 1, pediuDica = true, viuSolucao = true } = resumo ?? {};
+  const { estrelas = 1, pediuDica = true, viuSolucao = true, moedas = 0 } = resumo ?? {};
   const criterios = [
     { texto: 'Passou da fase', feito: true },
     { texto: 'Sem ver a solução', feito: !viuSolucao },
@@ -55,6 +88,10 @@ export function Vitoria({ fase, modo, resumo, temProxima, outroModoFeito, aoProx
             </span>
           ))}
         </div>
+        {moedas > 0 && <ContadorDeMoedas quantas={moedas} atraso={1250 + estrelas * 280} />}
+        {moedas === 0 && estrelas < 3 && (
+          <p className="vitoria__sem-moedas">Mais estrelas nesta fase ainda valem moedas.</p>
+        )}
         <ul className="vitoria__criterios">
           {criterios.map(({ texto, feito }) => (
             <li key={texto} className={feito ? 'criterio--feito' : ''}>

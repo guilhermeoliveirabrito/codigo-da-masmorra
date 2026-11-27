@@ -76,8 +76,9 @@ export function TelaDaFase({
   const cenarioRef = useRef(null);
 
   const vencer = useCallback(() => {
+    const resumo = resumoRef.current ?? { estrelas: 1, tentativas: 0, pediuDica: true };
+    resumoRef.current = { ...resumo, moedas: aoConcluir(resumo) ?? 0 };
     setVenceu(true);
-    aoConcluir(resumoRef.current ?? { estrelas: 1, tentativas: 0, pediuDica: true });
   }, [aoConcluir]);
 
   useEffect(() => {

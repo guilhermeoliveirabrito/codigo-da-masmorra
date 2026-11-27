@@ -684,7 +684,14 @@ pre {
   pointer-events: auto;
 }
 
-.menu__estrelas {
+.menu__placar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.menu__estrelas,
+.menu__moedas {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -700,6 +707,11 @@ pre {
 .menu__estrelas small {
   font-size: 13px;
   color: var(--neblina);
+}
+
+.menu__moedas .sprite {
+  width: 18px;
+  height: 18px;
 }
 
 .menu__estrelas .icone {
@@ -3419,6 +3431,40 @@ button.sala:active:not(:disabled) {
   display: flex;
   gap: 10px;
   margin-bottom: 8px;
+}
+
+.vitoria__moedas {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font: 700 24px/1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.vitoria__moedas .sprite {
+  width: 24px;
+  height: 24px;
+}
+
+.vitoria__moedas small {
+  font-size: 15px;
+  color: var(--neblina);
+}
+
+/* quando termina de contar, a moeda dá um pulinho */
+.vitoria__moedas--fim .sprite {
+  animation: moeda-pula 0.4s steps(4);
+}
+
+@keyframes moeda-pula {
+  50% { transform: translateY(-6px); }
+}
+
+.vitoria__sem-moedas {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: var(--neblina);
 }
 
 .estrela {

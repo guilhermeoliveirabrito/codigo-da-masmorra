@@ -6,8 +6,8 @@ import { Porta } from '../components/Porta';
 import { useInstalacao } from '../hooks/useInstalacao';
 import { ContextoDaConversa, useConversa } from '../conversa';
 import { semAnimacao } from '../hooks/useTransicao';
-import { BARRIL, ESTANDARTE } from '../pixel/desenhos';
-import { Icone, NoFundo } from '../pixel/Sprite';
+import { BARRIL, ESTANDARTE, MOEDA } from '../pixel/desenhos';
+import { Icone, NoFundo, Sprite } from '../pixel/Sprite';
 import { tocar, tocarDeLeve } from '../som';
 import { FundoDoSalao, limitesDoSalao, useSalao } from './Salao';
 
@@ -54,6 +54,7 @@ export function Menu({
   totalDeFases,
   estrelas,
   maximoDeEstrelas,
+  moedas,
   conquistas,
   totalDeConquistas,
   som,
@@ -153,11 +154,17 @@ export function Menu({
       </div>
 
       <header className="menu__hud">
-        <span className="menu__estrelas" title="Estrelas">
-          <Icone nome="estrela" />
-          {estrelas}
-          <small>/{maximoDeEstrelas}</small>
-        </span>
+        <div className="menu__placar">
+          <span className="menu__estrelas" title="Estrelas">
+            <Icone nome="estrela" />
+            {estrelas}
+            <small>/{maximoDeEstrelas}</small>
+          </span>
+          <span className="menu__moedas" title="Moedas">
+            <Sprite desenho={MOEDA} />
+            {moedas}
+          </span>
+        </div>
         <div className="menu__cantos">
           <button
             type="button"

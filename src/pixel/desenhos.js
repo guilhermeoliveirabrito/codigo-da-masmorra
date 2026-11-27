@@ -329,6 +329,11 @@ export const ALAVANCA_BAIXO = {
   ],
 };
 
+// moeda do placar e da loja
+export const MOEDA = {
+  camadas: [['..kkkk..', '.kYYYyk.', 'kYWYyyok', 'kYYyoyok', 'kYyyoyok', 'kYyyyyok', '.kyyyok.', '..kkkk..']],
+};
+
 export const BAU = {
   camadas: [
     [

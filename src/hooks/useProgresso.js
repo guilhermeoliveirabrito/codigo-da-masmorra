@@ -11,8 +11,11 @@ const INICIAL = {
   livrosVistos: [], // páginas do livro que já abriram sozinhas no começo da fase
   estrelas: {}, // melhor resultado de cada fase em cada modo, tipo { 'placa-web': 3 }
   conquistas: [],
+  moedas: 0,
   som: true,
 };
+
+const MOEDAS_NO_MAXIMO = 999_999;
 
 const listaDeTextos = (valor) => (Array.isArray(valor) ? valor.filter((item) => typeof item === 'string') : []);
 
@@ -39,6 +42,7 @@ function validar(dados) {
     livrosVistos: listaDeTextos(dados.livrosVistos),
     estrelas,
     conquistas: listaDeTextos(dados.conquistas),
+    moedas: Number.isInteger(dados.moedas) ? Math.min(Math.max(dados.moedas, 0), MOEDAS_NO_MAXIMO) : 0,
     som: dados.som !== false,
   };
 }
@@ -101,6 +105,8 @@ export function useProgresso() {
         }),
       darEstrelas: (chave, quantas) =>
         atualizar((atual) => ((atual.estrelas[chave] ?? 0) >= quantas ? {} : { estrelas: { ...atual.estrelas, [chave]: quantas } })),
+      ganharMoedas: (quantas) =>
+        atualizar((atual) => ({ moedas: Math.min(atual.moedas + Math.max(0, Math.floor(quantas)), MOEDAS_NO_MAXIMO) })),
       ganharConquista: (id) =>
         atualizar((atual) => (atual.conquistas.includes(id) ? {} : { conquistas: [...atual.conquistas, id] })),
       alternarSom: () => atualizar((atual) => ({ som: !atual.som })),
