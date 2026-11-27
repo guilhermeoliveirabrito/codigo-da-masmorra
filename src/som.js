@@ -60,6 +60,7 @@ const melodia = (ctx, notas, passo, opcoes = {}) =>
 
 const SONS = {
   clique: (ctx) => nota(ctx, { freq: 620, duracao: 0.035, volume: 0.05 }),
+  passar: (ctx) => nota(ctx, { freq: 990, duracao: 0.02, volume: 0.025 }),
   rodar: (ctx) => nota(ctx, { freq: 220, ate: 880, duracao: 0.14, onda: 'triangle', volume: 0.12 }),
   acerto: (ctx) => melodia(ctx, [523, 659, 784, 1047], 0.08, { volume: 0.08 }),
   quase: (ctx) => melodia(ctx, [440, 392], 0.11, { onda: 'triangle', volume: 0.12 }),
@@ -109,4 +110,9 @@ export function tocar(nome) {
   } catch {
     // sem som, segue o jogo
   }
+}
+
+// som de passar o mouse: só toca se o áudio já foi liberado por um clique (não cria o contexto antes)
+export function tocarDeLeve(nome) {
+  if (ligado && contexto?.state === 'running') tocar(nome);
 }

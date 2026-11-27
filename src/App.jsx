@@ -159,10 +159,12 @@ export default function App() {
           faseAtual={fase}
           comecou={comecou}
           modo={modo}
-          resumo={`Web: ${concluidas.web.length} de ${fases.length} · Mobile: ${concluidas.mobile.length} de ${fases.length}`}
+          feitas={{ web: concluidas.web.length, mobile: concluidas.mobile.length }}
+          totalDeFases={fases.length}
           estrelas={totalDeEstrelas}
           maximoDeEstrelas={fases.length * 6}
           conquistas={progresso.conquistas.length}
+          totalDeConquistas={CONQUISTAS.length}
           som={progresso.som}
           aoAlternarSom={alternarSom}
           aoConquistas={() => setConquistasAbertas(true)}

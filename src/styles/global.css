@@ -48,7 +48,7 @@ button,
 .cena,
 .cabecalho,
 .abas-do-celular,
-.menu__palco,
+.menu,
 .transicao {
   -webkit-user-select: none;
   user-select: none;
@@ -304,137 +304,414 @@ pre {
   display: none;
 }
 
-/* Menu inicial */
+/* Menu inicial: um salão do tamanho da tela, com a sala de sempre embaixo */
 .menu {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
-  align-items: center;
-  gap: 40px;
+  position: relative;
   min-height: 100vh;
   min-height: 100dvh;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: max(28px, env(safe-area-inset-top)) max(16px, 3vw) max(28px, env(safe-area-inset-bottom));
+  overflow: hidden;
+  background: var(--pedra-escura);
 }
 
-.menu__palco {
-  position: relative;
-  container-type: inline-size;
-}
-
-.menu__titulo {
+/* régua com a altura da tela (o 100dvh muda quando a barra do navegador aparece ou some) */
+.menu__regua {
   position: absolute;
-  top: 5cqw;
+  top: 0;
   left: 0;
-  right: 0;
-  z-index: 5;
-  margin: 0;
-  text-align: center;
-  font: 700 clamp(24px, 7.4cqw, 64px) / 1 var(--fonte-pixel);
-  color: var(--osso);
-  text-shadow:
-    0.06em 0.06em 0 var(--breu),
-    -0.03em -0.03em 0 var(--breu),
-    0.03em -0.03em 0 var(--breu),
-    -0.03em 0.03em 0 var(--breu);
+  width: 1px;
+  height: 100vh;
+  height: 100dvh;
+  visibility: hidden;
   pointer-events: none;
 }
 
-.menu__painel {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+.salao__fundo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.menu__chamada {
-  margin: 0;
-  font-size: 17px;
-  line-height: 1.5;
+/* bordas escuras e um calor de tocha no meio */
+.menu::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(24, 20, 37, 0.5), transparent 45%),
+    radial-gradient(ellipse 90% 85% at 50% 55%, transparent 40%, rgba(24, 20, 37, 0.8) 100%);
+  pointer-events: none;
+}
+
+.menu__sala {
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+}
+
+.menu__poeira {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.menu__poeira span {
+  position: absolute;
+  width: var(--px, 2px);
+  height: var(--px, 2px);
+  background: var(--ouro);
+  opacity: 0;
+  animation: poeira 10s steps(60) infinite;
+}
+
+@keyframes poeira {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  15% { opacity: 0.55; }
+  80% { opacity: 0.35; }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--px, 2px) * 8), calc(var(--px, 2px) * -34));
+  }
+}
+
+/* a porta abriu: o menu sai da frente e quem aparece é a turma entrando */
+.menu--saindo .menu__conteudo,
+.menu--saindo .menu__hud {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s steps(3);
+}
+
+.menu--medindo .menu__sala {
+  visibility: hidden;
+}
+
+/* tudo aqui dentro é medido em em: cresce junto com a altura da tela */
+.menu__conteudo {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 1.1em, 24px);
+  width: min(100%, 28em + 32px);
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top) + clamp(20px, 4vh, 44px)) 16px 0;
+  font-size: clamp(15px, 1.15vh + 7px, 21px);
+}
+
+.menu__logo {
+  width: min(100% + 60px, 34em, 62vh);
+  margin: 0 -30px;
+  line-height: 0;
+  animation: logo-chega 0.6s steps(6) both;
+}
+
+@keyframes logo-chega {
+  from {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+}
+
+.logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 5px 0 rgba(24, 20, 37, 0.55));
+}
+
+.logo__reflexo {
+  opacity: 0.55;
+  transform: translateX(-30px);
+  animation: reflexo 6s steps(35) 1.4s infinite;
+}
+
+@keyframes reflexo {
+  0% { transform: translateX(-30px); }
+  26%, 100% { transform: translateX(110px); }
+}
+
+.logo__faisca {
+  opacity: 0;
+  animation: faisca 3.4s steps(1) infinite;
+}
+
+@keyframes faisca {
+  0%, 80% { opacity: 0; }
+  84% { opacity: 1; }
+  88% { opacity: 0.4; }
+  92% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+
+/* a lista principal: texto de jogo, com cursor no item escolhido */
+.menu__lista {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0.5em;
+  background: rgba(24, 20, 37, 0.82);
+  border: 2px solid var(--pedra-clara);
+  box-shadow:
+    0 0 0 2px var(--breu),
+    4px 4px 0 2px rgba(24, 20, 37, 0.7);
+  animation: menu-chega 0.4s steps(4) 0.15s both;
+}
+
+@keyframes menu-chega {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.opcao {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 0.6em;
+  min-height: max(44px, 2.1em);
+  padding: 0.45em 0.55em 0.4em 1.75em;
+  border: 0;
+  background: none;
+  font: 700 1.375em/1.1 var(--fonte-pixel);
   color: var(--osso);
+  text-align: left;
+  cursor: pointer;
 }
 
-.menu__acoes {
+.opcao--principal {
+  font-size: 1.625em;
+  color: var(--ouro);
+}
+
+.opcao__cursor {
+  position: absolute;
+  top: 50%;
+  left: 0.5em;
+  height: 0.72em;
+  translate: 0 -50%;
+  color: var(--fogo);
+  opacity: 0;
+}
+
+.opcao__detalhe {
+  margin-left: auto;
+  overflow: hidden;
+  font: 600 max(13px, 0.55em) / 1.2 var(--fonte-pixel);
+  color: var(--neblina);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.opcao:hover,
+.opcao:focus-visible {
+  outline: none;
+  background: rgba(254, 174, 52, 0.12);
+  color: #fee761;
+}
+
+.opcao:active {
+  translate: 0 2px;
+}
+
+/* sem o mouse em cima nem foco, o cursor fica no primeiro */
+.opcao:hover .opcao__cursor,
+.opcao:focus-visible .opcao__cursor,
+.menu__lista:not(:hover):not(:focus-within) .opcao--principal .opcao__cursor {
+  opacity: 1;
+  animation: cursor-vai 0.7s steps(2) infinite;
+}
+
+@keyframes cursor-vai {
+  50% { transform: translateX(3px); }
+}
+
+.menu__atalhos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5em;
+  width: 100%;
+  animation: menu-chega 0.4s steps(4) 0.25s both;
+}
+
+.atalho {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45em;
+  min-height: 4em;
+  padding: 0.6em 4px 0.5em;
+  border: 2px solid var(--breu);
+  font: 600 0.875em/1 var(--fonte-pixel);
+  color: var(--osso);
+  background: rgba(38, 43, 68, 0.92);
+  box-shadow:
+    inset 0 2px 0 var(--pedra),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.3);
+  cursor: pointer;
 }
 
-.menu__acoes .botao {
-  justify-content: flex-start;
-  min-height: 48px;
+.atalho .icone {
+  height: 1.15em;
+  color: var(--ouro);
 }
 
-.botao--grande {
-  min-height: 56px;
-  font-size: 20px;
+.atalho__conta {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  font-size: max(11px, 0.8em);
+  color: var(--neblina);
 }
 
-.menu__onde {
-  margin-left: auto;
-  font-size: 14px;
-  opacity: 0.75;
+.atalho:hover,
+.atalho:focus-visible {
+  outline: none;
+  color: #fff;
+  background: var(--pedra);
+  box-shadow:
+    inset 0 2px 0 var(--pedra-clara),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.3),
+    0 0 0 2px var(--ouro);
+}
+
+.atalho:active {
+  translate: 0 2px;
 }
 
 .menu__modo {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  border: 2px solid var(--breu);
+  animation: menu-chega 0.4s steps(4) 0.35s both;
+}
+
+.menu__modo button {
+  display: flex;
   align-items: center;
-  gap: 10px 12px;
+  gap: 0.55em;
+  min-height: max(48px, 3.1em);
+  padding: 0.4em 0.65em;
+  border: 0;
+  font: 600 1em/1 var(--fonte-pixel);
+  color: var(--neblina);
+  text-align: left;
+  background: rgba(24, 20, 37, 0.88);
+  cursor: pointer;
 }
 
-.menu__modo .modo {
-  justify-self: start;
-}
-
-.menu__modo p {
-  grid-column: 1 / -1;
-  margin: 0;
-  font-size: 15px;
+.menu__modo button small {
+  display: block;
+  margin-top: 0.3em;
+  font: 400 max(11px, 0.7em) / 1 var(--fonte-texto);
   color: var(--neblina);
 }
 
-.menu__rodape {
+.menu__modo .icone {
+  height: 0.9em;
+}
+
+.menu__modo .modo--ativo {
+  color: var(--ouro);
+  background: var(--pedra);
+  box-shadow: inset 0 -3px 0 var(--ouro);
+}
+
+.menu__modo button:focus-visible {
+  outline: 2px solid var(--ouro);
+  outline-offset: -2px;
+}
+
+.menu__feitas {
+  margin-left: auto;
+  font-size: 0.82em;
+}
+
+/* celular deitado: pouca altura, o menu vai pra duas colunas */
+@media (orientation: landscape) and (max-height: 520px) {
+  .menu__conteudo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    width: min(100%, 52em);
+    padding-top: calc(env(safe-area-inset-top) + 12px);
+    font-size: 14px;
+  }
+
+  .menu__logo {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(50vw, 21em);
+    margin: 0;
+  }
+
+  .menu__lista {
+    grid-row: 2 / 4;
+  }
+
+  .menu__atalhos .atalho {
+    min-height: 3.4em;
+  }
+}
+
+/* placar e botões nos cantos de cima, por cima da parede */
+.menu__hud {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 3;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 8px 16px;
-  padding-top: 16px;
-  border-top: 2px solid var(--pedra);
-  font-size: 14px;
-  color: var(--neblina);
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+  pointer-events: none;
 }
 
-.menu__links {
-  display: flex;
-  gap: 16px;
-}
-
-.menu__placar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px 14px;
+.menu__hud > * {
+  pointer-events: auto;
 }
 
 .menu__estrelas {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font: 600 15px/1 var(--fonte-pixel);
+  gap: 7px;
+  height: 44px;
+  padding: 0 12px;
+  font: 700 18px/1 var(--fonte-pixel);
   color: var(--ouro);
+  background: rgba(24, 20, 37, 0.82);
+  border: 2px solid var(--breu);
+  box-shadow: inset 0 0 0 2px var(--pedra-escura);
+}
+
+.menu__estrelas small {
+  font-size: 13px;
+  color: var(--neblina);
 }
 
 .menu__estrelas .icone {
-  width: 14px;
-  height: 14px;
+  height: 16px;
 }
 
-.menu__som {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 6;
+.menu__cantos {
+  display: flex;
+  gap: 8px;
+}
+
+.menu__canto {
   display: grid;
   place-items: center;
   width: 44px;
@@ -442,16 +719,20 @@ pre {
   padding: 0;
   border: 2px solid var(--breu);
   color: var(--osso);
-  background: rgba(24, 20, 37, 0.7);
+  background: rgba(24, 20, 37, 0.82);
+  box-shadow: inset 0 0 0 2px var(--pedra-escura);
   cursor: pointer;
 }
 
-.menu__som .icone {
-  width: 20px;
+.menu__canto .icone {
   height: 18px;
 }
 
-.menu__som:focus-visible {
+.menu__canto:hover {
+  color: var(--ouro);
+}
+
+.menu__canto:focus-visible {
   outline: 2px solid var(--ouro);
   outline-offset: 2px;
 }
@@ -461,19 +742,51 @@ pre {
   height: 16px;
 }
 
-.menu__link {
-  padding: 4px 0;
-  border: 0;
-  background: none;
-  color: var(--osso);
-  font-size: 14px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
+/* Ajustes */
+.ajustes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(460px, 100%);
+  padding: 22px 22px 20px;
 }
 
-.menu__dica {
-  flex-basis: 100%;
+.ajustes h2 {
+  margin: 0 0 6px;
+  font: 700 26px/1.1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.ajustes__linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 14px;
+  padding: 12px 14px;
+  background: var(--breu);
+}
+
+.ajustes__linha > span {
+  flex: 1 1 160px;
+  font: 600 16px/1.2 var(--fonte-pixel);
+}
+
+.ajustes__linha small {
+  display: block;
+  margin-top: 4px;
+  font: 13px/1.4 var(--fonte-texto);
+  color: var(--neblina);
+}
+
+.botao--perigo {
+  background: var(--brasa);
+  color: #fff;
+}
+
+.ajustes__fechar {
+  align-self: flex-end;
+  margin-top: 6px;
 }
 
 /* Mapa de fases */
@@ -1169,6 +1482,18 @@ button.sala:active:not(:disabled) {
   background: var(--breu);
 }
 
+/* no menu a sala não tem moldura: a parede do salão continua por trás */
+.cena.cena--solta {
+  overflow: visible;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.cena--solta .cena__fundo {
+  overflow: visible;
+}
+
 .cena__fundo {
   position: absolute;
   inset: 0;
@@ -1378,7 +1703,7 @@ button.sala:active:not(:disabled) {
   background: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  animation: gato-anda 7s linear both;
+  animation: gato-anda calc(7s * var(--fator-do-gato, 1)) linear both;
 }
 
 .gato--para-esquerda {
@@ -1396,14 +1721,15 @@ button.sala:active:not(:disabled) {
   scale: -1 1;
 }
 
+/* --alem: no menu, quanto o salão passa da sala pra cada lado */
 @keyframes gato-anda {
-  from { transform: translateX(-10cqw); }
-  to { transform: translateX(104cqw); }
+  from { transform: translateX(calc(-10cqw - var(--alem, 0cqw))); }
+  to { transform: translateX(calc(104cqw + var(--alem, 0cqw))); }
 }
 
 @keyframes gato-volta {
-  from { transform: translateX(104cqw); }
-  to { transform: translateX(-10cqw); }
+  from { transform: translateX(calc(104cqw + var(--alem, 0cqw))); }
+  to { transform: translateX(calc(-10cqw - var(--alem, 0cqw))); }
 }
 
 .gato__coracao {
@@ -3173,26 +3499,6 @@ button.sala:active:not(:disabled) {
   margin-top: 20px;
 }
 
-@media (max-width: 960px) {
-  .menu {
-    grid-template-columns: minmax(0, 1fr);
-    align-content: start;
-    gap: 24px;
-  }
-
-  .menu__palco {
-    max-width: 720px;
-    width: 100%;
-    margin: 0 auto;
-  }
-
-  .menu__painel {
-    max-width: 560px;
-    width: 100%;
-    margin: 0 auto;
-  }
-}
-
 /* No celular: uma parte da fase por vez, com abas e o Rodar fixo embaixo */
 @media (max-width: 760px) {
   .so-tela-grande {
@@ -3211,13 +3517,25 @@ button.sala:active:not(:disabled) {
     display: flex;
   }
 
-  /* no celular o título ocupa a largura toda: o som vai pro canto de baixo */
-  .menu__som {
-    top: auto;
-    bottom: 8px;
-    right: 8px;
-    width: 38px;
-    height: 38px;
+  /* no celular o título ocupa a largura toda: começa embaixo do placar */
+  .menu__conteudo {
+    padding-top: calc(env(safe-area-inset-top) + 66px);
+  }
+
+  .menu__logo {
+    width: min(100% + 24px, 62vh);
+    margin: 0 -12px;
+  }
+
+  @media (orientation: landscape) and (max-height: 520px) {
+    .menu__conteudo {
+      padding-top: calc(env(safe-area-inset-top) + 12px);
+    }
+
+    .menu__logo {
+      width: min(50vw, 21em);
+      margin: 0;
+    }
   }
 
   .modal {

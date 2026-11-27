@@ -36,7 +36,7 @@ Pra abrir no celular durante o desenvolvimento, use `npm run dev -- --host` e ac
 
 No celular, a fase fica dividida em duas abas (Missão e Código), com o botão Rodar sempre embaixo. Publicado no GitHub Pages, o jogo pode ser instalado na tela inicial e abre mesmo sem internet:
 
-- Android: menu do Chrome, Instalar app (ou o botão Instalar no celular, no menu do jogo).
+- Android: menu do Chrome, Instalar app (ou Instalar no celular, nos ajustes do jogo, a engrenagem no canto da tela inicial).
 - iPhone: no Safari, Compartilhar e Adicionar à Tela de Início.
 
 A cada push na `main`, o workflow em `.github/workflows/deploy.yml` faz o build e coloca o resultado na branch `gh-pages`, que é a que o GitHub Pages publica.

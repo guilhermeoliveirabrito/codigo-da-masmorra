@@ -362,6 +362,9 @@ export const ICONES = {
   mudo: ['...x....', '..xx....', 'xxxx.x.x', 'xxxx..x.', 'xxxx.x.x', '..xx....', '...x....'],
   trofeu: ['xxxxxxx', 'xxxxxxx', '.xxxxx.', '..xxx..', '...x...', '..xxx..', '.xxxxx.'],
   coracao: ['.xx.xx.', 'xxxxxxx', 'xxxxxxx', '.xxxxx.', '..xxx..', '...x...'],
+  cursor: ['x.....', 'xx....', 'xxx...', 'xxxx..', 'xxxxx.', 'xxxx..', 'xxx...', 'xx....', 'x.....'],
+  engrenagem: ['...x.x...', '.x.xxx.x.', '..xxxxx..', 'xxxx.xxxx', '.xx...xx.', 'xxxx.xxxx', '..xxxxx..', '.x.xxx.x.', '...x.x...'],
+  pergunta: ['.xxxx.', 'xx..xx', '....xx', '...xx.', '..xx..', '..xx..', '......', '..xx..'],
 };
 
 // andando de lado, virados pra direita (pra esquerda o css espelha)

@@ -139,9 +139,10 @@ function Brasas({ tochas, altura }) {
   );
 }
 
-export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children, fundo, className = '' }) {
+// solta: sem parede, chão e moldura (o menu desenha um salão inteiro em volta)
+export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children, fundo, solta, className = '', style }) {
   return (
-    <div className={`cena ${className}`}>
+    <div className={`cena ${solta ? 'cena--solta' : ''} ${className}`} style={style}>
       <svg
         className="cena__fundo"
         viewBox={`0 0 ${LARGURA} ${ALTURA}`}
@@ -158,12 +159,12 @@ export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children,
             <stop offset="1" stopColor="#181425" stopOpacity="0.7" />
           </radialGradient>
         </defs>
-        <ParedeEChao />
+        {!solta && <ParedeEChao />}
         {fundo}
         {tochas.map((x) => (
           <circle key={x} className="cena__luz" cx={x + 4} cy={alturaDasTochas + 6} r={44} fill="url(#luz-da-tocha)" />
         ))}
-        <rect width={LARGURA} height={ALTURA} fill="url(#sombra-da-cena)" />
+        {!solta && <rect width={LARGURA} height={ALTURA} fill="url(#sombra-da-cena)" />}
       </svg>
 
       {tochas.map((x) => (
