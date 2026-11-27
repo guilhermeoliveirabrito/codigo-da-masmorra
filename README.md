@@ -23,6 +23,14 @@ Jogar: https://guilhermeoliveirabrito.github.io/codigo-da-masmorra/
 
 Cada fase dá até 3 estrelas (passar, não ver a solução, não pedir dica) e tem conquistas escondidas pelo caminho.
 
+## Moedas, segredos e loja
+
+Passar de fase dá moedas: 20 na primeira vez mais 10 por estrela, e depois só as estrelas novas valem. Cada sala também esconde um segredo (um vaso, um tijolo solto, uma garrafa boiando no rio...), e a tela inicial tem mais um. Na loja, as moedas compram acessórios pra turma, um gatinho e uma gosminha que acompanham as viagens e tochas azuis.
+
+## Caça aos bugs
+
+Modo arcade liberado depois da primeira fase: o goblin Bugado quebra componentes e você tem 3 minutos pra consertar o máximo que conseguir. São 18 bugs (`src/caca/bugs.jsx`), e só entram os das fases que você já passou no modo escolhido. Consertos seguidos aumentam o combo, pular zera, e o recorde fica salvo por modo.
+
 ## Rodando
 
 ```bash
@@ -49,7 +57,7 @@ Como o código do jogador roda na própria página, algumas proteções ficam em
 
 Cada fase fica numa pasta em `src/fases`, com a cena, o texto do livro, as dicas e uma função `verificar`, que desenha o componente fora da tela e confere o resultado. Pra criar uma fase nova, dá pra copiar uma das pastas e adicionar ela em `src/fases/index.js`.
 
-Os personagens, o cenário e os ícones são pixel art desenhada no código (`src/pixel`), com a paleta Endesga 32. Quando um personagem muda de lugar, ele troca pro desenho de lado e anda no ritmo dos passos; entre uma fase e outra, a turma atravessa um corredor (`src/components/Viagem.jsx`).
+Os personagens, o cenário e os ícones são pixel art desenhada no código (`src/pixel`), com a paleta Endesga 32. Quando um personagem muda de lugar, ele troca pro desenho de lado e anda no ritmo dos passos; entre uma fase e outra, a turma atravessa um corredor (`src/components/Viagem.jsx`). Os acessórios da loja entram em cada quadro do desenho (`src/pixel/acessorios.js`), e o logo da tela inicial também é montado pixel a pixel (`src/pixel/letreiro.js`).
 
 Nas fases 8 e 9 o código usa `setInterval` e `fetch`, mas não os do navegador: o jogo entrega versões próprias (`src/motor/ambiente.js`). Na cena elas funcionam de verdade, e no teste o tempo é controlado pelo jogo, o que permite conferir se o intervalo para quando o componente sai da tela. O `fetch` responde de um servidor de mentira, então nada sai da página.
 
