@@ -39,6 +39,7 @@ export const faseMensageiro = {
   titulo: 'O mensageiro',
   conceito: 'API',
   elenco: ['lia', 'tom'],
+  segredo: { tipo: 'cogumelo', x: 178, y: 72 },
   componente: 'Mapa',
   arquivo: 'Mapa.jsx',
   Cena: CenaMensageiro,

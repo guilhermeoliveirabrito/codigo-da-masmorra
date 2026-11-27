@@ -925,6 +925,12 @@ button.sala:active:not(:disabled) {
   color: var(--ouro);
 }
 
+.sala__segredo {
+  width: 13px;
+  height: 13px;
+  margin-top: 4px;
+}
+
 .sala__selos {
   position: absolute;
   top: 10px;
@@ -1304,6 +1310,11 @@ button.sala:active:not(:disabled) {
   width: 34px;
   height: 34px;
   color: var(--ouro);
+}
+
+.aviso--segredo .aviso__trofeu {
+  width: 30px;
+  height: 30px;
 }
 
 .aviso__texto {
@@ -1704,6 +1715,110 @@ button.sala:active:not(:disabled) {
 
 @keyframes golpe {
   50% { transform: translateX(30%); }
+}
+
+/* segredos: um esconderijo por sala, com um brilho de vez em quando como pista */
+.segredo {
+  position: absolute;
+  z-index: 1;
+}
+
+.segredo > .sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* área de toque maior que o desenho, pro dedo achar */
+.segredo__botao {
+  position: absolute;
+  inset: -2.2cqw;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.segredo__botao:focus-visible {
+  outline: 2px dashed var(--ouro);
+  outline-offset: -2px;
+}
+
+.segredo__brilho {
+  position: absolute;
+  top: -1.2cqw;
+  right: -1.2cqw;
+  width: 2.2cqw;
+  height: 2.2cqw;
+  background:
+    linear-gradient(#fff, #fff) center / 100% 30% no-repeat,
+    linear-gradient(#fff, #fff) center / 30% 100% no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  animation: brilho-do-segredo 7s steps(1) infinite;
+}
+
+.segredo--vaso .segredo__brilho { animation-delay: -2s; }
+.segredo--tijolo .segredo__brilho { animation-delay: -4.5s; }
+.segredo--caveira .segredo__brilho { animation-delay: -1s; }
+.segredo--cogumelo .segredo__brilho { animation-delay: -5.5s; }
+.segredo--toca .segredo__brilho { animation-delay: -3s; }
+
+@keyframes brilho-do-segredo {
+  0%, 89% { opacity: 0; transform: scale(0.6); }
+  90% { opacity: 1; transform: scale(0.6); }
+  92% { opacity: 1; transform: scale(1); }
+  94% { opacity: 0.7; transform: scale(0.6); }
+  96%, 100% { opacity: 0; }
+}
+
+.segredo--abrindo > .sprite {
+  animation: segredo-treme 0.12s steps(2) 3;
+}
+
+@keyframes segredo-treme {
+  50% { transform: translateX(0.6cqw); }
+}
+
+/* a garrafa boia no rio */
+.segredo--garrafa > .sprite {
+  animation: garrafa-boia 2.4s steps(4) infinite;
+}
+
+@keyframes garrafa-boia {
+  50% { transform: translateY(0.6cqw) rotate(-10deg); }
+}
+
+.segredo__premio {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 0.6cqw;
+  font: 700 3.4cqw/1 var(--fonte-pixel);
+  color: var(--ouro);
+  text-shadow:
+    0 0.4cqw 0 var(--breu),
+    0.3cqw 0 0 var(--breu),
+    -0.3cqw 0 0 var(--breu);
+  white-space: nowrap;
+  translate: -50% 0;
+  pointer-events: none;
+  animation: premio-sobe 1.4s steps(14) forwards;
+}
+
+.segredo__premio .sprite {
+  width: 3.8cqw;
+  height: 3.8cqw;
+}
+
+@keyframes premio-sobe {
+  0% { opacity: 0; transform: translateY(1.5cqw); }
+  15%, 70% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-7cqw); }
 }
 
 /* o gato que passeia de vez em quando */
@@ -2297,6 +2412,8 @@ button.sala:active:not(:disabled) {
 
 .cena--iluminada .cena__escuridao {
   opacity: 0;
+  /* acesa, o que estava no escuro dá pra clicar */
+  pointer-events: none;
 }
 
 .tocha__clarao {

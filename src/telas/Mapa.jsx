@@ -1,7 +1,20 @@
+import { MOEDA } from '../pixel/desenhos';
 import { PERSONAGENS } from '../pixel/personagens';
 import { Icone, Sprite } from '../pixel/Sprite';
 
-export function Mapa({ fases, proximas, modo, concluidas, estrelas, faseAtual, estaLiberada, aoEscolher, aoVoltar, aoTrocarModo }) {
+export function Mapa({
+  fases,
+  proximas,
+  modo,
+  concluidas,
+  estrelas,
+  segredos,
+  faseAtual,
+  estaLiberada,
+  aoEscolher,
+  aoVoltar,
+  aoTrocarModo,
+}) {
   return (
     <main className="mapa">
       <header className="mapa__topo">
@@ -50,6 +63,9 @@ export function Mapa({ fases, proximas, modo, concluidas, estrelas, faseAtual, e
                         <Icone key={n} nome="estrela" className={n < ganhas ? 'estrela--ganha' : ''} />
                       ))}
                     </span>
+                  )}
+                  {liberada && segredos.includes(fase.id) && (
+                    <Sprite desenho={MOEDA} className="sala__segredo" titulo="Segredo da sala encontrado" />
                   )}
                 </span>
                 <span className="sala__selos">

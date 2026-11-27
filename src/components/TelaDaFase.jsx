@@ -5,6 +5,7 @@ import { criarAmbienteDaCena } from '../motor/ambiente';
 import { carregarMotor } from '../motor/carregarMotor';
 import { traduzirErro } from '../motor/erros';
 import { Icone } from '../pixel/Sprite';
+import { SegredoDaSala } from '../segredos';
 import { tocar } from '../som';
 import { Dialogo } from './Dialogo';
 import { Dicas } from './Dicas';
@@ -62,6 +63,7 @@ export function TelaDaFase({
   const [aba, setAba] = useState('missao'); // só no celular: 'missao' ou 'codigo'
   const [rodando, setRodando] = useState(false);
   const { valor: conversa, reagir } = useConversa(fase.elenco ?? SEM_ELENCO);
+  const segredo = useMemo(() => (fase.segredo ? { id: fase.id, ...fase.segredo } : null), [fase]);
 
   // erros dentro de cliques: durante o teste vão pra uma lista, depois aparecem na tela
   const errosDeCliqueRef = useRef(null);
@@ -237,7 +239,9 @@ export function TelaDaFase({
   return (
     <main className={`jogo jogo--aba-${aba} ${saindo ? 'jogo--saindo' : ''}`}>
       <section className={`jogo__mundo ${execucao?.liberada ? 'jogo__mundo--festa' : ''}`} aria-label="Cena">
-        <ContextoDaConversa.Provider value={conversa}>{cena}</ContextoDaConversa.Provider>
+        <SegredoDaSala.Provider value={segredo}>
+          <ContextoDaConversa.Provider value={conversa}>{cena}</ContextoDaConversa.Provider>
+        </SegredoDaSala.Provider>
         {resultado && (
           <div className="so-celular">
             <Resultado key={resultado.id} resultado={resultado} />

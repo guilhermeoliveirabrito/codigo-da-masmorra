@@ -2,9 +2,22 @@ import { memo, useContext, useEffect, useLayoutEffect, useRef, useState } from '
 import { conquistar } from '../conquistas';
 import { ContextoDaConversa } from '../conversa';
 import { semAnimacao } from '../hooks/useTransicao';
-import { GATO, TOCHA } from '../pixel/desenhos';
+import {
+  BURACO,
+  CAVEIRA,
+  COGUMELO,
+  GARRAFA,
+  GATO,
+  MOEDA,
+  TIJOLO_SOLTO,
+  TOCA,
+  TOCHA,
+  VASO,
+  VASO_QUEBRADO,
+} from '../pixel/desenhos';
 import { PERSONAGENS } from '../pixel/personagens';
 import { Sprite, tamanhoDoDesenho } from '../pixel/Sprite';
+import { MOEDAS_POR_SEGREDO, SegredoDaSala, SegredosAchados, acharSegredo } from '../segredos';
 import { tocar } from '../som';
 import { Seguro } from './Seguro';
 
@@ -172,6 +185,7 @@ export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children,
       ))}
       <Brasas tochas={tochas} altura={alturaDasTochas} />
 
+      <SegredoDaCena />
       {children}
       <Gato />
 
@@ -181,6 +195,60 @@ export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children,
 }
 
 // De vez em quando um gato atravessa a sala. Quem clicar nele ganha um amigo.
+// cada esconderijo e como ele fica depois de achado (null: some)
+const ESCONDERIJOS = {
+  vaso: { desenho: VASO, depois: VASO_QUEBRADO },
+  tijolo: { desenho: TIJOLO_SOLTO, depois: BURACO },
+  caveira: { desenho: CAVEIRA },
+  cogumelo: { desenho: COGUMELO },
+  toca: { desenho: TOCA },
+  garrafa: { desenho: GARRAFA, depois: null },
+};
+
+function SegredoDaCena() {
+  const segredo = useContext(SegredoDaSala);
+  return segredo ? <Segredo key={segredo.id} {...segredo} /> : null;
+}
+
+function Segredo({ id, tipo, x, y }) {
+  const achados = useContext(SegredosAchados);
+  const achado = achados.includes(id);
+  const [premio, setPremio] = useState(false);
+  const { desenho, depois = desenho } = ESCONDERIJOS[tipo];
+  const { largura, altura } = tamanhoDoDesenho(desenho);
+  const visivel = achado ? depois : desenho;
+
+  useEffect(() => {
+    if (!premio) return;
+    const espera = setTimeout(() => setPremio(false), 1400);
+    return () => clearTimeout(espera);
+  }, [premio]);
+
+  function abrir() {
+    tocar('segredo');
+    setPremio(true);
+    acharSegredo(id);
+  }
+
+  if (!visivel && !premio) return null;
+  return (
+    <div className={`segredo segredo--${tipo} ${premio ? 'segredo--abrindo' : ''}`} style={posicao(x, y, largura, altura)}>
+      {visivel && <Sprite desenho={visivel} />}
+      {!achado && (
+        <>
+          <span className="segredo__brilho" aria-hidden="true" />
+          <button type="button" className="segredo__botao" onClick={abrir} aria-label="Tem alguma coisa aqui" data-som="nenhum" />
+        </>
+      )}
+      {premio && (
+        <span className="segredo__premio" aria-hidden="true">
+          <Sprite desenho={MOEDA} />+{MOEDAS_POR_SEGREDO}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function Gato() {
   const [passeio, setPasseio] = useState(null);
   const [carinho, setCarinho] = useState(false);

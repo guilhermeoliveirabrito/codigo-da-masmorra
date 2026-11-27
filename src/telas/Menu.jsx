@@ -9,9 +9,11 @@ import { semAnimacao } from '../hooks/useTransicao';
 import { BARRIL, ESTANDARTE, MOEDA } from '../pixel/desenhos';
 import { Icone, NoFundo, Sprite } from '../pixel/Sprite';
 import { tocar, tocarDeLeve } from '../som';
+import { SegredoDaSala } from '../segredos';
 import { FundoDoSalao, limitesDoSalao, useSalao } from './Salao';
 
 const ELENCO_DO_MENU = ['guarda', 'lia', 'tom'];
+const SEGREDO_DO_MENU = { id: 'menu', tipo: 'toca', x: 62, y: 73 };
 const TOCHAS_DA_SALA = [66, 118];
 const TOCHAS_DE_FORA = [-36, -132, 220, 316];
 
@@ -123,34 +125,36 @@ export function Menu({
       </div>
 
       <div className="menu__sala" style={sala ?? undefined}>
-        <ContextoDaConversa.Provider value={conversa}>
-          <Cena
-            solta
-            tochas={tochas}
-            alturaDasTochas={42}
-            className={abrindo ? 'cena--tremer' : ''}
-            fundo={
-              <>
-                <NoFundo desenho={ESTANDARTE} x={22} y={28} />
-                <NoFundo desenho={ESTANDARTE} x={158} y={28} />
-                <NoFundo desenho={BARRIL} x={20} y={68} />
-                <Porta x={96} y={30} largura={28} altura={50} aberta={abrindo} />
-              </>
-            }
-          >
-            <Personagem quem="guarda" x={40} y={74} />
-            <Personagem quem="lia" x={entrando ? 90 : 128} y={76} velocidade={64} some={entrando} />
-            <Personagem
-              quem="tom"
-              x={entrando ? 90 : 146}
-              y={76}
-              velocidade={64}
-              some={entrando}
-              fala={abrindo && !entrando ? 'Vamos!' : null}
-              lado="direita"
-            />
-          </Cena>
-        </ContextoDaConversa.Provider>
+        <SegredoDaSala.Provider value={SEGREDO_DO_MENU}>
+          <ContextoDaConversa.Provider value={conversa}>
+            <Cena
+              solta
+              tochas={tochas}
+              alturaDasTochas={42}
+              className={abrindo ? 'cena--tremer' : ''}
+              fundo={
+                <>
+                  <NoFundo desenho={ESTANDARTE} x={22} y={28} />
+                  <NoFundo desenho={ESTANDARTE} x={158} y={28} />
+                  <NoFundo desenho={BARRIL} x={20} y={68} />
+                  <Porta x={96} y={30} largura={28} altura={50} aberta={abrindo} />
+                </>
+              }
+            >
+              <Personagem quem="guarda" x={40} y={74} />
+              <Personagem quem="lia" x={entrando ? 90 : 128} y={76} velocidade={64} some={entrando} />
+              <Personagem
+                quem="tom"
+                x={entrando ? 90 : 146}
+                y={76}
+                velocidade={64}
+                some={entrando}
+                fala={abrindo && !entrando ? 'Vamos!' : null}
+                lado="direita"
+              />
+            </Cena>
+          </ContextoDaConversa.Provider>
+        </SegredoDaSala.Provider>
       </div>
 
       <header className="menu__hud">

@@ -11,6 +11,7 @@ export const CONQUISTAS = [
   { id: 'guardiao', titulo: 'Canção de ninar', descricao: 'Fez o Guardião dormir.' },
   { id: 'web', titulo: 'Mestre da Web', descricao: 'Terminou todas as fases no modo Web.' },
   { id: 'mobile', titulo: 'Mestre do Mobile', descricao: 'Terminou todas as fases no modo Mobile.' },
+  { id: 'explorador', titulo: 'Explorador', descricao: 'Achou todos os segredos escondidos na masmorra.' },
   { id: 'gato', titulo: 'Amigo do gato', descricao: 'Fez carinho no gato da masmorra.', secreta: true },
   { id: 'coruja', titulo: 'Coruja', descricao: 'Jogou depois da meia-noite.', secreta: true },
 ];

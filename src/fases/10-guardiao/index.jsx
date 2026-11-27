@@ -29,6 +29,7 @@ export const faseGuardiao = {
   titulo: 'O guardião',
   conceito: 'tudo junto',
   elenco: ['lia', 'tom', 'guarda'],
+  segredo: { tipo: 'caveira', x: 70, y: 72 },
   componente: 'Batalha',
   arquivo: 'Batalha.jsx',
   Cena: CenaGuardiao,

@@ -18,6 +18,7 @@ export const fasePorta = {
   titulo: 'A porta que fecha sozinha',
   conceito: 'useEffect',
   elenco: ['lia', 'tom'],
+  segredo: { tipo: 'tijolo', x: 88, y: 40 },
   componente: 'Ampulheta',
   arquivo: 'Ampulheta.jsx',
   Cena: CenaPorta,

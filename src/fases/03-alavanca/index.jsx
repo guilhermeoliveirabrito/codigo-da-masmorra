@@ -15,6 +15,7 @@ export const faseAlavanca = {
   titulo: 'A alavanca',
   conceito: 'eventos',
   elenco: ['lia'],
+  segredo: { tipo: 'tijolo', x: 72, y: 56 },
   componente: 'Alavanca',
   arquivo: 'Alavanca.jsx',
   Cena: CenaAlavanca,

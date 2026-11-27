@@ -37,7 +37,7 @@ export function ComoJogar({ aoFechar }) {
           <strong>Mobile</strong>, os componentes do React Native, como num app de celular. Dá pra trocar no menu
           e comparar.
         </p>
-        <p className="como-jogar__modos">Ah, e clique nos personagens. Eles gostam de conversar.</p>
+        <p className="como-jogar__modos">Ah, e clique nos personagens. Eles gostam de conversar. E se alguma coisa brilhar na sala, clique também: cada sala esconde um segredo.</p>
         <button type="button" className="botao botao--fogo" onClick={aoFechar} autoFocus>
           Entendi
         </button>

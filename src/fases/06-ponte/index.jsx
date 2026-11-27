@@ -63,6 +63,7 @@ export const fasePonte = {
   titulo: 'A ponte',
   conceito: 'listas',
   elenco: ['lia'],
+  segredo: { tipo: 'vaso', x: 178, y: 70 },
   componente: 'Ponte',
   arquivo: 'Ponte.jsx',
   Cena: CenaPonte,

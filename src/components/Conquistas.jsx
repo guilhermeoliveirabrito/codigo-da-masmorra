@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
 import { CONQUISTAS } from '../conquistas';
-import { Icone } from '../pixel/Sprite';
+import { MOEDA } from '../pixel/desenhos';
+import { Icone, Sprite } from '../pixel/Sprite';
+import { SEGREDOS } from '../segredos';
 
 export function AvisoDeConquista({ conquista }) {
+  const segredo = conquista.tipo === 'segredo';
   return (
-    <div className="aviso" role="status">
-      <Icone nome="trofeu" className="aviso__trofeu" />
+    <div className={`aviso ${segredo ? 'aviso--segredo' : ''}`} role="status">
+      {segredo ? <Sprite desenho={MOEDA} className="aviso__trofeu" /> : <Icone nome="trofeu" className="aviso__trofeu" />}
       <div className="aviso__texto">
-        <span className="aviso__rotulo">Conquista!</span>
+        <span className="aviso__rotulo">{segredo ? 'Segredo!' : 'Conquista!'}</span>
         <strong>{conquista.titulo}</strong>
         <span>{conquista.descricao}</span>
       </div>
@@ -15,7 +18,7 @@ export function AvisoDeConquista({ conquista }) {
   );
 }
 
-export function ListaDeConquistas({ ganhas, aoFechar }) {
+export function ListaDeConquistas({ ganhas, segredos, aoFechar }) {
   useEffect(() => {
     function aoApertarTecla(evento) {
       if (evento.key === 'Escape') aoFechar();
@@ -31,7 +34,7 @@ export function ListaDeConquistas({ ganhas, aoFechar }) {
           <h2>
             Conquistas
             <span>
-              {ganhas.length} de {CONQUISTAS.length}
+              {ganhas.length} de {CONQUISTAS.length} · {segredos} de {SEGREDOS.length} segredos
             </span>
           </h2>
           <button type="button" className="botao botao--pedra botao--pequeno" onClick={aoFechar} autoFocus>

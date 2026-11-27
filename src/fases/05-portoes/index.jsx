@@ -55,6 +55,7 @@ export const fasePortoes = {
   titulo: 'Os portões',
   conceito: 'condicional',
   elenco: ['lia', 'tom'],
+  segredo: { tipo: 'toca', x: 176, y: 73 },
   componente: 'Portao',
   arquivo: 'Portao.jsx',
   Cena: CenaPortoes,

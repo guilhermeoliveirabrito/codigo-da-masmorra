@@ -329,6 +329,63 @@ export const ALAVANCA_BAIXO = {
   ],
 };
 
+// esconderijos dos segredos (ver components/Segredo.jsx)
+export const VASO = {
+  camadas: [['...kkk...', '..kTbBk..', '..kkkkk..', '.kbTbbBk.', 'kbTTbbbBk', 'kbTbbbbBk', 'kbbbbbBBk', 'kBbbbBBBk', '.kBBBBBk.', '..kkkkk..']],
+};
+
+export const VASO_QUEBRADO = {
+  camadas: [['.........', '.........', '.........', '.........', '.........', '.........', '..k...k..', '.kbk.kTbk', 'kbTbkkbBk', '.kkk..kk.']],
+};
+
+export const TIJOLO_SOLTO = {
+  camadas: [
+    [
+      '.kkkkkkkkkkkkkk.',
+      'knnnnnnnnnnnnnnk',
+      'kNNNNNNNdNNNNNNk',
+      'kNNdNNNNNdNNNNNk',
+      'kNNNNNNNNNdNNNNk',
+      'kNNNNNNNNNNNNNNk',
+      'kddddddddddddddk',
+      '.kkkkkkkkkkkkkk.',
+    ],
+  ],
+};
+
+export const BURACO = {
+  camadas: [
+    [
+      '.dddddddddddddd.',
+      'dkkkkkkkkkkkkkkd',
+      'dkkkkkkkkkkkkkkd',
+      'dkkkkkkkkkkkkkkd',
+      'dkkkkkkkkkkkkkkd',
+      'dkkkkkkkkkkkkkkd',
+      'dkkkkkkkkkkkkkkd',
+      '.dddddddddddddd.',
+    ],
+  ],
+};
+
+export const CAVEIRA = {
+  camadas: [['..kkkkk..', '.kwWWWwk.', 'kwWWWWWwk', 'kwkkWkkwk', 'kwkkWkkwk', 'kwwWkWwwk', '.kwwwwwk.', '..kwkwk..']],
+};
+
+export const COGUMELO = {
+  camadas: [['..kkkk..', '.krWrrk.', 'krrrrWrk', 'kWrrrrrk', '.kkkkkk.', '..ktTk..', '..ktTk..', '..kkkk..']],
+};
+
+// o ratinho pisca lá de dentro
+export const TOCA = {
+  camadas: [['...kkk...', '..kkkkk..', '.kkkkkkk.', '.kkWkWkk.', 'kkkkkkkkk', 'kkkkkkkkk', 'kkkkkkkkk']],
+  piscada: ['.........', '.........', '.........', '...k.k...', '.........', '.........', '.........'],
+};
+
+export const GARRAFA = {
+  camadas: [['...kk...', '..kTTk..', '..kbbk..', '.kCcCCk.', 'kCcWCCCk', 'kCcCCCCk', 'kCCCCCCk', '.kkkkkk.']],
+};
+
 // moeda do placar e da loja
 export const MOEDA = {
   camadas: [['..kkkk..', '.kYYYyk.', 'kYWYyyok', 'kYYyoyok', 'kYyyoyok', 'kYyyyyok', '.kyyyok.', '..kkkk..']],

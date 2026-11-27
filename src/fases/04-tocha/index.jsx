@@ -16,6 +16,7 @@ export const faseTocha = {
   titulo: 'A tocha',
   conceito: 'useState',
   elenco: ['tom'],
+  segredo: { tipo: 'caveira', x: 106, y: 72 },
   componente: 'Tocha',
   arquivo: 'Tocha.jsx',
   Cena: CenaTocha,

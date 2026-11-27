@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { SEGREDOS } from '../segredos';
 
 const CHAVE = 'codigo-da-masmorra:progresso:v1';
 const TAMANHO_MAXIMO_DO_CODIGO = 50_000;
@@ -12,6 +13,7 @@ const INICIAL = {
   estrelas: {}, // melhor resultado de cada fase em cada modo, tipo { 'placa-web': 3 }
   conquistas: [],
   moedas: 0,
+  segredos: [], // ids dos segredos já achados (ver segredos.js)
   som: true,
 };
 
@@ -43,6 +45,7 @@ function validar(dados) {
     estrelas,
     conquistas: listaDeTextos(dados.conquistas),
     moedas: Number.isInteger(dados.moedas) ? Math.min(Math.max(dados.moedas, 0), MOEDAS_NO_MAXIMO) : 0,
+    segredos: [...new Set(listaDeTextos(dados.segredos).filter((id) => SEGREDOS.includes(id)))],
     som: dados.som !== false,
   };
 }
@@ -107,6 +110,12 @@ export function useProgresso() {
         atualizar((atual) => ((atual.estrelas[chave] ?? 0) >= quantas ? {} : { estrelas: { ...atual.estrelas, [chave]: quantas } })),
       ganharMoedas: (quantas) =>
         atualizar((atual) => ({ moedas: Math.min(atual.moedas + Math.max(0, Math.floor(quantas)), MOEDAS_NO_MAXIMO) })),
+      guardarSegredo: (id, moedas) =>
+        atualizar((atual) =>
+          atual.segredos.includes(id)
+            ? {}
+            : { segredos: [...atual.segredos, id], moedas: Math.min(atual.moedas + moedas, MOEDAS_NO_MAXIMO) }
+        ),
       ganharConquista: (id) =>
         atualizar((atual) => (atual.conquistas.includes(id) ? {} : { conquistas: [...atual.conquistas, id] })),
       alternarSom: () => atualizar((atual) => ({ som: !atual.som })),
