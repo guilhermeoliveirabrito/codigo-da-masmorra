@@ -523,6 +523,7 @@ export const ICONES = {
   cursor: ['x.....', 'xx....', 'xxx...', 'xxxx..', 'xxxxx.', 'xxxx..', 'xxx...', 'xx....', 'x.....'],
   engrenagem: ['...x.x...', '.x.xxx.x.', '..xxxxx..', 'xxxx.xxxx', '.xx...xx.', 'xxxx.xxxx', '..xxxxx..', '.x.xxx.x.', '...x.x...'],
   pergunta: ['.xxxx.', 'xx..xx', '....xx', '...xx.', '..xx..', '..xx..', '......', '..xx..'],
+  chama: ['...x...', '...xx..', '..xxx..', '.xxxxx.', '.xx.xxx', 'xx...xx', 'xx...xx', '.xx.xx.', '..xxx..'],
   nota: ['....xxx', '...xxxx', '...xx.x', '...x...', '...x...', '.xxx...', 'xxxx...', '.xx....'],
 };
 

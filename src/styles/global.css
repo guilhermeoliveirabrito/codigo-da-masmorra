@@ -503,7 +503,7 @@ pre {
   opacity: 0;
 }
 
-.opcao__detalhe--novo {
+.opcao__detalhe.opcao__detalhe--novo {
   color: var(--musgo);
 }
 
@@ -555,7 +555,7 @@ pre {
 
 .menu__atalhos {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.5em;
   width: 100%;
   animation: menu-chega 0.4s steps(4) 0.25s both;
@@ -583,6 +583,25 @@ pre {
 .atalho .icone {
   height: 1.15em;
   color: var(--ouro);
+}
+
+.atalho .sprite {
+  width: 1.15em;
+  height: 1.15em;
+}
+
+/* tem coisa ao alcance das moedas */
+.atalho__novo {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  font: 700 12px/1 var(--fonte-pixel);
+  color: var(--breu);
+  background: var(--musgo);
 }
 
 .atalho__conta {
@@ -709,7 +728,8 @@ pre {
 }
 
 .menu__estrelas,
-.menu__moedas {
+.menu__moedas,
+.menu__sequencia {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -729,6 +749,14 @@ pre {
 
 .menu__moedas .sprite {
   width: 18px;
+  height: 18px;
+}
+
+.menu__sequencia {
+  color: var(--fogo);
+}
+
+.menu__sequencia .icone {
   height: 18px;
 }
 
@@ -996,6 +1024,49 @@ pre {
 .caca__moedas {
   justify-content: center;
   margin: 0;
+}
+
+.caca__dia,
+.caca__sequencia {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 12px;
+  font: 700 18px/1 var(--fonte-pixel);
+  background: var(--breu);
+  border: 2px solid var(--pedra-escura);
+}
+
+.caca__dia {
+  font-size: 15px;
+  color: var(--neblina);
+}
+
+.caca__sequencia,
+.caca__chama {
+  color: var(--fogo);
+}
+
+.caca__sequencia .icone,
+.caca__chama .icone {
+  height: 18px;
+}
+
+.caca__chama {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 700 18px/1 var(--fonte-pixel);
+}
+
+.caca__chama--grande {
+  font-size: 26px;
+}
+
+.caca__chama--grande .icone {
+  height: 26px;
+  animation: tempo-acabando 0.6s steps(2) infinite;
 }
 
 @media (max-width: 960px) {

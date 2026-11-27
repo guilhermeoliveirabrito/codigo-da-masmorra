@@ -74,6 +74,10 @@ export function Menu({
   bugs,
   recordeDeBugs,
   aoCaca,
+  diaFeito,
+  sequencia,
+  moedasDoDia,
+  aoDia,
   aoComoJogar,
   aoTrocarModo,
   aoApagarProgresso,
@@ -178,6 +182,12 @@ export function Menu({
             <Sprite desenho={MOEDA} />
             {moedas}
           </span>
+          {sequencia > 0 && (
+            <span className="menu__sequencia" title="Dias seguidos consertando o bug do dia">
+              <Icone nome="chama" />
+              {sequencia}
+            </span>
+          )}
         </div>
         <div className="menu__cantos">
           <button
@@ -223,6 +233,13 @@ export function Menu({
               </span>
             )}
           </button>
+          <button type="button" className="opcao" onClick={aoDia} onPointerEnter={aoPassar} disabled={!bugs} data-menu>
+            <Icone nome={bugs ? 'cursor' : 'cadeado'} className="opcao__cursor" />
+            <span className="opcao__texto">Bug do dia</span>
+            <span className={`opcao__detalhe ${bugs && !diaFeito ? 'opcao__detalhe--novo' : ''}`}>
+              {!bugs ? 'passe da fase 1' : diaFeito ? 'feito hoje' : `+${moedasDoDia} moedas`}
+            </span>
+          </button>
           <button
             type="button"
             className="opcao"
@@ -241,14 +258,18 @@ export function Menu({
             <Icone nome="cursor" className="opcao__cursor" />
             <span className="opcao__texto">Escolher fase</span>
           </button>
-          <button type="button" className="opcao" onClick={aoLoja} onPointerEnter={aoPassar} data-menu>
-            <Icone nome="cursor" className="opcao__cursor" />
-            <span className="opcao__texto">Loja</span>
-            {podeComprar && <span className="opcao__detalhe opcao__detalhe--novo">dá pra comprar algo</span>}
-          </button>
         </nav>
 
         <div className="menu__atalhos">
+          <button type="button" className="atalho" onClick={aoLoja} onPointerEnter={aoPassar} data-menu>
+            <Sprite desenho={MOEDA} />
+            Loja
+            {podeComprar && (
+              <span className="atalho__novo" title="Dá pra comprar alguma coisa">
+                !
+              </span>
+            )}
+          </button>
           <button type="button" className="atalho" onClick={aoLivro} onPointerEnter={aoPassar} data-menu>
             <Icone nome="livro" />
             Livro

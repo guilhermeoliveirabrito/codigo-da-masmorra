@@ -15,6 +15,7 @@ export const CONQUISTAS = [
   { id: 'fregues', titulo: 'Freguês', descricao: 'Comprou alguma coisa na loja.' },
   { id: 'cacador', titulo: 'Caçador de bugs', descricao: 'Consertou 5 bugs numa rodada só da Caça aos bugs.' },
   { id: 'combo', titulo: 'Combo máximo', descricao: 'Chegou no combo x5 da Caça aos bugs.' },
+  { id: 'sequencia', titulo: 'Sete dias seguidos', descricao: 'Consertou o bug do dia sete dias seguidos.' },
   { id: 'gato', titulo: 'Amigo do gato', descricao: 'Fez carinho no gato da masmorra.', secreta: true },
   { id: 'coruja', titulo: 'Coruja', descricao: 'Jogou depois da meia-noite.', secreta: true },
 ];

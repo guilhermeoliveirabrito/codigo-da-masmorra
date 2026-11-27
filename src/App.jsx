@@ -14,6 +14,8 @@ import { fases, proximasFases } from './fases';
 import { carregarMotorDepois } from './motor/carregarMotor';
 import { useProgresso } from './hooks/useProgresso';
 import { semAnimacao, useTransicao } from './hooks/useTransicao';
+import { bugDoDia, hoje, moedasDoDia, ontemDe, sequenciaAtual } from './caca/doDia';
+import { BugDoDia } from './telas/BugDoDia';
 import { CacaAosBugs, bugsDisponiveis } from './telas/CacaAosBugs';
 import { Mapa } from './telas/Mapa';
 import { ligarMusica, tocarMusica } from './musica';
@@ -36,6 +38,7 @@ export default function App() {
     comprar,
     alternarItem,
     salvarRecorde,
+    cumprirDesafio,
     marcarLivroVisto,
     darEstrelas,
     ganharConquista,
@@ -104,6 +107,18 @@ export default function App() {
     [guardarSegredo]
   );
 
+  // bug do dia consertado: sequência, moedas e, aos 7 dias, a conquista
+  const cumprirDia = useCallback(() => {
+    const atual = progressoRef.current;
+    const dia = hoje();
+    if (atual.desafio.dia === dia) return null;
+    const sequencia = atual.desafio.dia === ontemDe(dia) ? atual.desafio.sequencia + 1 : 1;
+    const moedas = moedasDoDia(sequencia);
+    cumprirDesafio(dia, sequencia, moedas);
+    if (sequencia >= 7) conquistar('sequencia');
+    return { sequencia, moedas };
+  }, [cumprirDesafio]);
+
   function comprarItem(item) {
     const atual = progressoRef.current;
     if (atual.itens.includes(item.id) || atual.moedas < item.preco) return;
@@ -128,6 +143,9 @@ export default function App() {
   }, []);
 
   const { modo, concluidas } = progresso;
+  // a data é lida a cada desenho: virando a meia-noite com o jogo aberto, o bug do dia muda
+  const hojeAgora = hoje();
+  const bugDeHoje = bugDoDia(bugsDisponiveis(concluidas[modo]), hojeAgora);
   const indice = Math.min(progresso.faseAtual, fases.length - 1);
   const fase = fases[indice];
   const chaveDoCodigo = `${fase.id}-${modo}`;
@@ -246,6 +264,10 @@ export default function App() {
               aoJogar={() => jogarFase(indice)}
               aoMapa={() => navegar(() => setTela('mapa'))}
               bugs={bugsDisponiveis(concluidas[modo]).length}
+              diaFeito={progresso.desafio.dia === hojeAgora}
+              sequencia={sequenciaAtual(progresso.desafio, hojeAgora)}
+              moedasDoDia={moedasDoDia(progresso.desafio.dia === ontemDe(hojeAgora) ? progresso.desafio.sequencia + 1 : 1)}
+              aoDia={() => navegar(() => setTela('dia'))}
               recordeDeBugs={progresso.recordes[modo]}
               aoCaca={() => navegar(() => setTela('caca'))}
               aoLivro={() => setLivroAberto(true)}
@@ -256,6 +278,18 @@ export default function App() {
                 achadosRef.current.clear();
                 apagarTudo();
               }}
+            />
+          )}
+
+          {tela === 'dia' && bugDeHoje && (
+            <BugDoDia
+              key={`${modo}-${hojeAgora}`}
+              modo={modo}
+              bug={bugDeHoje}
+              dia={hojeAgora}
+              desafio={progresso.desafio}
+              aoConsertar={cumprirDia}
+              aoVoltar={() => navegar(() => setTela('menu'))}
             />
           )}
 

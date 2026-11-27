@@ -19,6 +19,7 @@ const INICIAL = {
   itens: [], // comprados na loja
   usando: [], // dos comprados, os que estão em uso
   recordes: { web: 0, mobile: 0 }, // da Caça aos bugs
+  desafio: { dia: '', sequencia: 0, melhor: 0 }, // bug do dia: último dia feito e dias seguidos
   som: true,
 };
 
@@ -55,6 +56,11 @@ function validar(dados) {
     recordes: {
       web: pontuacaoValida(dados.recordes?.web),
       mobile: pontuacaoValida(dados.recordes?.mobile),
+    },
+    desafio: {
+      dia: /^\d{4}-\d{2}-\d{2}$/.test(dados.desafio?.dia) ? dados.desafio.dia : '',
+      sequencia: pontuacaoValida(dados.desafio?.sequencia),
+      melhor: pontuacaoValida(dados.desafio?.melhor),
     },
     som: dados.som !== false,
     musica: dados.musica !== false,
@@ -152,6 +158,15 @@ export function useProgresso() {
       salvarRecorde: (modo, pontos) =>
         atualizar((atual) =>
           pontos > atual.recordes[modo] ? { recordes: { ...atual.recordes, [modo]: pontuacaoValida(pontos) } } : {}
+        ),
+      cumprirDesafio: (dia, sequencia, moedas) =>
+        atualizar((atual) =>
+          atual.desafio.dia === dia
+            ? {}
+            : {
+                desafio: { dia, sequencia, melhor: Math.max(atual.desafio.melhor, sequencia) },
+                moedas: Math.min(atual.moedas + moedas, MOEDAS_NO_MAXIMO),
+              }
         ),
       ganharConquista: (id) =>
         atualizar((atual) => (atual.conquistas.includes(id) ? {} : { conquistas: [...atual.conquistas, id] })),

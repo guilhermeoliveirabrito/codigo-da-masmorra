@@ -1,13 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { BUGS } from '../caca/bugs';
-import { Cena, Tela, posicao } from '../components/Cenario';
+import { CenaDoBug, FALAS, sortear, useGoblin, useTelaDoBug } from '../caca/CenaDoBug';
+import { conferir } from '../caca/conferir';
 import { Editor } from '../components/Editor';
 import { Resultado } from '../components/Resultado';
 import { fases } from '../fases';
-import { criarAmbienteDaCena } from '../motor/ambiente';
-import { carregarMotor } from '../motor/carregarMotor';
-import { pegarComponente } from '../motor/componente';
-import { traduzirErro } from '../motor/erros';
 import { ritmoDaMusica, tocarMusica } from '../musica';
 import { BUGADO, BUGADO_BRAVO, MOEDA } from '../pixel/desenhos';
 import { Icone, Sprite } from '../pixel/Sprite';
@@ -18,16 +15,6 @@ export const PONTOS_POR_MOEDA = 50;
 const COMBO_MAXIMO = 5;
 const BONUS_POR_SEGUNDO = 10;
 
-const FALAS = {
-  oi: 'Hehe! Quebrei a masmorra toda. Duvido você consertar!',
-  novo: ['Hehe, quebrei esse aqui!', 'Duvido você achar o erro.', 'Esse eu caprichei.', 'Mexi só numa coisinha...', 'Esse tá impossível.'],
-  conserto: ['Nãaao! Meu bug!', 'Sorte de principiante.', 'Hmpf. Esse era fácil.', 'Como você achou?!', 'Eu ia consertar mesmo...'],
-  combo: ['Para de consertar tudo!', 'Você tá rápido demais!', 'Isso não é justo!'],
-  pulo: ['Desistiu? Hehehe!', 'Fugiu do bug!', 'Esse fica pra depois, né?'],
-  erro: ['Errou! Hehe.', 'Quase... só que não.', 'Ainda quebrado!', 'Tenta de novo!'],
-};
-const sortear = (lista) => lista[Math.floor(Math.random() * lista.length)];
-
 function embaralhar(lista) {
   const copia = [...lista];
   for (let i = copia.length - 1; i > 0; i--) {
@@ -37,23 +24,8 @@ function embaralhar(lista) {
   return copia;
 }
 
-// o painel onde aparece o componente que o goblin quebrou
-function Painel() {
-  return (
-    <g>
-      <rect x={7} y={7} width={102} height={56} fill="#181425" />
-      <rect x={8} y={8} width={100} height={54} fill="#5a6988" />
-      <rect x={8} y={8} width={100} height={1} fill="#8b9bb4" />
-      <rect x={8} y={8} width={1} height={54} fill="#8b9bb4" />
-      <rect x={11} y={11} width={94} height={48} fill="#181425" />
-      <rect x={30} y={63} width={2} height={17} fill="#262b44" />
-      <rect x={84} y={63} width={2} height={17} fill="#262b44" />
-    </g>
-  );
-}
-
 const relogio = (segundos) => `${Math.floor(segundos / 60)}:${String(segundos % 60).padStart(2, '0')}`;
-const conceitoDo = (bug) => fases.find((fase) => fase.id === bug.fase)?.conceito;
+export const conceitoDo = (bug) => fases.find((fase) => fase.id === bug.fase)?.conceito;
 const PLACAR_ZERADO = { pontos: 0, combo: 1, melhorCombo: 1, consertados: 0 };
 
 // só entra bug de fase que o jogador já passou nesse modo
@@ -69,9 +41,9 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
   const [placar, setPlacar] = useState(PLACAR_ZERADO);
   const [restante, setRestante] = useState(DURACAO);
   const [resultado, setResultado] = useState(null);
-  const [goblin, setGoblin] = useState({ fala: FALAS.oi, bravo: false, vez: 0 });
+  const [goblin, falar] = useGoblin();
   const [ganho, setGanho] = useState(null);
-  const [tela, setTela] = useState(null); // o componente do jogador desenhado na cena
+  const [tela, mostrarNaCena] = useTelaDoBug(modo);
   const [rodando, setRodando] = useState(false);
   // depois de um conserto, o próximo bug demora um pouco: nesse meio-tempo nada conta de novo
   const [trocando, setTrocando] = useState(false);
@@ -79,7 +51,6 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
 
   const bug = BUGS.find((b) => b.id === fila[0]) ?? null;
   const fimRef = useRef(0);
-  const cenarioRef = useRef(null);
   const esperasRef = useRef([]);
   const estadoRef = useRef({});
   useLayoutEffect(() => {
@@ -90,33 +61,7 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
     esperasRef.current.push(setTimeout(funcao, ms));
   }, []);
 
-  useEffect(
-    () => () => {
-      esperasRef.current.forEach(clearTimeout);
-      cenarioRef.current?.limpar();
-    },
-    []
-  );
-
-  const falar = useCallback((fala, bravo = false) => setGoblin((atual) => ({ fala, bravo, vez: atual.vez + 1 })), []);
-
-  // roda o código só pra mostrar na cena como ele está (quebrado ou não)
-  const mostrarNaCena = useCallback(
-    async (codigoDaVez, bugDaVez) => {
-      cenarioRef.current?.limpar();
-      const cenario = criarAmbienteDaCena({ rotas: bugDaVez.rotas });
-      cenarioRef.current = cenario;
-      try {
-        const { executar } = await carregarMotor();
-        const modulo = executar(codigoDaVez, modo, new Set(), { aoErroEmEvento: () => {}, ambiente: cenario.ambiente });
-        const { Componente } = pegarComponente(modulo, bugDaVez.componente);
-        setTela(Componente ? { Componente, vez: Date.now() } : null);
-      } catch {
-        setTela(null);
-      }
-    },
-    [modo]
-  );
+  useEffect(() => () => esperasRef.current.forEach(clearTimeout), []);
 
   const carregar = useCallback(
     (id) => {
@@ -206,34 +151,14 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
     if (travado) return;
     setRodando(true);
     tocar('rodar');
-    const avisos = new Set();
-    const errosDeClique = [];
-    const traduzir = (e) => traduzirErro(e, codigo, modo);
-    let veredito;
-    try {
-      const { executar } = await carregarMotor();
-      const opcoes = { aoErroEmEvento: (e) => errosDeClique.push(e) };
-      const { Componente, problema } = pegarComponente(executar(codigo, modo, avisos, opcoes), bug.componente);
-      if (!Componente) veredito = { tipo: 'erro', mensagem: problema };
-      else {
-        const montar = (ambiente) => pegarComponente(executar(codigo, modo, avisos, { ...opcoes, ambiente }), bug.componente).Componente;
-        veredito = await bug.testar({ Componente, modo, traduzir, avisos, montar });
-      }
-    } catch (e) {
-      // código que nem roda: a dica do bug ajuda a achar onde
-      const dica = bug.dica?.[modo] ?? bug.dica;
-      veredito = { tipo: 'erro', mensagem: `${traduzir(e)}${typeof dica === 'string' ? ` ${dica}` : ''}` };
-    }
-    if (errosDeClique.length && veredito.tipo !== 'ok') {
-      veredito = { tipo: 'erro', mensagem: `${traduzir(errosDeClique[0])} (Isso aconteceu no clique.)` };
-    }
+    const veredito = await conferir(bug, codigo, modo);
     setRodando(false);
     if (estadoRef.current.etapa !== 'jogando') return;
     mostrarNaCena(codigo, bug);
 
     if (veredito.tipo !== 'ok') {
       tocar(veredito.tipo === 'quase' ? 'quase' : 'erro');
-      setResultado({ ...veredito, id: Date.now(), avisos: veredito.esconderAvisos ? [] : [...avisos] });
+      setResultado({ ...veredito, id: Date.now() });
       falar(sortear(FALAS.erro));
       return;
     }
@@ -246,7 +171,7 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
       melhorCombo: Math.max(atual.melhorCombo, combo),
       consertados: atual.consertados + 1,
     }));
-    setGanho({ pontos: valeu, vez: Date.now() });
+    setGanho({ texto: `+${valeu}`, vez: Date.now() });
     setResultado({ tipo: 'ok', mensagem: `Consertado! +${valeu} pontos.`, id: Date.now(), avisos: [] });
     falar(combo >= 4 ? sortear(FALAS.combo) : sortear(FALAS.conserto), true);
     tocar('acerto');
@@ -268,8 +193,6 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
     // o bug pulado volta pro fim da fila
     proximoBug([...fila.slice(1), fila[0]]);
   }
-
-  const goblinVisto = goblin.bravo ? BUGADO_BRAVO : BUGADO;
 
   return (
     <main className={`caca ${restante <= 10 && etapa === 'jogando' ? 'caca--acabando' : ''}`} data-bug={bug?.id}>
@@ -294,24 +217,7 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
       </header>
 
       <section className="caca__mundo" aria-label="Cena">
-        <Cena tochas={[134, 178]} fundo={<Painel />}>
-          <Tela modo={modo} vazio="quebrado" className="painel__tela caca__tela" style={posicao(12, 12, 92, 46)}>
-            {tela && <tela.Componente key={tela.vez} {...(bug?.props ?? {})} />}
-          </Tela>
-          <div className="bugado" style={{ ...posicao(158, 78, 16, 21), '--meio': '4.17cqw' }}>
-            <Sprite key={`goblin-${goblin.vez}`} desenho={goblinVisto} titulo="Bugado, o goblin" className="bugado__sprite" />
-            {goblin.fala && (
-              <span key={`fala-${goblin.vez}`} className="balao balao--direita">
-                {goblin.fala}
-              </span>
-            )}
-            {ganho && (
-              <span key={ganho.vez} className="caca__ganho" aria-hidden="true">
-                +{ganho.pontos}
-              </span>
-            )}
-          </div>
-        </Cena>
+        <CenaDoBug modo={modo} bug={bug} tela={tela} goblin={goblin} ganho={ganho} />
         {bug && (
           <p className="caca__missao">
             <span className="etiqueta">{conceitoDo(bug)}</span>
