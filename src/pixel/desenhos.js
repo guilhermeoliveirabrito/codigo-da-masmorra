@@ -465,6 +465,23 @@ export const BUGADO_BRAVO = {
   ],
 };
 
+// ícones das salas no mapa
+export const PLACA_PEQUENA = {
+  camadas: [['kkkkkkkkkkkkkk', 'ktttttttttttTk', 'ktkkkkktkkkkTk', 'ktttttttttttTk', 'ktkkkktkkkkkTk', 'kTTTTTTTTTTTTk', 'kkkkkkbbkkkkkk', '......bB......', '......bB......', '......bB......', '.....kbBk.....']],
+};
+
+export const CRACHA = {
+  camadas: [['.....kkkk.....', '.....kmmk.....', '..kkkkmmkkkk..', '.kwwwwwwwwwwk.', '.kwsskwwwwwwk.', '.kwsskwkkkkwk.', '.kwyykwwwwwwk.', '.kwyykwkkkwwk.', '.kwwwwwwwwwwk.', '.kCCCCCCCCCCk.', '..kkkkkkkkkk..']],
+};
+
+export const PONTE_PEQUENA = {
+  camadas: [['k............k', 'kk..........kk', 'kmk........kmk', 'k.mk......km.k', 'k..mk....km..k', 'kkkkkkkkkkkkkk', 'kbTbkbTbkbTbbk', 'kBbBkBbBkBbBBk', 'kkkkkkkkkkkkkk', '.k..........k.', '.k..........k.']],
+};
+
+export const CABECA_DE_DRAGAO = {
+  camadas: [['..k......k......', '.kBk....kBk.....', '.kBBk..kBBk.....', '..kRRkkRRk......', '.kRRRRRRRRkkk...', 'kRRYYkRRRRRRRk..', 'kRRYkkRRRRRRRRk.', 'kRRRRRRRRRRkkRk.', '.kRRRRRRRRRRRRk.', '..kRWRWRWRWRRk..', '...kkkkkkkkkk...']],
+};
+
 // moeda do placar e da loja
 export const MOEDA = {
   camadas: [['..kkkk..', '.kYYYyk.', 'kYWYyyok', 'kYYyoyok', 'kYyyoyok', 'kYyyyyok', '.kyyyok.', '..kkkk..']],

@@ -1207,7 +1207,7 @@ pre {
   margin-top: 6px;
 }
 
-/* Mapa de fases */
+/* Mapa da masmorra: salas de pedra ligadas por uma trilha em zigue-zague */
 .mapa {
   max-width: 1240px;
   margin: 0 auto;
@@ -1219,157 +1219,433 @@ pre {
   flex-wrap: wrap;
   align-items: center;
   gap: 14px 20px;
-  margin-bottom: 26px;
+  margin-bottom: 22px;
 }
 
 .mapa__topo h1 {
   flex: 1;
   margin: 0;
   font: 700 30px/1.1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.mapa__corpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: 24px;
+}
+
+.mapa__area {
+  min-width: 0;
+}
+
+/* chão de lajes visto de cima */
+.mapa__tabuleiro {
+  --linha: 150px;
+  position: relative;
+  padding: 14px;
+  background-color: #1f2338;
+  background-image:
+    linear-gradient(rgba(24, 20, 37, 0.85) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(24, 20, 37, 0.85) 2px, transparent 2px),
+    linear-gradient(rgba(58, 68, 102, 0.25) 1px, transparent 1px);
+  background-size:
+    48px 48px,
+    48px 48px,
+    48px 12px;
+  border: 3px solid var(--breu);
+  box-shadow:
+    inset 0 0 0 3px var(--pedra-escura),
+    inset 0 0 90px rgba(24, 20, 37, 0.9);
+}
+
+.mapa__trilha {
+  position: absolute;
+  inset: 14px;
+  width: calc(100% - 28px);
+  height: calc(100% - 28px);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.mapa__trilha line {
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: square;
+}
+
+.trilha__corredor {
+  stroke: #2b3150;
+  stroke-width: 22px;
+}
+
+.trilha__pegadas {
+  stroke: var(--pedra);
+  stroke-width: 5px;
+  stroke-dasharray: 5 9;
+}
+
+.trilha--percorrida .trilha__pegadas {
+  stroke: var(--ouro);
 }
 
 .mapa__salas {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(var(--colunas), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--linhas), var(--linha));
   margin: 0;
   padding: 0;
   list-style: none;
-  counter-reset: sala;
+}
+
+.mapa__lugar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  animation: sala-aparece 0.3s steps(3) var(--atraso, 0ms) both;
+}
+
+@keyframes sala-aparece {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
 .sala {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--osso);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sala__pedra {
   position: relative;
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
-  align-items: center;
-  gap: 14px;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  padding: 14px;
+  background: #2b3150;
+  border: 3px solid var(--breu);
+  box-shadow:
+    inset 0 0 0 3px var(--pedra),
+    inset 0 -8px 0 rgba(24, 20, 37, 0.45),
+    0 6px 0 rgba(24, 20, 37, 0.7);
+}
+
+.sala__icone {
   width: 100%;
   height: 100%;
-  padding: 14px;
-  border: 2px solid var(--pedra-clara);
-  text-align: left;
-  background: var(--pedra-escura);
-  cursor: pointer;
+}
+
+.sala--feita .sala__pedra {
   box-shadow:
-    0 0 0 2px var(--breu),
-    4px 4px 0 2px var(--breu);
+    inset 0 0 0 3px var(--ouro),
+    inset 0 -8px 0 rgba(24, 20, 37, 0.45),
+    0 6px 0 rgba(24, 20, 37, 0.7);
 }
 
-button.sala:hover:not(:disabled) {
-  background: var(--pedra);
+/* a próxima por fazer pisca devagar chamando */
+.sala--proxima .sala__pedra {
+  animation: sala-chama 1.4s steps(2) infinite;
 }
 
-button.sala:active:not(:disabled) {
-  transform: translate(2px, 2px);
+@keyframes sala-chama {
+  50% {
+    box-shadow:
+      inset 0 0 0 3px var(--fogo),
+      inset 0 -8px 0 rgba(24, 20, 37, 0.45),
+      0 6px 0 rgba(24, 20, 37, 0.7),
+      0 0 0 4px rgba(247, 118, 34, 0.35);
+  }
+}
+
+/* trancada: só a silhueta do que tem lá dentro */
+.sala--trancada .sala__pedra {
+  background: #1a1d30;
   box-shadow:
-    0 0 0 2px var(--breu),
-    2px 2px 0 2px var(--breu);
+    inset 0 0 0 3px var(--pedra-escura),
+    0 6px 0 rgba(24, 20, 37, 0.7);
 }
 
-.sala:focus-visible {
-  outline: 2px solid var(--ouro);
-  outline-offset: 4px;
-}
-
-.sala--atual {
-  border-color: var(--fogo);
-  animation: sala-pulsa 1.4s steps(1) infinite;
-}
-
-@keyframes sala-pulsa {
-  50% { border-color: var(--ouro); }
-}
-
-.sala:disabled,
-.sala--em-breve {
-  cursor: default;
+.sala--trancada .sala__icone {
+  filter: brightness(0);
   opacity: 0.55;
 }
 
-.sala__retrato {
-  width: 56px;
-  height: 56px;
-  background: var(--breu);
-  box-shadow: 0 0 0 2px var(--pedra-clara);
+.sala__cadeado {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  height: 16px;
+  color: var(--neblina);
 }
 
-.sala__retrato--vazio {
-  background: repeating-linear-gradient(45deg, var(--breu) 0 6px, var(--pedra-escura) 6px 12px);
+.sala__segredo {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 14px;
+  height: 14px;
 }
 
-.sala__texto {
+/* o chefe: sala maior e de borda vermelha */
+.sala--chefe .sala__pedra {
+  width: 100px;
+  height: 100px;
+  background: #3e2731;
+}
+
+.sala--chefe:not(.sala--trancada) .sala__pedra {
+  box-shadow:
+    inset 0 0 0 3px var(--brasa),
+    inset 0 -8px 0 rgba(24, 20, 37, 0.45),
+    0 6px 0 rgba(24, 20, 37, 0.7);
+}
+
+.sala--escolhida .sala__pedra {
+  outline: 3px solid #fee761;
+  outline-offset: 4px;
+}
+
+.sala:focus-visible {
+  outline: none;
+}
+
+.sala:focus-visible .sala__pedra {
+  outline: 3px dashed #fee761;
+  outline-offset: 4px;
+}
+
+.sala:hover:not(.sala--escolhida) .sala__pedra {
+  outline: 3px solid var(--pedra-clara);
+  outline-offset: 4px;
+}
+
+.sala:active .sala__pedra {
+  translate: 0 2px;
+}
+
+.sala__legenda {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 6px;
+  padding-right: 6px;
+  font: 700 14px/1 var(--fonte-pixel);
+  /* plaquinha por cima da trilha */
+  background: var(--breu);
 }
 
 .sala__numero {
-  font: 600 13px/1 var(--fonte-pixel);
-  color: var(--fogo);
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  color: var(--breu);
+  background: var(--osso);
 }
 
-.sala__texto strong {
-  font: 700 19px/1.15 var(--fonte-pixel);
-  color: var(--osso);
+.sala--trancada .sala__numero {
+  color: var(--neblina);
+  background: var(--pedra-escura);
 }
 
 .sala__estrelas {
   display: flex;
-  gap: 3px;
-  margin-top: 2px;
-  color: var(--pedra);
+  gap: 2px;
 }
 
 .sala__estrelas .icone {
-  width: 13px;
-  height: 13px;
+  height: 11px;
+  color: var(--pedra);
 }
 
-.sala__estrelas .estrela--ganha {
+.sala__estrelas .estrela--ganha,
+.mapa__selos .estrela--ganha {
   color: var(--ouro);
 }
 
-.sala__segredo {
-  width: 13px;
-  height: 13px;
+.sala__breve {
+  font: 700 30px/1 var(--fonte-pixel);
+  color: var(--pedra);
+}
+
+.sala--em-breve {
+  cursor: default;
+}
+
+/* a Lia marcando onde a turma parou */
+.mapa__turma {
+  position: absolute;
+  top: calc(50% - 62px);
+  left: calc(50% - 74px);
+  z-index: 1;
+  width: 28px;
+  height: auto;
+  pointer-events: none;
+  animation: turma-espera 1.2s steps(2) infinite;
+}
+
+@keyframes turma-espera {
+  50% { transform: translateY(-3px); }
+}
+
+.mapa__detalhe {
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 18px;
+  background: var(--breu);
+  border: 2px solid var(--pedra-escura);
+  box-shadow: inset 0 0 0 2px #2b3150;
+}
+
+.mapa__qual {
+  font: 600 13px/1 var(--fonte-pixel);
+  color: var(--fogo);
+}
+
+.mapa__detalhe h2 {
+  margin: 0;
+  font: 700 24px/1.1 var(--fonte-pixel);
+}
+
+.mapa__fala {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 4px 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--neblina);
+}
+
+.mapa__fala p {
+  margin: 0;
+}
+
+.mapa__rosto {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--pedra);
+}
+
+.mapa__selos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mapa__selos li {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  font: 600 12px/1 var(--fonte-pixel);
+  color: var(--neblina);
+  background: var(--pedra-escura);
+}
+
+.mapa__selos .icone {
+  height: 12px;
+  color: var(--pedra);
+}
+
+.mapa__selos .sprite {
+  width: 12px;
+  height: 12px;
+}
+
+.mapa__selos .selo--feito {
+  color: var(--musgo);
+}
+
+.mapa__selos .selo--feito .icone {
+  color: var(--musgo);
+}
+
+.mapa__jogar {
+  align-self: stretch;
+  justify-content: center;
   margin-top: 4px;
 }
 
-.sala__selos {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 4px;
-}
-
-.selo {
-  display: grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  color: var(--pedra-clara);
-  background: var(--breu);
-}
-
-.selo--feito {
-  color: var(--breu);
-  background: var(--musgo);
-}
-
-.selo .icone {
-  height: 10px;
-}
-
-.sala__tranca,
-.sala__breve {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
+.mapa__aviso {
+  font-size: 13px;
+  line-height: 1.4;
   color: var(--neblina);
-  font: 600 13px/1 var(--fonte-pixel);
+}
+
+@media (max-width: 960px) {
+  .mapa__corpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* no celular o painel da sala fica preso embaixo, por cima do mapa */
+  .mapa__detalhe {
+    position: sticky;
+    top: auto;
+    bottom: 0;
+    z-index: 4;
+    margin: 0 calc(-1 * max(16px, 3vw));
+    padding: 14px max(16px, 3vw) max(14px, env(safe-area-inset-bottom));
+    border-width: 2px 0 0;
+    box-shadow: 0 -6px 0 rgba(24, 20, 37, 0.6);
+  }
+
+  .mapa__fala {
+    display: none;
+  }
+
+  .mapa__detalhe h2 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 560px) {
+  .mapa__tabuleiro {
+    --linha: 136px;
+    padding: 10px;
+  }
+
+  .mapa__trilha {
+    inset: 10px;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+  }
+
+  .sala__pedra {
+    width: 76px;
+    height: 76px;
+    padding: 12px;
+  }
+
+  .sala--chefe .sala__pedra {
+    width: 88px;
+    height: 88px;
+  }
+
+  .mapa__turma {
+    left: calc(50% - 66px);
+    width: 24px;
+  }
 }
 
 /* Transição entre telas: a tela fecha num círculo e abre de novo */
@@ -2064,13 +2340,8 @@ button.sala:active:not(:disabled) {
 }
 
 /* retratos piscando cada um no seu tempo */
-.mapa__salas li:nth-child(2n) .sprite__piscada,
 .dialogo__fala:nth-child(2n) .sprite__piscada {
   animation-delay: -1.4s;
-}
-
-.mapa__salas li:nth-child(3n) .sprite__piscada {
-  animation-delay: -2.7s;
 }
 
 @keyframes respirar {
