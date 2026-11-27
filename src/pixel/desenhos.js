@@ -523,6 +523,7 @@ export const ICONES = {
   cursor: ['x.....', 'xx....', 'xxx...', 'xxxx..', 'xxxxx.', 'xxxx..', 'xxx...', 'xx....', 'x.....'],
   engrenagem: ['...x.x...', '.x.xxx.x.', '..xxxxx..', 'xxxx.xxxx', '.xx...xx.', 'xxxx.xxxx', '..xxxxx..', '.x.xxx.x.', '...x.x...'],
   pergunta: ['.xxxx.', 'xx..xx', '....xx', '...xx.', '..xx..', '..xx..', '......', '..xx..'],
+  nota: ['....xxx', '...xxxx', '...xx.x', '...x...', '...x...', '.xxx...', 'xxxx...', '.xx....'],
 };
 
 // andando de lado, virados pra direita (pra esquerda o css espelha)

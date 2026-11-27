@@ -16,6 +16,7 @@ import { useProgresso } from './hooks/useProgresso';
 import { semAnimacao, useTransicao } from './hooks/useTransicao';
 import { CacaAosBugs, bugsDisponiveis } from './telas/CacaAosBugs';
 import { Mapa } from './telas/Mapa';
+import { ligarMusica, tocarMusica } from './musica';
 import { ligarSom, tocar } from './som';
 import { Menu } from './telas/Menu';
 
@@ -39,6 +40,7 @@ export default function App() {
     darEstrelas,
     ganharConquista,
     alternarSom,
+    alternarMusica,
     apagarTudo,
   } = useProgresso();
   const { transicao, navegar, viajar, pular } = useTransicao();
@@ -60,6 +62,11 @@ export default function App() {
   useEffect(carregarMotorDepois, []);
 
   useEffect(() => ligarSom(progresso.som), [progresso.som]);
+  useEffect(() => ligarMusica(progresso.musica), [progresso.musica]);
+  // a caça aos bugs escolhe a própria música; no resto, a calma
+  useEffect(() => {
+    if (tela !== 'caca') tocarMusica('calma');
+  }, [tela]);
 
   // conquistas podem vir de qualquer lugar do jogo (ver conquistas.js)
   useEffect(
@@ -233,6 +240,8 @@ export default function App() {
               totalDeConquistas={CONQUISTAS.length}
               som={progresso.som}
               aoAlternarSom={alternarSom}
+              musica={progresso.musica}
+              aoAlternarMusica={alternarMusica}
               aoConquistas={() => setConquistasAbertas(true)}
               aoJogar={() => jogarFase(indice)}
               aoMapa={() => navegar(() => setTela('mapa'))}

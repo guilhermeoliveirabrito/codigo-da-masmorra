@@ -8,6 +8,7 @@ import { criarAmbienteDaCena } from '../motor/ambiente';
 import { carregarMotor } from '../motor/carregarMotor';
 import { pegarComponente } from '../motor/componente';
 import { traduzirErro } from '../motor/erros';
+import { ritmoDaMusica, tocarMusica } from '../musica';
 import { BUGADO, BUGADO_BRAVO, MOEDA } from '../pixel/desenhos';
 import { Icone, Sprite } from '../pixel/Sprite';
 import { tocar } from '../som';
@@ -165,6 +166,16 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
     falar(sortear(FALAS.novo));
     tocar('porta');
   }
+
+  // música da corrida enquanto joga; nos 10 segundos finais ela acelera
+  const acabando = etapa === 'jogando' && restante <= 10;
+  useEffect(() => {
+    tocarMusica(etapa === 'jogando' ? 'corrida' : 'calma');
+  }, [etapa]);
+  useEffect(() => {
+    if (acabando) ritmoDaMusica(1.25);
+  }, [acabando]);
+  useEffect(() => () => tocarMusica('calma'), []);
 
   // relógio: conta pelo horário de fim, pra não atrasar se a aba engasgar
   useEffect(() => {

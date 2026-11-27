@@ -14,6 +14,7 @@ const INICIAL = {
   estrelas: {}, // melhor resultado de cada fase em cada modo, tipo { 'placa-web': 3 }
   conquistas: [],
   moedas: 0,
+  musica: true,
   segredos: [], // ids dos segredos já achados (ver segredos.js)
   itens: [], // comprados na loja
   usando: [], // dos comprados, os que estão em uso
@@ -56,6 +57,7 @@ function validar(dados) {
       mobile: pontuacaoValida(dados.recordes?.mobile),
     },
     som: dados.som !== false,
+    musica: dados.musica !== false,
   };
 }
 
@@ -154,7 +156,8 @@ export function useProgresso() {
       ganharConquista: (id) =>
         atualizar((atual) => (atual.conquistas.includes(id) ? {} : { conquistas: [...atual.conquistas, id] })),
       alternarSom: () => atualizar((atual) => ({ som: !atual.som })),
-      apagarTudo: () => setProgresso((atual) => ({ ...INICIAL, modo: atual.modo, som: atual.som })),
+      alternarMusica: () => atualizar((atual) => ({ musica: !atual.musica })),
+      apagarTudo: () => setProgresso((atual) => ({ ...INICIAL, modo: atual.modo, som: atual.som, musica: atual.musica })),
       marcarLivroVisto: (id) =>
         atualizar((atual) => (atual.livrosVistos.includes(id) ? {} : { livrosVistos: [...atual.livrosVistos, id] })),
     };

@@ -16,6 +16,11 @@ function pegarContexto() {
   return contexto;
 }
 
+// a música usa o mesmo áudio, mas só depois que o navegador liberou (nunca cria ele antes de um clique)
+export function audioLiberado() {
+  return ligado && contexto?.state === 'running' ? contexto : null;
+}
+
 // o iPhone só deixa tocar som depois de um toque na tela
 export function destravarSom() {
   try {

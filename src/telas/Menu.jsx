@@ -64,6 +64,8 @@ export function Menu({
   totalDeConquistas,
   som,
   aoAlternarSom,
+  musica,
+  aoAlternarMusica,
   aoConquistas,
   aoJogar,
   aoMapa,
@@ -291,8 +293,10 @@ export function Menu({
       {ajustesAbertos && (
         <Ajustes
           som={som}
+          musica={musica}
           instalacao={instalacao}
           aoAlternarSom={aoAlternarSom}
+          aoAlternarMusica={aoAlternarMusica}
           aoApagarProgresso={aoApagarProgresso}
           aoFechar={() => setAjustesAbertos(false)}
         />

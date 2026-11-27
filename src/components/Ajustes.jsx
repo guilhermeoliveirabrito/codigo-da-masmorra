@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Icone } from '../pixel/Sprite';
 
-export function Ajustes({ som, instalacao, aoAlternarSom, aoApagarProgresso, aoFechar }) {
+export function Ajustes({ som, musica, instalacao, aoAlternarSom, aoAlternarMusica, aoApagarProgresso, aoFechar }) {
   const [confirmar, setConfirmar] = useState(false);
   const [apagado, setApagado] = useState(false);
 
@@ -40,6 +40,17 @@ export function Ajustes({ som, instalacao, aoAlternarSom, aoApagarProgresso, aoF
           <button type="button" className="botao botao--pedra" onClick={aoAlternarSom} aria-pressed={som}>
             <Icone nome={som ? 'som' : 'mudo'} />
             {som ? 'Ligado' : 'Desligado'}
+          </button>
+        </div>
+
+        <div className="ajustes__linha">
+          <span>
+            Música
+            {!som && <small>Ligue o som pra ouvir a música.</small>}
+          </span>
+          <button type="button" className="botao botao--pedra" onClick={aoAlternarMusica} aria-pressed={musica}>
+            <Icone nome="nota" />
+            {musica ? 'Ligada' : 'Desligada'}
           </button>
         </div>
 
