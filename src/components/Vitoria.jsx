@@ -3,6 +3,8 @@ import { semAnimacao } from '../hooks/useTransicao';
 import { BAU, BAU_FECHADO, MOEDA } from '../pixel/desenhos';
 import { Icone, Sprite } from '../pixel/Sprite';
 import { tocar } from '../som';
+import { textoDoFim } from '../compartilhar';
+import { Compartilhar } from './Compartilhar';
 import { TextoRico } from './TextoRico';
 
 // as moedas ganhas sobem de pouco em pouco, cada passo com um plim
@@ -40,7 +42,7 @@ function ContadorDeMoedas({ quantas, atraso }) {
 // pra onde cada moeda pula quando o baú abre
 const MOEDAS = [-34, 22, -12, 40, 6, -26, 30];
 
-export function Vitoria({ fase, modo, resumo, temProxima, outroModoFeito, aoProxima, aoTrocarModo, aoFechar }) {
+export function Vitoria({ fase, modo, resumo, temProxima, outroModoFeito, estrelasNoModo, maximoNoModo, aoProxima, aoTrocarModo, aoFechar }) {
   const aprendeu = typeof fase.aprendeu === 'object' ? fase.aprendeu[modo] : fase.aprendeu;
   const outroModo = modo === 'web' ? 'Mobile' : 'Web';
   const { estrelas = 1, pediuDica = true, viuSolucao = true, moedas = 0 } = resumo ?? {};
@@ -122,6 +124,7 @@ export function Vitoria({ fase, modo, resumo, temProxima, outroModoFeito, aoProx
               Próxima fase
             </button>
           )}
+          {!temProxima && <Compartilhar texto={textoDoFim(modo, estrelasNoModo, maximoNoModo)} />}
           {!outroModoFeito && (
             <button type="button" className="botao botao--pedra" onClick={aoTrocarModo}>
               Jogar no modo {outroModo}

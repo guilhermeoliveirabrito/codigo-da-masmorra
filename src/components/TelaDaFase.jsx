@@ -26,6 +26,8 @@ export function TelaDaFase({
   codigo,
   temProxima,
   outroModoFeito,
+  estrelasNoModo,
+  maximoNoModo,
   saindo,
   aoMudarCodigo,
   aoRecomecar,
@@ -283,6 +285,8 @@ export function TelaDaFase({
           resumo={resumoRef.current}
           temProxima={temProxima}
           outroModoFeito={outroModoFeito}
+          estrelasNoModo={estrelasNoModo}
+          maximoNoModo={maximoNoModo}
           aoProxima={aoProxima}
           aoTrocarModo={aoTrocarModo}
           aoFechar={() => setVenceu(false)}

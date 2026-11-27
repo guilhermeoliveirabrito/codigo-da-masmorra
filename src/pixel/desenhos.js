@@ -525,6 +525,7 @@ export const ICONES = {
   pergunta: ['.xxxx.', 'xx..xx', '....xx', '...xx.', '..xx..', '..xx..', '......', '..xx..'],
   chama: ['...x...', '...xx..', '..xxx..', '.xxxxx.', '.xx.xxx', 'xx...xx', 'xx...xx', '.xx.xx.', '..xxx..'],
   nota: ['....xxx', '...xxxx', '...xx.x', '...x...', '...x...', '.xxx...', 'xxxx...', '.xx....'],
+  compartilhar: ['...x...', '..xxx..', '.x.x.x.', '...x...', 'x..x..x', 'x.....x', 'x.....x', 'xxxxxxx'],
   pular: ['x...x...x', 'xx..xx..x', 'xxx.xxx.x', 'xxxxxxxxx', 'xxx.xxx.x', 'xx..xx..x', 'x...x...x'],
   lupa: ['..xxx...', '.x...x..', 'x.....x.', 'x.....x.', 'x.....x.', '.x...x..', '..xxxxx.', '.....xxx', '......xx'],
 };

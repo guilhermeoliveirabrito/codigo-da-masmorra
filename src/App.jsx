@@ -339,6 +339,8 @@ export default function App() {
                 codigo={codigo}
                 temProxima={indice < fases.length - 1}
                 outroModoFeito={concluidas[outroModo].includes(fase.id)}
+                estrelasNoModo={fases.reduce((soma, f) => soma + (progresso.estrelas[`${f.id}-${modo}`] ?? 0), 0)}
+                maximoNoModo={fases.length * 3}
                 saindo={saindo}
                 aoMudarCodigo={(novo) => salvarCodigo(chaveDoCodigo, novo)}
                 aoRecomecar={() => apagarCodigo(chaveDoCodigo)}

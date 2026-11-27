@@ -4665,6 +4665,37 @@ pre {
   margin-top: 20px;
 }
 
+/* Compartilhar: o aviso só ocupa espaço quando tem o que dizer */
+.compartilhar {
+  display: flex;
+  flex-direction: column;
+}
+
+.compartilhar__aviso {
+  margin: 0;
+  font-size: 14px;
+  color: var(--musgo);
+  text-align: center;
+}
+
+.compartilhar__aviso:not(:empty) {
+  margin-top: 6px;
+}
+
+.compartilhar__aviso--falhou {
+  color: var(--osso);
+}
+
+.compartilhar__texto {
+  margin-top: 6px;
+  padding: 8px 10px;
+  resize: none;
+  font: 14px/1.4 var(--fonte-texto);
+  color: var(--osso);
+  background: var(--breu);
+  border: 2px solid var(--pedra-clara);
+}
+
 /* No celular: uma parte da fase por vez, com abas e o Rodar fixo embaixo */
 @media (max-width: 760px) {
   .so-tela-grande {

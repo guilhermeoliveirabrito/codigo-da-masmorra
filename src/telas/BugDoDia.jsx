@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { linhaDoBug } from '../caca/bugs';
 import { CenaDoBug, FALAS, sortear, useGoblin, useTelaDoBug } from '../caca/CenaDoBug';
+import { textoDoDia } from '../compartilhar';
 import { conferir } from '../caca/conferir';
 import { moedasDoDia, ontemDe, sequenciaAtual } from '../caca/doDia';
+import { Compartilhar } from '../components/Compartilhar';
 import { Editor } from '../components/Editor';
 import { Resultado } from '../components/Resultado';
 import { BUGADO, MOEDA } from '../pixel/desenhos';
@@ -199,6 +201,7 @@ export function BugDoDia({ modo, bug, dia, desafio, aoConsertar, aoVoltar }) {
               <button type="button" className="botao botao--fogo" onClick={aoVoltar} autoFocus>
                 Menu
               </button>
+              <Compartilhar texto={textoDoDia(dia, premio?.sequencia ?? desafio.sequencia)} />
             </div>
           </div>
         </div>

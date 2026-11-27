@@ -2,8 +2,10 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import { BUGS, linhaDoBug } from '../caca/bugs';
 import { CenaDoBug, FALAS, sortear, useGoblin, useTelaDoBug } from '../caca/CenaDoBug';
 import { conferir } from '../caca/conferir';
+import { Compartilhar } from '../components/Compartilhar';
 import { Editor } from '../components/Editor';
 import { Resultado } from '../components/Resultado';
+import { textoDaCaca } from '../compartilhar';
 import { fases } from '../fases';
 import { ritmoDaMusica, tocarMusica } from '../musica';
 import { BUGADO, BUGADO_BRAVO, MOEDA } from '../pixel/desenhos';
@@ -373,6 +375,7 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
               <button type="button" className="botao botao--fogo" onClick={comecar} autoFocus data-som="nenhum">
                 Jogar de novo
               </button>
+              {final.consertados > 0 && <Compartilhar texto={textoDaCaca(final, modo)} />}
               <button type="button" className="botao botao--pedra" onClick={aoVoltar}>
                 Menu
               </button>
