@@ -126,6 +126,10 @@ function traduzir(erro, codigo, modo) {
     const evento = modo === 'mobile' ? 'onPress' : 'onClick';
     return `a tela entrou num loop: o estado muda enquanto a tela é desenhada, e isso desenha a tela de novo, sem parar. Costuma ser um ${evento}={setAlgo(...)} sem a arrow function. Use ${evento}={() => setAlgo(...)}.`;
   }
+  // Chrome, Safari e Firefox escrevem de jeitos diferentes
+  if (/Assignment to constant variable|Attempted to assign to readonly property|invalid assignment to const/.test(mensagem)) {
+    return 'você tentou mudar com = uma variável criada com const. Se ela é um estado, quem muda é a função do useState, tipo setAcesa(!acesa).';
+  }
   if (/Invalid hook call|Minified React error #321/.test(mensagem)) {
     return 'o useState (e todo hook) só funciona dentro do componente, direto no corpo da função. Fora dele, ou dentro de outra função, não dá.';
   }

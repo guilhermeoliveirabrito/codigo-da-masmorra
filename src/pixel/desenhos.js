@@ -415,6 +415,56 @@ export const GARRAFA = {
   camadas: [['...kk...', '..kTTk..', '..kbbk..', '.kCcCCk.', 'kCcWCCCk', 'kCcCCCCk', 'kCCCCCCk', '.kkkkkk.']],
 };
 
+// Caça aos bugs: o goblin Bugado, rindo e bravo (quando consertam o bug dele)
+const TOPO_DO_BUGADO = [
+  '................',
+  '.....kkkkkk.....',
+  'k...kllllllk...k',
+  'kk.klllllllgk.kk',
+  'klkllllllllgklgk',
+  '.klgllllllllgkk.',
+];
+const CORPO_DO_BUGADO = [
+  '...kkBBBBBBkk...',
+  '..kBBbbbbbbBBk..',
+  '.klkBbbbbbbBklk.',
+  '.kllkBbyybBkllk.',
+  '..kkkBbbbbBkkk..',
+  '....kBBkkBBk....',
+  '....kggk.kggk...',
+  '...kkkk..kkkk...',
+];
+export const BUGADO = {
+  camadas: [
+    [
+      ...TOPO_DO_BUGADO,
+      '..kgkkllllkkgk..',
+      '..klYklllkYkgk..',
+      '..klkklllkkkgk..',
+      '..klllllllllgk..',
+      '..kllkWkWkllgk..',
+      '...klkkkkkkgk...',
+      '....kgggggggk...',
+      ...CORPO_DO_BUGADO,
+    ],
+  ],
+};
+export const BUGADO_BRAVO = {
+  camadas: [
+    [
+      ...TOPO_DO_BUGADO,
+      '..kgrkllllkrgk..',
+      '..klkYklllYkgk..',
+      '..klkklllkkkgk..',
+      '..klllllllllgk..',
+      '..klllkkkkllgk..',
+      '...klkWWWWkgk...',
+      '....kgggggggk...',
+      ...CORPO_DO_BUGADO,
+    ],
+  ],
+};
+
 // moeda do placar e da loja
 export const MOEDA = {
   camadas: [['..kkkk..', '.kYYYyk.', 'kYWYyyok', 'kYYyoyok', 'kYyyoyok', 'kYyyyyok', '.kyyyok.', '..kkkk..']],

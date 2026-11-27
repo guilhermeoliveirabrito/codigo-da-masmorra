@@ -17,6 +17,7 @@ const INICIAL = {
   segredos: [], // ids dos segredos já achados (ver segredos.js)
   itens: [], // comprados na loja
   usando: [], // dos comprados, os que estão em uso
+  recordes: { web: 0, mobile: 0 }, // da Caça aos bugs
   som: true,
 };
 
@@ -50,9 +51,15 @@ function validar(dados) {
     moedas: Number.isInteger(dados.moedas) ? Math.min(Math.max(dados.moedas, 0), MOEDAS_NO_MAXIMO) : 0,
     segredos: [...new Set(listaDeTextos(dados.segredos).filter((id) => SEGREDOS.includes(id)))],
     ...itensValidos(dados),
+    recordes: {
+      web: pontuacaoValida(dados.recordes?.web),
+      mobile: pontuacaoValida(dados.recordes?.mobile),
+    },
     som: dados.som !== false,
   };
 }
+
+const pontuacaoValida = (valor) => (Number.isInteger(valor) ? Math.min(Math.max(valor, 0), MOEDAS_NO_MAXIMO) : 0);
 
 // só itens que existem, e só usa o que comprou
 function itensValidos(dados) {
@@ -140,6 +147,10 @@ export function useProgresso() {
           const usando = atual.usando.includes(id) ? atual.usando.filter((item) => item !== id) : [...atual.usando, id];
           return { usando };
         }),
+      salvarRecorde: (modo, pontos) =>
+        atualizar((atual) =>
+          pontos > atual.recordes[modo] ? { recordes: { ...atual.recordes, [modo]: pontuacaoValida(pontos) } } : {}
+        ),
       ganharConquista: (id) =>
         atualizar((atual) => (atual.conquistas.includes(id) ? {} : { conquistas: [...atual.conquistas, id] })),
       alternarSom: () => atualizar((atual) => ({ som: !atual.som })),

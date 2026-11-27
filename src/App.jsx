@@ -14,6 +14,7 @@ import { fases, proximasFases } from './fases';
 import { carregarMotorDepois } from './motor/carregarMotor';
 import { useProgresso } from './hooks/useProgresso';
 import { semAnimacao, useTransicao } from './hooks/useTransicao';
+import { CacaAosBugs, bugsDisponiveis } from './telas/CacaAosBugs';
 import { Mapa } from './telas/Mapa';
 import { ligarSom, tocar } from './som';
 import { Menu } from './telas/Menu';
@@ -33,6 +34,7 @@ export default function App() {
     guardarSegredo,
     comprar,
     alternarItem,
+    salvarRecorde,
     marcarLivroVisto,
     darEstrelas,
     ganharConquista,
@@ -170,6 +172,17 @@ export default function App() {
     else viajar(acao, destino, { saida });
   }
 
+  // fim de uma rodada da Caça aos bugs
+  const terminarCaca = useCallback(
+    (resumo) => {
+      if (resumo.moedas) ganharMoedas(resumo.moedas);
+      salvarRecorde(modo, resumo.pontos);
+      if (resumo.consertados >= 5) conquistar('cacador');
+      if (resumo.melhorCombo >= 5) conquistar('combo');
+    },
+    [ganharMoedas, salvarRecorde, modo]
+  );
+
   // resumo: { estrelas, tentativas, pediuDica } da rodada que passou. Devolve quantas moedas ganhou.
   const concluir = useCallback(
     (resumo) => {
@@ -223,6 +236,9 @@ export default function App() {
               aoConquistas={() => setConquistasAbertas(true)}
               aoJogar={() => jogarFase(indice)}
               aoMapa={() => navegar(() => setTela('mapa'))}
+              bugs={bugsDisponiveis(concluidas[modo]).length}
+              recordeDeBugs={progresso.recordes[modo]}
+              aoCaca={() => navegar(() => setTela('caca'))}
               aoLivro={() => setLivroAberto(true)}
               aoComoJogar={() => setComoJogarAberto(true)}
               aoTrocarModo={mudarModo}
@@ -231,6 +247,17 @@ export default function App() {
                 achadosRef.current.clear();
                 apagarTudo();
               }}
+            />
+          )}
+
+          {tela === 'caca' && (
+            <CacaAosBugs
+              key={modo}
+              modo={modo}
+              concluidas={concluidas[modo]}
+              recorde={progresso.recordes[modo]}
+              aoTerminar={terminarCaca}
+              aoVoltar={() => navegar(() => setTela('menu'))}
             />
           )}
 

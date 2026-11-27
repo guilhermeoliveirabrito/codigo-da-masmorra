@@ -13,6 +13,8 @@ export const CONQUISTAS = [
   { id: 'mobile', titulo: 'Mestre do Mobile', descricao: 'Terminou todas as fases no modo Mobile.' },
   { id: 'explorador', titulo: 'Explorador', descricao: 'Achou todos os segredos escondidos na masmorra.' },
   { id: 'fregues', titulo: 'Freguês', descricao: 'Comprou alguma coisa na loja.' },
+  { id: 'cacador', titulo: 'Caçador de bugs', descricao: 'Consertou 5 bugs numa rodada só da Caça aos bugs.' },
+  { id: 'combo', titulo: 'Combo máximo', descricao: 'Chegou no combo x5 da Caça aos bugs.' },
   { id: 'gato', titulo: 'Amigo do gato', descricao: 'Fez carinho no gato da masmorra.', secreta: true },
   { id: 'coruja', titulo: 'Coruja', descricao: 'Jogou depois da meia-noite.', secreta: true },
 ];

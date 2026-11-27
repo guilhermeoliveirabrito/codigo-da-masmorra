@@ -69,6 +69,9 @@ export function Menu({
   aoMapa,
   aoLivro,
   aoLoja,
+  bugs,
+  recordeDeBugs,
+  aoCaca,
   aoComoJogar,
   aoTrocarModo,
   aoApagarProgresso,
@@ -217,6 +220,20 @@ export function Menu({
                 Fase {faseAtual.numero} · {faseAtual.titulo}
               </span>
             )}
+          </button>
+          <button
+            type="button"
+            className="opcao"
+            onClick={aoCaca}
+            onPointerEnter={aoPassar}
+            disabled={!bugs}
+            data-menu
+          >
+            <Icone nome={bugs ? 'cursor' : 'cadeado'} className="opcao__cursor" />
+            <span className="opcao__texto">Caça aos bugs</span>
+            <span className="opcao__detalhe">
+              {!bugs ? 'passe da fase 1' : recordeDeBugs > 0 ? `recorde ${recordeDeBugs}` : `${bugs} bugs`}
+            </span>
           </button>
           <button type="button" className="opcao" onClick={aoMapa} onPointerEnter={aoPassar} data-menu>
             <Icone nome="cursor" className="opcao__cursor" />

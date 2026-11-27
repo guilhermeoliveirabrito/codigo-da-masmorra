@@ -527,6 +527,20 @@ pre {
   translate: 0 2px;
 }
 
+/* trancada: aparece, mas ainda não dá pra entrar */
+.opcao:disabled {
+  color: var(--pedra-clara);
+  background: none;
+  cursor: not-allowed;
+  translate: none;
+}
+
+.opcao:disabled .opcao__cursor {
+  opacity: 1;
+  color: var(--pedra-clara);
+  animation: none;
+}
+
 /* sem o mouse em cima nem foco, o cursor fica no primeiro */
 .opcao:hover .opcao__cursor,
 .opcao:focus-visible .opcao__cursor,
@@ -756,6 +770,276 @@ pre {
 .cabecalho__som .icone {
   width: 18px;
   height: 16px;
+}
+
+/* Caça aos bugs */
+.caca {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: 20px 28px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 24px 32px;
+}
+
+.caca__topo {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.caca__topo h1 {
+  margin: 0;
+  font: 700 24px/1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.caca__placar {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.caca__tempo,
+.caca__pontos,
+.caca__combo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 42px;
+  padding: 0 12px;
+  font: 700 22px/1 var(--fonte-pixel);
+  background: var(--breu);
+  border: 2px solid var(--pedra-escura);
+}
+
+.caca__tempo {
+  min-width: 84px;
+  color: var(--osso);
+}
+
+.caca--acabando .caca__tempo {
+  color: var(--brasa);
+  border-color: var(--brasa);
+  animation: tempo-acabando 1s steps(2) infinite;
+}
+
+@keyframes tempo-acabando {
+  50% { opacity: 0.55; }
+}
+
+.caca__pontos {
+  min-width: 96px;
+  color: var(--ouro);
+}
+
+.caca__pontos small {
+  font-size: 13px;
+  color: var(--neblina);
+}
+
+.caca__combo {
+  min-width: 56px;
+  color: var(--neblina);
+}
+
+.caca__combo--2 { color: var(--osso); }
+.caca__combo--3 { color: var(--ouro); }
+.caca__combo--4 { color: var(--fogo); }
+
+.caca__combo--5 {
+  color: var(--brasa);
+  border-color: var(--brasa);
+  animation: tempo-acabando 0.5s steps(2) infinite;
+}
+
+.caca__mundo,
+.caca__codigo {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.caca__mundo {
+  gap: 14px;
+}
+
+.caca__missao {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 15px;
+  line-height: 1.45;
+  background: var(--breu);
+}
+
+.caca__missao .etiqueta {
+  margin-right: 8px;
+}
+
+.caca__ajuda {
+  margin: 0;
+  font-size: 14px;
+  color: var(--neblina);
+}
+
+.bugado {
+  position: absolute;
+  z-index: 3;
+}
+
+.bugado__sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: bugado-pula 0.9s steps(2) infinite;
+}
+
+@keyframes bugado-pula {
+  50% { transform: translateY(-0.6cqw); }
+}
+
+.bugado .balao {
+  max-width: 44cqw;
+}
+
+.caca__ganho {
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  z-index: 6;
+  font: 700 4cqw/1 var(--fonte-pixel);
+  color: var(--ouro);
+  text-shadow:
+    0 0.4cqw 0 var(--breu),
+    0.3cqw 0 0 var(--breu),
+    -0.3cqw 0 0 var(--breu);
+  translate: -50% 0;
+  pointer-events: none;
+  animation: premio-sobe 1.2s steps(12) forwards;
+}
+
+.caca__janela {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(520px, 100%);
+  padding: 24px;
+  text-align: center;
+}
+
+.caca__retrato {
+  width: 64px;
+  height: auto;
+}
+
+.caca__janela h2 {
+  margin: 0;
+  font: 700 28px/1.1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.caca__janela p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.caca__regras {
+  margin: 4px 0;
+  padding-left: 20px;
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.caca__recorde {
+  font-size: 14px;
+  color: var(--neblina);
+}
+
+.caca__recorde--novo {
+  font: 700 18px/1 var(--fonte-pixel);
+  color: var(--musgo);
+}
+
+.caca__total {
+  font: 700 56px/1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.caca__total small {
+  margin-left: 6px;
+  font-size: 18px;
+  color: var(--neblina);
+}
+
+.caca__resumo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 18px;
+  margin: 4px 0;
+  padding: 0;
+  font-size: 15px;
+  list-style: none;
+}
+
+.caca__resumo strong {
+  font-family: var(--fonte-pixel);
+  color: var(--osso);
+}
+
+.caca__moedas {
+  justify-content: center;
+  margin: 0;
+}
+
+@media (max-width: 960px) {
+  .caca {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .caca {
+    gap: 14px;
+    padding: 10px 12px 24px;
+  }
+
+  .caca__topo h1 {
+    display: none;
+  }
+
+  /* o relógio fica sempre à vista enquanto rola até o código */
+  .caca__topo {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    margin: -10px -12px 0;
+    padding: calc(env(safe-area-inset-top) + 8px) 12px 8px;
+    background: var(--breu);
+    box-shadow: 0 2px 0 var(--pedra-escura);
+  }
+
+  .caca__tempo,
+  .caca__pontos,
+  .caca__combo {
+    height: 40px;
+    padding: 0 9px;
+    font-size: 18px;
+  }
+
+  .caca__tempo {
+    min-width: 66px;
+  }
+
+  .caca__pontos {
+    min-width: 0;
+  }
 }
 
 /* Loja */
