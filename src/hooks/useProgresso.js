@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { IDS_DOS_ITENS } from '../loja';
+import { IDS_DOS_ITENS, usarItem } from '../loja';
 import { SEGREDOS } from '../segredos';
 
 const CHAVE = 'codigo-da-masmorra:progresso:v1';
@@ -69,10 +69,12 @@ function validar(dados) {
 
 const pontuacaoValida = (valor) => (Number.isInteger(valor) ? Math.min(Math.max(valor, 0), MOEDAS_NO_MAXIMO) : 0);
 
-// só itens que existem, e só usa o que comprou
+// só itens que existem, só usa o que comprou e só um de cada grupo
 function itensValidos(dados) {
   const itens = [...new Set(listaDeTextos(dados.itens).filter((id) => IDS_DOS_ITENS.includes(id)))];
-  const usando = [...new Set(listaDeTextos(dados.usando).filter((id) => itens.includes(id)))];
+  const usando = listaDeTextos(dados.usando)
+    .filter((id) => itens.includes(id))
+    .reduce((lista, id) => usarItem(lista, id), []);
   return { itens, usando };
 }
 
@@ -147,12 +149,12 @@ export function useProgresso() {
         atualizar((atual) =>
           atual.itens.includes(id) || atual.moedas < preco
             ? {}
-            : { itens: [...atual.itens, id], usando: [...atual.usando, id], moedas: atual.moedas - preco }
+            : { itens: [...atual.itens, id], usando: usarItem(atual.usando, id), moedas: atual.moedas - preco }
         ),
       alternarItem: (id) =>
         atualizar((atual) => {
           if (!atual.itens.includes(id)) return {};
-          const usando = atual.usando.includes(id) ? atual.usando.filter((item) => item !== id) : [...atual.usando, id];
+          const usando = atual.usando.includes(id) ? atual.usando.filter((item) => item !== id) : usarItem(atual.usando, id);
           return { usando };
         }),
       salvarRecorde: (modo, pontos) =>

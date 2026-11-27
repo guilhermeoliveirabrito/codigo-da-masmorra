@@ -8,7 +8,7 @@ import { TelaDaFase } from './components/TelaDaFase';
 import { Transicao } from './components/Transicao';
 import { Viagem } from './components/Viagem';
 import { CONQUISTAS, conquistar, ouvirConquistas } from './conquistas';
-import { ITENS, ItensEmUso } from './loja';
+import { ITENS, ItensEmUso, temaEmUso } from './loja';
 import { MOEDAS_POR_SEGREDO, SEGREDOS, SegredosAchados, ouvirSegredos } from './segredos';
 import { fases, proximasFases } from './fases';
 import { carregarMotorDepois } from './motor/carregarMotor';
@@ -241,7 +241,7 @@ export default function App() {
   return (
     <SegredosAchados.Provider value={progresso.segredos}>
       <ItensEmUso.Provider value={progresso.usando}>
-        <div className={`app ${esperando ? 'app--esperando' : ''}`}>
+        <div className={['app', esperando && 'app--esperando', temaEmUso(progresso.usando)].filter(Boolean).join(' ')}>
           {tela === 'menu' && (
             <Menu
               faseAtual={fase}
@@ -252,8 +252,8 @@ export default function App() {
               estrelas={totalDeEstrelas}
               maximoDeEstrelas={fases.length * 6}
               moedas={progresso.moedas}
-            podeComprar={ITENS.some((item) => !progresso.itens.includes(item.id) && item.preco <= progresso.moedas)}
-            aoLoja={() => setLojaAberta(true)}
+              podeComprar={ITENS.some((item) => !progresso.itens.includes(item.id) && item.preco <= progresso.moedas)}
+              aoLoja={() => setLojaAberta(true)}
               conquistas={progresso.conquistas.length}
               totalDeConquistas={CONQUISTAS.length}
               som={progresso.som}

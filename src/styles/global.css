@@ -1254,6 +1254,28 @@ pre {
   max-width: 100%;
 }
 
+/* amostra de tema: cada faixa é um pedaço de código com a cor dele */
+.amostra {
+  width: 100%;
+  height: auto;
+}
+
+.amostra__fundo {
+  fill: var(--editor-fundo, #120f1c);
+}
+
+.amostra__margem {
+  fill: var(--editor-margem, var(--breu));
+}
+
+.amostra__numero {
+  fill: var(--editor-numero, #4c5576);
+}
+
+.amostra__normal {
+  color: var(--editor-texto, #efe6d2);
+}
+
 .item__texto {
   display: flex;
   flex-direction: column;
@@ -3518,8 +3540,8 @@ pre {
 .jogo__arquivo {
   padding: 10px 14px 8px;
   font: 14px/1 var(--fonte-codigo);
-  color: var(--osso);
-  background: #120f1c;
+  color: var(--editor-texto, var(--osso));
+  background: var(--editor-fundo, #120f1c);
   border: 2px solid var(--pedra-clara);
   border-bottom: 0;
   box-shadow: 0 -2px 0 var(--breu);
@@ -3532,8 +3554,10 @@ pre {
   padding-bottom: 10px;
 }
 
+/* As cores do editor vêm de variáveis: sem tema, valem as de depois da vírgula.
+   Os temas da loja (lá no fim deste bloco) trocam só as variáveis. */
 .editor {
-  background: #120f1c;
+  background: var(--editor-fundo, #120f1c);
 }
 
 .editor__area {
@@ -3555,8 +3579,8 @@ pre {
   min-width: 3em;
   overflow: hidden;
   text-align: right;
-  color: #4c5576;
-  background: var(--breu);
+  color: var(--editor-numero, #4c5576);
+  background: var(--editor-margem, var(--breu));
   user-select: none;
 }
 
@@ -3612,7 +3636,7 @@ pre {
 .editor__realce {
   display: none;
   overflow: hidden;
-  color: #efe6d2;
+  color: var(--editor-texto, #efe6d2);
   pointer-events: none;
 }
 
@@ -3620,8 +3644,8 @@ pre {
   resize: none;
   outline: none;
   overflow: auto;
-  color: #efe6d2;
-  caret-color: var(--fogo);
+  color: var(--editor-texto, #efe6d2);
+  caret-color: var(--editor-cursor, var(--fogo));
   background: transparent;
 }
 
@@ -3644,43 +3668,99 @@ pre {
   }
 
   .editor textarea {
-    color: #efe6d2;
+    color: var(--editor-texto, #efe6d2);
     -webkit-text-fill-color: currentColor;
   }
 }
 
 .editor textarea::selection {
-  background: rgba(139, 155, 180, 0.4);
+  background: var(--editor-selecao, rgba(139, 155, 180, 0.4));
 }
 
 /* cores do código */
 .cor-palavra {
-  color: #f6757a;
+  color: var(--cor-palavra, #f6757a);
 }
 
 .cor-tag {
-  color: #2ce8f5;
+  color: var(--cor-tag, #2ce8f5);
 }
 
 .cor-atributo {
-  color: #feae34;
+  color: var(--cor-atributo, #feae34);
 }
 
 .cor-texto {
-  color: #63c74d;
+  color: var(--cor-texto, #63c74d);
 }
 
 .cor-valor {
-  color: #fee761;
+  color: var(--cor-valor, #fee761);
 }
 
 .cor-comentario {
-  color: #8b9bb4;
+  color: var(--cor-comentario, #8b9bb4);
   font-style: italic;
 }
 
 .cor-sinal {
-  color: #8b9bb4;
+  color: var(--cor-sinal, #8b9bb4);
+}
+
+/* Temas do editor. Valem no editor, na aba do arquivo e na amostra da loja;
+   o código do livro continua com as cores de sempre. */
+.tema-pergaminho .editor,
+.tema-pergaminho .jogo__arquivo,
+.amostra.tema-pergaminho {
+  --editor-fundo: #ead4aa;
+  --editor-margem: #e0c08f;
+  --editor-numero: #733e39;
+  --editor-texto: #3e2731;
+  --editor-cursor: #a22633;
+  --editor-selecao: rgba(184, 111, 80, 0.4);
+  --cor-palavra: #a22633;
+  --cor-tag: #124e89;
+  --cor-atributo: #8a4836;
+  --cor-texto: #265c42;
+  --cor-valor: #68386c;
+  --cor-comentario: #694a36;
+  --cor-sinal: #733e39;
+}
+
+.tema-neon .editor,
+.tema-neon .jogo__arquivo,
+.amostra.tema-neon {
+  --editor-fundo: #14082a;
+  --editor-margem: #0d0520;
+  --editor-numero: #6d4fa8;
+  --editor-texto: #f3e8ff;
+  --editor-cursor: #ff4fd8;
+  --editor-selecao: rgba(255, 79, 216, 0.3);
+  --cor-palavra: #ff4fd8;
+  --cor-tag: #2ce8f5;
+  --cor-atributo: #fee761;
+  --cor-texto: #7dff9e;
+  --cor-valor: #ff9d5c;
+  --cor-comentario: #9a7cc9;
+  --cor-sinal: #b59be6;
+}
+
+.tema-musgo .editor,
+.tema-musgo .jogo__arquivo,
+.amostra.tema-musgo {
+  --editor-fundo: #0b1a10;
+  --editor-margem: #07120a;
+  --editor-numero: #2f6b3a;
+  --editor-texto: #9fe68a;
+  --editor-cursor: #d4ffb8;
+  --editor-selecao: rgba(99, 199, 77, 0.3);
+  --cor-palavra: #d4ffb8;
+  --cor-tag: #63c74d;
+  --cor-atributo: #b8e986;
+  --cor-texto: #e6ffd6;
+  --cor-valor: #7cf07a;
+  --cor-comentario: #4f9a52;
+  --cor-sinal: #5cae5a;
 }
 
 .editor__simbolos {

@@ -6,8 +6,41 @@ import { visualDe } from './Cenario';
 
 const VITRINE = { 'tochas-azuis': TOCHA_AZUL, gato: GATINHO, gosminha: GOSMINHA };
 
-// acessório aparece já no personagem, o resto é o próprio desenho
+// um editorzinho de mentira: [x, linha, largura, tipo de pedaço de código]
+const PEDACOS_DA_AMOSTRA = [
+  [7, 0, 5, 'palavra'], [13, 0, 4, 'normal'], [18, 0, 8, 'texto'],
+  [9, 1, 1, 'sinal'], [10, 1, 3, 'tag'], [14, 1, 5, 'atributo'], [20, 1, 4, 'valor'], [24, 1, 1, 'sinal'],
+  [11, 2, 9, 'texto'],
+  [9, 3, 2, 'sinal'], [11, 3, 3, 'tag'], [14, 3, 1, 'sinal'],
+  [7, 4, 13, 'comentario'],
+];
+
+function AmostraDoTema({ tema }) {
+  return (
+    <svg className={`amostra ${tema}`} viewBox="0 0 32 22" shapeRendering="crispEdges" aria-hidden="true">
+      <rect className="amostra__fundo" width="32" height="22" />
+      <rect className="amostra__margem" width="5" height="22" />
+      {PEDACOS_DA_AMOSTRA.map(([x, linha, largura, tipo]) => (
+        <rect
+          key={`${x}-${linha}`}
+          className={tipo === 'normal' ? 'amostra__normal' : `cor-${tipo}`}
+          fill="currentColor"
+          x={x}
+          y={3 + linha * 4}
+          width={largura}
+          height={2}
+        />
+      ))}
+      {[0, 1, 2, 3, 4].map((linha) => (
+        <rect key={linha} className="amostra__numero" x={2} y={3 + linha * 4} width={2} height={2} />
+      ))}
+    </svg>
+  );
+}
+
+// acessório aparece já no personagem, tema vira um editorzinho, o resto é o próprio desenho
 function Vitrine({ item }) {
+  if (item.grupo === 'tema') return <AmostraDoTema tema={item.id} />;
   const desenho = item.quem ? visualDe(item.quem, [item.id]).desenho : VITRINE[item.id];
   return <Sprite desenho={desenho} />;
 }
