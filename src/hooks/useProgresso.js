@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { IDS_DOS_ITENS } from '../loja';
 import { SEGREDOS } from '../segredos';
 
 const CHAVE = 'codigo-da-masmorra:progresso:v1';
@@ -14,6 +15,8 @@ const INICIAL = {
   conquistas: [],
   moedas: 0,
   segredos: [], // ids dos segredos já achados (ver segredos.js)
+  itens: [], // comprados na loja
+  usando: [], // dos comprados, os que estão em uso
   som: true,
 };
 
@@ -46,8 +49,16 @@ function validar(dados) {
     conquistas: listaDeTextos(dados.conquistas),
     moedas: Number.isInteger(dados.moedas) ? Math.min(Math.max(dados.moedas, 0), MOEDAS_NO_MAXIMO) : 0,
     segredos: [...new Set(listaDeTextos(dados.segredos).filter((id) => SEGREDOS.includes(id)))],
+    ...itensValidos(dados),
     som: dados.som !== false,
   };
+}
+
+// só itens que existem, e só usa o que comprou
+function itensValidos(dados) {
+  const itens = [...new Set(listaDeTextos(dados.itens).filter((id) => IDS_DOS_ITENS.includes(id)))];
+  const usando = [...new Set(listaDeTextos(dados.usando).filter((id) => itens.includes(id)))];
+  return { itens, usando };
 }
 
 // localStorage pode falhar (aba anônima, navegador bloqueando)
@@ -116,6 +127,19 @@ export function useProgresso() {
             ? {}
             : { segredos: [...atual.segredos, id], moedas: Math.min(atual.moedas + moedas, MOEDAS_NO_MAXIMO) }
         ),
+      // compra só se ainda não tem e se as moedas dão; já sai usando
+      comprar: (id, preco) =>
+        atualizar((atual) =>
+          atual.itens.includes(id) || atual.moedas < preco
+            ? {}
+            : { itens: [...atual.itens, id], usando: [...atual.usando, id], moedas: atual.moedas - preco }
+        ),
+      alternarItem: (id) =>
+        atualizar((atual) => {
+          if (!atual.itens.includes(id)) return {};
+          const usando = atual.usando.includes(id) ? atual.usando.filter((item) => item !== id) : [...atual.usando, id];
+          return { usando };
+        }),
       ganharConquista: (id) =>
         atualizar((atual) => (atual.conquistas.includes(id) ? {} : { conquistas: [...atual.conquistas, id] })),
       alternarSom: () => atualizar((atual) => ({ som: !atual.som })),

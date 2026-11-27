@@ -2,21 +2,26 @@ import { memo, useContext, useEffect, useLayoutEffect, useRef, useState } from '
 import { conquistar } from '../conquistas';
 import { ContextoDaConversa } from '../conversa';
 import { semAnimacao } from '../hooks/useTransicao';
+import { ItensEmUso } from '../loja';
+import { ACESSORIOS, vestir } from '../pixel/acessorios';
 import {
   BURACO,
   CAVEIRA,
   COGUMELO,
   GARRAFA,
+  GATINHO,
   GATO,
+  GOSMINHA,
   MOEDA,
   TIJOLO_SOLTO,
   TOCA,
   TOCHA,
+  TOCHA_AZUL,
   VASO,
   VASO_QUEBRADO,
 } from '../pixel/desenhos';
 import { PERSONAGENS } from '../pixel/personagens';
-import { Sprite, tamanhoDoDesenho } from '../pixel/Sprite';
+import { Icone, Sprite, tamanhoDoDesenho } from '../pixel/Sprite';
 import { MOEDAS_POR_SEGREDO, SegredoDaSala, SegredosAchados, acharSegredo } from '../segredos';
 import { tocar } from '../som';
 import { Seguro } from './Seguro';
@@ -38,6 +43,17 @@ export function posicao(x, y, largura, altura) {
 
 // pixels de jogo pra unidade da cena (100cqw é a largura inteira)
 const emCqw = (pixels) => `${((pixels / LARGURA) * 100).toFixed(2)}cqw`;
+
+// o personagem como ele aparece: com o acessório da loja, se estiver usando um
+const vestidos = new Map();
+export function visualDe(quem, usando) {
+  const acessorio = Object.keys(ACESSORIOS).find((id) => ACESSORIOS[id].quem === quem && usando.includes(id));
+  const chave = `${quem}:${acessorio ?? ''}`;
+  if (!vestidos.has(chave)) {
+    vestidos.set(chave, acessorio ? vestir(PERSONAGENS[quem], ACESSORIOS[acessorio]) : { ...PERSONAGENS[quem], folga: 0 });
+  }
+  return vestidos.get(chave);
+}
 
 // pseudo-aleatório, pra parede sair sempre igual
 export function ruido(a, b) {
@@ -153,9 +169,12 @@ function Brasas({ tochas, altura }) {
 }
 
 // solta: sem parede, chão e moldura (o menu desenha um salão inteiro em volta)
-export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children, fundo, solta, className = '', style }) {
+// bichos: onde o gatinho e a gosminha ficam nesta cena ({ gato: [x, y], gosminha: [x, y] })
+export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children, fundo, solta, bichos, className = '', style }) {
+  const usando = useContext(ItensEmUso);
+  const azuis = usando.includes('tochas-azuis');
   return (
-    <div className={`cena ${solta ? 'cena--solta' : ''} ${className}`} style={style}>
+    <div className={`cena ${solta ? 'cena--solta' : ''} ${azuis ? 'cena--tochas-azuis' : ''} ${className}`} style={style}>
       <svg
         className="cena__fundo"
         viewBox={`0 0 ${LARGURA} ${ALTURA}`}
@@ -164,8 +183,8 @@ export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children,
       >
         <defs>
           <radialGradient id="luz-da-tocha">
-            <stop offset="0" stopColor="#f77622" stopOpacity="0.32" />
-            <stop offset="1" stopColor="#f77622" stopOpacity="0" />
+            <stop offset="0" stopColor={azuis ? '#2ce8f5' : '#f77622'} stopOpacity="0.32" />
+            <stop offset="1" stopColor={azuis ? '#2ce8f5' : '#f77622'} stopOpacity="0" />
           </radialGradient>
           <radialGradient id="sombra-da-cena" r="0.75">
             <stop offset="0.55" stopColor="#181425" stopOpacity="0" />
@@ -181,12 +200,13 @@ export function Cena({ modo, tochas = [12, 172], alturaDasTochas = 14, children,
       </svg>
 
       {tochas.map((x) => (
-        <Sprite key={x} desenho={TOCHA} className="tocha" style={posicao(x, alturaDasTochas, 8, 14)} />
+        <Sprite key={x} desenho={azuis ? TOCHA_AZUL : TOCHA} className="tocha" style={posicao(x, alturaDasTochas, 8, 14)} />
       ))}
       <Brasas tochas={tochas} altura={alturaDasTochas} />
 
       <SegredoDaCena />
       {children}
+      <Bichos usando={usando} onde={bichos} />
       <Gato />
 
       {modo && <span className="cena__modo">{modo === 'web' ? 'Modo Web' : 'Modo Mobile'}</span>}
@@ -245,6 +265,47 @@ function Segredo({ id, tipo, x, y }) {
           <Sprite desenho={MOEDA} />+{MOEDAS_POR_SEGREDO}
         </span>
       )}
+    </div>
+  );
+}
+
+// bichinhos comprados na loja: ficam num canto da sala e gostam de carinho
+const ONDE_FICAM = { gato: [3, 93], gosminha: [179, 99] };
+
+function Bichos({ usando, onde = ONDE_FICAM }) {
+  return ['gato', 'gosminha']
+    .filter((bicho) => usando.includes(bicho))
+    .map((bicho) => <Bicho key={bicho} tipo={bicho} x={onde[bicho][0]} y={onde[bicho][1]} />);
+}
+
+function Bicho({ tipo, x, y }) {
+  const [carinhos, setCarinhos] = useState(0);
+  const desenho = tipo === 'gato' ? GATINHO : GOSMINHA;
+  const { largura, altura } = tamanhoDoDesenho(desenho);
+
+  useEffect(() => {
+    if (!carinhos) return;
+    const espera = setTimeout(() => setCarinhos(0), 900);
+    return () => clearTimeout(espera);
+  }, [carinhos]);
+
+  function fazerCarinho() {
+    tocar(tipo === 'gato' ? 'miau' : 'bloop');
+    setCarinhos((n) => n + 1);
+  }
+
+  return (
+    <div className={`bicho bicho--${tipo}`} style={posicao(x, y, largura, altura)}>
+      <button
+        type="button"
+        className="bicho__botao"
+        onClick={fazerCarinho}
+        aria-label={tipo === 'gato' ? 'Fazer carinho no gatinho' : 'Fazer carinho na gosminha'}
+        data-som="nenhum"
+      >
+        <Sprite desenho={desenho} />
+      </button>
+      {carinhos > 0 && <Icone key={carinhos} nome="coracao" className="bicho__coracao" />}
     </div>
   );
 }
@@ -310,7 +371,9 @@ export function Personagem({
   style,
   children,
 }) {
-  const { nome, desenho, andando } = PERSONAGENS[quem];
+  const usando = useContext(ItensEmUso);
+  // com chapéu ou coroa o desenho cresce pra cima (folga); os pés continuam no mesmo lugar
+  const { nome, desenho, andando, folga } = visualDe(quem, usando);
   const { largura, altura } = tamanhoDoDesenho(desenho);
   const ref = useRef(null);
   const [movimento, setMovimento] = useState(null); // null, 'direita' ou 'esquerda'
@@ -388,7 +451,7 @@ export function Personagem({
   const distanciaDaEntrada = entrada === 'direita' ? LARGURA - x + 2 : x + largura + 2;
   const distanciaDaSaida = LARGURA - x + 4;
   const estilo = {
-    ...posicao(x, y, largura, altura),
+    ...posicao(x, y - folga, largura, altura),
     // a ponta do balão mira aqui
     '--meio': emCqw(largura / 2),
     '--tempo-de-andar': `${rastro.tempo.toFixed(2)}s`,

@@ -227,6 +227,14 @@ export const TOCHA = {
   ],
 };
 
+// as mesmas tochas com fogo mágico (item da loja)
+const FOGO_AZUL = { y: 'c', Y: 'w', o: 'C' };
+export const TOCHA_AZUL = {
+  quadros: TOCHA.quadros.map((camadas) =>
+    camadas.map((camada) => camada.map((linha) => linha.replace(/[yYo]/g, (cor) => FOGO_AZUL[cor])))
+  ),
+};
+
 export const TOCHA_APAGADA = {
   camadas: [
     [
@@ -327,6 +335,27 @@ export const ALAVANCA_BAIXO = {
       '..kk....',
     ],
   ],
+};
+
+// bichinhos da loja: o gato sentado (o rabo mexe) e a gosminha
+const CORPO_DO_GATINHO = [
+  '.k....k....',
+  'kok..kok...',
+  'kookkook...',
+  'koooooook..',
+  'kWkooWkok..',
+  'koooqoook..',
+  '.kooooook..',
+];
+export const GATINHO = {
+  quadros: [
+    [[...CORPO_DO_GATINHO, '..kottok...', '.kootttok.H', '.koHtttHokH', '.koHtttHokH', '.koooooookH', '.kOkkkkOkHH', '..k....k...']],
+    [[...CORPO_DO_GATINHO, '..kottok..H', '.kootttok.H', '.koHtttHokH', '.koHtttHok.', '.koooooook.', '.kOkkkkOkHH', '..k....k...']],
+  ],
+};
+
+export const GOSMINHA = {
+  camadas: [['...kkkk...', '.kkllllkk.', 'klWllllllk', 'kWlkllkllk', 'kllkllkllk', 'klllllllGk', 'kggggggggk', '.kkkkkkkk.']],
 };
 
 // esconderijos dos segredos (ver components/Segredo.jsx)

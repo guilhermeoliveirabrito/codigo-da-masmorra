@@ -14,6 +14,8 @@ import { FundoDoSalao, limitesDoSalao, useSalao } from './Salao';
 
 const ELENCO_DO_MENU = ['guarda', 'lia', 'tom'];
 const SEGREDO_DO_MENU = { id: 'menu', tipo: 'toca', x: 62, y: 73 };
+// no celular as pontas da sala ficam fora da tela: os bichos ficam mais pro meio
+const BICHOS_DO_MENU = { gato: [112, 93], gosminha: [62, 99] };
 const TOCHAS_DA_SALA = [66, 118];
 const TOCHAS_DE_FORA = [-36, -132, 220, 316];
 
@@ -57,6 +59,7 @@ export function Menu({
   estrelas,
   maximoDeEstrelas,
   moedas,
+  podeComprar,
   conquistas,
   totalDeConquistas,
   som,
@@ -65,6 +68,7 @@ export function Menu({
   aoJogar,
   aoMapa,
   aoLivro,
+  aoLoja,
   aoComoJogar,
   aoTrocarModo,
   aoApagarProgresso,
@@ -131,6 +135,7 @@ export function Menu({
               solta
               tochas={tochas}
               alturaDasTochas={42}
+              bichos={BICHOS_DO_MENU}
               className={abrindo ? 'cena--tremer' : ''}
               fundo={
                 <>
@@ -216,6 +221,11 @@ export function Menu({
           <button type="button" className="opcao" onClick={aoMapa} onPointerEnter={aoPassar} data-menu>
             <Icone nome="cursor" className="opcao__cursor" />
             <span className="opcao__texto">Escolher fase</span>
+          </button>
+          <button type="button" className="opcao" onClick={aoLoja} onPointerEnter={aoPassar} data-menu>
+            <Icone nome="cursor" className="opcao__cursor" />
+            <span className="opcao__texto">Loja</span>
+            {podeComprar && <span className="opcao__detalhe opcao__detalhe--novo">dá pra comprar algo</span>}
           </button>
         </nav>
 

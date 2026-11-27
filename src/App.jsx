@@ -3,10 +3,12 @@ import { Cabecalho } from './components/Cabecalho';
 import { ComoJogar } from './components/ComoJogar';
 import { AvisoDeConquista, ListaDeConquistas } from './components/Conquistas';
 import { Livro } from './components/Livro';
+import { Loja } from './components/Loja';
 import { TelaDaFase } from './components/TelaDaFase';
 import { Transicao } from './components/Transicao';
 import { Viagem } from './components/Viagem';
 import { CONQUISTAS, conquistar, ouvirConquistas } from './conquistas';
+import { ITENS, ItensEmUso } from './loja';
 import { MOEDAS_POR_SEGREDO, SEGREDOS, SegredosAchados, ouvirSegredos } from './segredos';
 import { fases, proximasFases } from './fases';
 import { carregarMotorDepois } from './motor/carregarMotor';
@@ -29,6 +31,8 @@ export default function App() {
     concluirFase,
     ganharMoedas,
     guardarSegredo,
+    comprar,
+    alternarItem,
     marcarLivroVisto,
     darEstrelas,
     ganharConquista,
@@ -41,6 +45,7 @@ export default function App() {
   const [comoJogarAberto, setComoJogarAberto] = useState(false);
   const [faseApresentada, setFaseApresentada] = useState(null);
   const [conquistasAbertas, setConquistasAbertas] = useState(false);
+  const [lojaAberta, setLojaAberta] = useState(false);
   const [avisos, setAvisos] = useState([]);
   const progressoRef = useRef(progresso);
   const avisadasRef = useRef(new Set());
@@ -89,6 +94,14 @@ export default function App() {
       }),
     [guardarSegredo]
   );
+
+  function comprarItem(item) {
+    const atual = progressoRef.current;
+    if (atual.itens.includes(item.id) || atual.moedas < item.preco) return;
+    comprar(item.id, item.preco);
+    tocar('compra');
+    conquistar('fregues');
+  }
 
   const avisoAtual = avisos[0];
   useEffect(() => {
@@ -189,108 +202,122 @@ export default function App() {
 
   return (
     <SegredosAchados.Provider value={progresso.segredos}>
-      <div className={`app ${esperando ? 'app--esperando' : ''}`}>
-        {tela === 'menu' && (
-          <Menu
-            faseAtual={fase}
-            comecou={comecou}
-            modo={modo}
-            feitas={{ web: concluidas.web.length, mobile: concluidas.mobile.length }}
-            totalDeFases={fases.length}
-            estrelas={totalDeEstrelas}
-            maximoDeEstrelas={fases.length * 6}
-            moedas={progresso.moedas}
-            conquistas={progresso.conquistas.length}
-            totalDeConquistas={CONQUISTAS.length}
-            som={progresso.som}
-            aoAlternarSom={alternarSom}
-            aoConquistas={() => setConquistasAbertas(true)}
-            aoJogar={() => jogarFase(indice)}
-            aoMapa={() => navegar(() => setTela('mapa'))}
-            aoLivro={() => setLivroAberto(true)}
-            aoComoJogar={() => setComoJogarAberto(true)}
-            aoTrocarModo={mudarModo}
-            aoApagarProgresso={() => {
-              avisadasRef.current.clear();
-              achadosRef.current.clear();
-              apagarTudo();
-            }}
-          />
-        )}
-
-        {tela === 'mapa' && (
-          <Mapa
-            fases={fases}
-            proximas={proximasFases}
-            modo={modo}
-            concluidas={concluidas}
-            estrelas={progresso.estrelas}
-            segredos={progresso.segredos}
-            faseAtual={indice}
-            estaLiberada={estaLiberada}
-            aoEscolher={(i) => jogarFase(i)}
-            aoVoltar={() => navegar(() => setTela('menu'))}
-            aoTrocarModo={mudarModo}
-          />
-        )}
-
-        {tela === 'jogo' && (
-          <>
-            <Cabecalho
-              fase={fase}
-              total={fases.length}
+      <ItensEmUso.Provider value={progresso.usando}>
+        <div className={`app ${esperando ? 'app--esperando' : ''}`}>
+          {tela === 'menu' && (
+            <Menu
+              faseAtual={fase}
+              comecou={comecou}
               modo={modo}
+              feitas={{ web: concluidas.web.length, mobile: concluidas.mobile.length }}
+              totalDeFases={fases.length}
+              estrelas={totalDeEstrelas}
+              maximoDeEstrelas={fases.length * 6}
+              moedas={progresso.moedas}
+            podeComprar={ITENS.some((item) => !progresso.itens.includes(item.id) && item.preco <= progresso.moedas)}
+            aoLoja={() => setLojaAberta(true)}
+              conquistas={progresso.conquistas.length}
+              totalDeConquistas={CONQUISTAS.length}
               som={progresso.som}
               aoAlternarSom={alternarSom}
-              aoMenu={() => navegar(() => setTela('menu'))}
-              aoTrocarModo={(novo) => novo !== modo && jogarFase(faseLiberadaNoModo(novo), novo)}
-              aoAbrirLivro={() => setLivroAberto(true)}
+              aoConquistas={() => setConquistasAbertas(true)}
+              aoJogar={() => jogarFase(indice)}
+              aoMapa={() => navegar(() => setTela('mapa'))}
+              aoLivro={() => setLivroAberto(true)}
+              aoComoJogar={() => setComoJogarAberto(true)}
+              aoTrocarModo={mudarModo}
+              aoApagarProgresso={() => {
+                avisadasRef.current.clear();
+                achadosRef.current.clear();
+                apagarTudo();
+              }}
             />
-            <TelaDaFase
-              key={chaveDoCodigo}
-              fase={fase}
+          )}
+
+          {tela === 'mapa' && (
+            <Mapa
+              fases={fases}
+              proximas={proximasFases}
               modo={modo}
-              codigo={codigo}
-              temProxima={indice < fases.length - 1}
-              outroModoFeito={concluidas[outroModo].includes(fase.id)}
-              saindo={saindo}
-              aoMudarCodigo={(novo) => salvarCodigo(chaveDoCodigo, novo)}
-              aoRecomecar={() => apagarCodigo(chaveDoCodigo)}
-              aoConcluir={concluir}
-              aoProxima={() => jogarFase(indice + 1, modo, { saida: true })}
-              aoTrocarModo={() => jogarFase(faseLiberadaNoModo(outroModo), outroModo)}
+              concluidas={concluidas}
+              estrelas={progresso.estrelas}
+              segredos={progresso.segredos}
+              faseAtual={indice}
+              estaLiberada={estaLiberada}
+              aoEscolher={(i) => jogarFase(i)}
+              aoVoltar={() => navegar(() => setTela('menu'))}
+              aoTrocarModo={mudarModo}
             />
-          </>
-        )}
+          )}
 
-        {(mostrarIntroducao || livroAberto) && (
-          <Livro
-            key={`livro-${fase.id}-${modo}`}
-            fases={fases}
-            liberadas={liberadas}
-            paginaInicial={indice}
-            modo={modo}
-            introducao={mostrarIntroducao}
-            aoFechar={() => {
-              if (tela === 'jogo') marcarLivroVisto(fase.id);
-              setLivroAberto(false);
-            }}
-          />
-        )}
+          {tela === 'jogo' && (
+            <>
+              <Cabecalho
+                fase={fase}
+                total={fases.length}
+                modo={modo}
+                som={progresso.som}
+                aoAlternarSom={alternarSom}
+                aoMenu={() => navegar(() => setTela('menu'))}
+                aoTrocarModo={(novo) => novo !== modo && jogarFase(faseLiberadaNoModo(novo), novo)}
+                aoAbrirLivro={() => setLivroAberto(true)}
+              />
+              <TelaDaFase
+                key={chaveDoCodigo}
+                fase={fase}
+                modo={modo}
+                codigo={codigo}
+                temProxima={indice < fases.length - 1}
+                outroModoFeito={concluidas[outroModo].includes(fase.id)}
+                saindo={saindo}
+                aoMudarCodigo={(novo) => salvarCodigo(chaveDoCodigo, novo)}
+                aoRecomecar={() => apagarCodigo(chaveDoCodigo)}
+                aoConcluir={concluir}
+                aoProxima={() => jogarFase(indice + 1, modo, { saida: true })}
+                aoTrocarModo={() => jogarFase(faseLiberadaNoModo(outroModo), outroModo)}
+              />
+            </>
+          )}
 
-        {comoJogarAberto && <ComoJogar aoFechar={() => setComoJogarAberto(false)} />}
-        {conquistasAbertas && (
-          <ListaDeConquistas
-            ganhas={progresso.conquistas}
-            segredos={progresso.segredos.length}
-            aoFechar={() => setConquistasAbertas(false)}
-          />
-        )}
-        {avisoAtual && <AvisoDeConquista key={avisoAtual.id} conquista={avisoAtual} />}
+          {(mostrarIntroducao || livroAberto) && (
+            <Livro
+              key={`livro-${fase.id}-${modo}`}
+              fases={fases}
+              liberadas={liberadas}
+              paginaInicial={indice}
+              modo={modo}
+              introducao={mostrarIntroducao}
+              aoFechar={() => {
+                if (tela === 'jogo') marcarLivroVisto(fase.id);
+                setLivroAberto(false);
+              }}
+            />
+          )}
 
-        <Transicao transicao={transicao?.tipo === 'iris' ? transicao : null} />
-        <Viagem transicao={viajando ? transicao : null} aoPular={pular} />
-      </div>
+          {comoJogarAberto && <ComoJogar aoFechar={() => setComoJogarAberto(false)} />}
+          {conquistasAbertas && (
+            <ListaDeConquistas
+              ganhas={progresso.conquistas}
+              segredos={progresso.segredos.length}
+              aoFechar={() => setConquistasAbertas(false)}
+            />
+          )}
+          {lojaAberta && (
+            <Loja
+              moedas={progresso.moedas}
+              itens={progresso.itens}
+              usando={progresso.usando}
+              aoComprar={comprarItem}
+              aoAlternar={alternarItem}
+              aoFechar={() => setLojaAberta(false)}
+            />
+          )}
+          {avisoAtual && <AvisoDeConquista key={avisoAtual.id} conquista={avisoAtual} />}
+
+          <Transicao transicao={transicao?.tipo === 'iris' ? transicao : null} />
+          <Viagem transicao={viajando ? transicao : null} aoPular={pular} />
+        </div>
+      </ItensEmUso.Provider>
     </SegredosAchados.Provider>
   );
 }

@@ -362,7 +362,7 @@ pre {
   position: absolute;
   width: var(--px, 2px);
   height: var(--px, 2px);
-  background: var(--ouro);
+  background: var(--poeira, var(--ouro));
   opacity: 0;
   animation: poeira 10s steps(60) infinite;
 }
@@ -501,6 +501,10 @@ pre {
   translate: 0 -50%;
   color: var(--fogo);
   opacity: 0;
+}
+
+.opcao__detalhe--novo {
+  color: var(--musgo);
 }
 
 .opcao__detalhe {
@@ -752,6 +756,124 @@ pre {
 .cabecalho__som .icone {
   width: 18px;
   height: 16px;
+}
+
+/* Loja */
+.loja {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(720px, 100%);
+  max-height: min(88dvh, 900px);
+  padding: 20px 20px 22px;
+}
+
+.loja__topo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.loja__topo h2 {
+  margin: 0;
+  font: 700 28px/1 var(--fonte-pixel);
+  color: var(--ouro);
+}
+
+.loja__saldo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-right: auto;
+  padding: 6px 10px;
+  font: 700 18px/1 var(--fonte-pixel);
+  color: var(--ouro);
+  background: var(--breu);
+}
+
+.loja__saldo .sprite {
+  width: 18px;
+  height: 18px;
+}
+
+.loja__dica {
+  margin: 0;
+  font-size: 14px;
+  color: var(--neblina);
+}
+
+.loja__itens {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  overscroll-behavior: contain;
+}
+
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  gap: 8px 12px;
+  padding: 10px;
+  background: var(--breu);
+  border: 2px solid var(--pedra-escura);
+}
+
+.item--em-uso {
+  border-color: var(--ouro);
+}
+
+.item__vitrine {
+  grid-row: 1 / 3;
+  display: grid;
+  place-items: center;
+  height: 76px;
+  padding: 6px;
+  background: var(--pedra-escura);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.item__vitrine .sprite {
+  height: 100%;
+  max-width: 100%;
+}
+
+.item__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--neblina);
+}
+
+.item__texto strong {
+  font: 700 16px/1.2 var(--fonte-pixel);
+  color: var(--osso);
+}
+
+.item__botao {
+  justify-self: start;
+  gap: 6px;
+  min-width: 96px;
+}
+
+.item__botao .sprite {
+  width: 16px;
+  height: 16px;
+}
+
+.item__falta {
+  position: absolute;
+  right: 12px;
+  bottom: 18px;
+  font-size: 12px;
+  color: var(--neblina);
 }
 
 /* Ajustes */
@@ -1180,6 +1302,24 @@ button.sala:active:not(:disabled) {
   animation: none;
 }
 
+/* os bichinhos chegam junto e vão atrás da turma */
+.corredor__bicho {
+  position: absolute;
+  z-index: 1;
+  --ritmo: 0.4s;
+  animation: chegar-no-corredor 1.1s linear 0.45s both;
+}
+
+.corredor__bicho .sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.corredor__bicho--gosminha .sprite {
+  animation: gosminha-pula 0.5s steps(2) infinite;
+}
+
 @keyframes chegar-no-corredor {
   from { transform: translateX(-70cqw); }
 }
@@ -1560,6 +1700,15 @@ button.sala:active:not(:disabled) {
   animation: brasa 2.6s steps(26) infinite;
 }
 
+.cena--tochas-azuis .brasa {
+  background: #2ce8f5;
+}
+
+/* com as tochas azuis, a poeira do menu brilha azul também */
+.menu:has(.cena--tochas-azuis) {
+  --poeira: #2ce8f5;
+}
+
 .brasa:nth-of-type(3n) {
   background: var(--fogo);
 }
@@ -1819,6 +1968,66 @@ button.sala:active:not(:disabled) {
   0% { opacity: 0; transform: translateY(1.5cqw); }
   15%, 70% { opacity: 1; }
   100% { opacity: 0; transform: translateY(-7cqw); }
+}
+
+/* bichinhos da loja */
+.bicho {
+  position: absolute;
+  z-index: 4;
+}
+
+.bicho--gato {
+  --ritmo: 1.4s;
+}
+
+.bicho__botao {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bicho__botao:focus-visible {
+  outline: 2px dashed var(--ouro);
+  outline-offset: 2px;
+}
+
+.bicho__botao .sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.bicho--gosminha .sprite {
+  animation: gosminha-pula 1.4s steps(2) infinite;
+}
+
+@keyframes gosminha-pula {
+  50% { transform: translateY(-1cqw); }
+}
+
+.bicho__coracao {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 3.4cqw;
+  height: auto;
+  color: var(--brasa);
+  translate: -50% 0;
+  pointer-events: none;
+  animation: coracao-do-bicho 0.9s steps(6) forwards;
+}
+
+@keyframes coracao-do-bicho {
+  from { transform: translateY(1cqw); }
+  to {
+    opacity: 0;
+    transform: translateY(-4cqw);
+  }
 }
 
 /* o gato que passeia de vez em quando */

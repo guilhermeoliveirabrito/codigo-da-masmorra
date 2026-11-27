@@ -90,6 +90,12 @@ const SONS = {
     chiado(ctx, { duracao: 0.07, corte: 2600, volume: 0.06 });
     melodia(ctx, [1319, 1568, 2093, 2637], 0.06, { onda: 'triangle', volume: 0.08 });
   },
+  // plim-plim de caixa registradora
+  compra: (ctx) =>
+    [988, 1319, 1568, 2093].forEach((freq, i) =>
+      nota(ctx, { freq, inicio: i * 0.06, duracao: 0.09, onda: i < 2 ? 'square' : 'triangle', volume: 0.07 })
+    ),
+  bloop: (ctx) => nota(ctx, { freq: 260, ate: 620, duracao: 0.12, onda: 'sine', volume: 0.12 }),
   contar: (ctx) => nota(ctx, { freq: 1480, ate: 1980, duracao: 0.04, volume: 0.035 }),
   tique: (ctx) => nota(ctx, { freq: 1600, duracao: 0.03, volume: 0.05 }),
   gosma: (ctx) => nota(ctx, { freq: 190, ate: 55, duracao: 0.3, onda: 'sine', volume: 0.3 }),

@@ -1,8 +1,9 @@
-import { memo, useEffect } from 'react';
-import { LIA_ANDANDO, TOCHA, TOM_ANDANDO } from '../pixel/desenhos';
-import { NoFundo, Sprite } from '../pixel/Sprite';
+import { memo, useContext, useEffect } from 'react';
+import { ItensEmUso } from '../loja';
+import { GATO, GOSMINHA, TOCHA, TOCHA_AZUL } from '../pixel/desenhos';
+import { NoFundo, Sprite, tamanhoDoDesenho } from '../pixel/Sprite';
 import { tocar } from '../som';
-import { ALTURA, LARGURA, Retangulos, montarChao, montarParede, posicao } from './Cenario';
+import { ALTURA, LARGURA, Retangulos, montarChao, montarParede, posicao, visualDe } from './Cenario';
 
 // corredor entre as salas: a parede se repete a cada PERIODO pixels, então dá pra rolar sem emenda
 const PERIODO = 96;
@@ -27,13 +28,14 @@ function Coluna({ x }) {
   );
 }
 
-const Fundo = memo(function Fundo() {
+const Fundo = memo(function Fundo({ azuis }) {
+  const fogo = azuis ? '#2ce8f5' : '#f77622';
   return (
     <svg className="corredor__fundo" viewBox={`0 0 ${LARGURA} ${ALTURA}`} shapeRendering="crispEdges" aria-hidden="true">
       <defs>
         <radialGradient id="luz-do-corredor">
-          <stop offset="0" stopColor="#f77622" stopOpacity="0.3" />
-          <stop offset="1" stopColor="#f77622" stopOpacity="0" />
+          <stop offset="0" stopColor={fogo} stopOpacity="0.3" />
+          <stop offset="1" stopColor={fogo} stopOpacity="0" />
         </radialGradient>
       </defs>
       <g className="corredor__rolagem">
@@ -43,7 +45,7 @@ const Fundo = memo(function Fundo() {
         {TOCHAS.map((x) => (
           <g key={x}>
             <circle cx={x + 4} cy={26} r={40} fill="url(#luz-do-corredor)" />
-            <NoFundo desenho={TOCHA} x={x} y={20} />
+            <NoFundo desenho={azuis ? TOCHA_AZUL : TOCHA} x={x} y={20} />
           </g>
         ))}
       </g>
@@ -70,11 +72,23 @@ const Frente = memo(function Frente() {
   );
 });
 
-function Viajante({ desenho, x, nome }) {
+function Viajante({ quem, x, usando }) {
+  const { nome, andando, folga } = visualDe(quem, usando);
+  const { largura, altura } = tamanhoDoDesenho(andando);
   return (
-    <div className="corredor__viajante" style={posicao(x, 76, 16, 24)}>
+    <div className="corredor__viajante" style={posicao(x, 76 - folga, largura, altura)}>
       <span className="personagem__sombra" />
-      <Sprite desenho={desenho} titulo={nome} className="personagem__sprite" />
+      <Sprite desenho={andando} titulo={nome} className="personagem__sprite" />
+    </div>
+  );
+}
+
+// os bichinhos da loja vão atrás da turma
+function Bicho({ desenho, x, y, tipo }) {
+  const { largura, altura } = tamanhoDoDesenho(desenho);
+  return (
+    <div className={`corredor__bicho corredor__bicho--${tipo}`} style={posicao(x, y, largura, altura)}>
+      <Sprite desenho={desenho} />
     </div>
   );
 }
@@ -100,6 +114,7 @@ export function Viagem({ transicao, aoPular }) {
     if (cobrindo) tocar('viagem');
   }, [cobrindo]);
 
+  const usando = useContext(ItensEmUso);
   if (!transicao) return null;
   const { etapa, destino } = transicao;
   const { fase, modo } = destino;
@@ -114,9 +129,11 @@ export function Viagem({ transicao, aoPular }) {
       {etapa !== 'saindo' && (
         <div className="viagem__painel" aria-hidden="true">
           <div className="corredor">
-            <Fundo />
-            {comTom && <Viajante desenho={TOM_ANDANDO} x={62} nome="Tom" />}
-            <Viajante desenho={LIA_ANDANDO} x={84} nome="Lia" />
+            <Fundo azuis={usando.includes('tochas-azuis')} />
+            {usando.includes('gosminha') && <Bicho tipo="gosminha" desenho={GOSMINHA} x={comTom ? 30 : 52} y={92} />}
+            {usando.includes('gato') && <Bicho tipo="gato" desenho={GATO} x={comTom ? 44 : 66} y={90} />}
+            {comTom && <Viajante quem="tom" x={62} usando={usando} />}
+            <Viajante quem="lia" x={84} usando={usando} />
             <Frente />
             <div className="corredor__placa">
               <span className="corredor__numero">Fase {fase.numero}</span>
