@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { linhaDoBug } from '../caca/bugs';
 import { CenaDoBug, FALAS, sortear, useGoblin, useTelaDoBug } from '../caca/CenaDoBug';
 import { conferir } from '../caca/conferir';
 import { moedasDoDia, ontemDe, sequenciaAtual } from '../caca/doDia';
@@ -7,7 +8,7 @@ import { Resultado } from '../components/Resultado';
 import { BUGADO, MOEDA } from '../pixel/desenhos';
 import { Icone, Sprite } from '../pixel/Sprite';
 import { tocar } from '../som';
-import { conceitoDo } from './CacaAosBugs';
+import { PistaDaLupa, conceitoDo } from './CacaAosBugs';
 
 const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
 
@@ -26,6 +27,7 @@ export function BugDoDia({ modo, bug, dia, desafio, aoConsertar, aoVoltar }) {
   const [resultado, setResultado] = useState(null);
   const [rodando, setRodando] = useState(false);
   const [premio, setPremio] = useState(null);
+  const [lupa, setLupa] = useState(false);
   const [goblin, falar] = useGoblin('Hoje eu caprichei nesse aqui. Duvido!');
   const [tela, mostrarNaCena] = useTelaDoBug(modo);
 
@@ -36,10 +38,21 @@ export function BugDoDia({ modo, bug, dia, desafio, aoConsertar, aoVoltar }) {
   function comecar() {
     setCodigo(bug.codigo[modo]);
     setResultado(null);
+    setLupa(false);
     setEtapa('jogando');
     mostrarNaCena(bug.codigo[modo], bug);
     tocar('porta');
   }
+
+  // aqui não tem pontos, então a lupa sai de graça
+  function usarLupa() {
+    if (lupa || etapa !== 'jogando') return;
+    setLupa(true);
+    falar(sortear(FALAS.lupa));
+    tocar('lupa');
+  }
+
+  const linhaDaLupa = lupa ? linhaDoBug(bug, modo, codigo) : 0;
 
   async function consertar() {
     if (rodando || etapa !== 'jogando') return;
@@ -62,7 +75,7 @@ export function BugDoDia({ modo, bug, dia, desafio, aoConsertar, aoVoltar }) {
   }
 
   return (
-    <main className="caca caca--do-dia">
+    <main className="caca caca--do-dia" data-bug={bug.id}>
       <header className="caca__topo">
         <button type="button" className="botao botao--pedra" onClick={aoVoltar} aria-label="Voltar ao menu">
           <Icone nome="menu" />
@@ -92,6 +105,18 @@ export function BugDoDia({ modo, bug, dia, desafio, aoConsertar, aoVoltar }) {
           <div className="jogo__botoes">
             <button
               type="button"
+              className="botao botao--pedra"
+              onClick={usarLupa}
+              disabled={lupa || rodando || etapa !== 'jogando'}
+              aria-label="Lupa"
+              title="Mostra a linha do bug"
+              data-som="nenhum"
+            >
+              <Icone nome="lupa" className="icone--lupa" />
+              <span className="so-tela-grande">Lupa</span>
+            </button>
+            <button
+              type="button"
               className="botao botao--fogo"
               onClick={consertar}
               disabled={rodando || etapa !== 'jogando'}
@@ -102,11 +127,14 @@ export function BugDoDia({ modo, bug, dia, desafio, aoConsertar, aoVoltar }) {
             </button>
           </div>
         </div>
-        <Editor valor={codigo} aoMudar={setCodigo} aoRodar={consertar} />
+        <Editor valor={codigo} aoMudar={setCodigo} aoRodar={consertar} linhaMarcada={linhaDaLupa} />
+        {lupa && <PistaDaLupa linha={linhaDaLupa} pista={bug.pista} />}
         {resultado ? (
           <Resultado key={resultado.id} resultado={resultado} />
         ) : (
-          <p className="caca__ajuda">Sem relógio e sem pressa: ache o que o goblin quebrou e aperte Consertar.</p>
+          <p className="caca__ajuda">
+            Sem relógio e sem pressa: ache o que o goblin quebrou e aperte Consertar. Se travar, a lupa mostra a linha.
+          </p>
         )}
       </section>
 

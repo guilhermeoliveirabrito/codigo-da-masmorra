@@ -101,6 +101,7 @@ const SONS = {
       nota(ctx, { freq, inicio: i * 0.06, duracao: 0.09, onda: i < 2 ? 'square' : 'triangle', volume: 0.07 })
     ),
   bloop: (ctx) => nota(ctx, { freq: 260, ate: 620, duracao: 0.12, onda: 'sine', volume: 0.12 }),
+  lupa: (ctx) => melodia(ctx, [880, 1320], 0.06, { onda: 'triangle', volume: 0.07 }),
   contar: (ctx) => nota(ctx, { freq: 1480, ate: 1980, duracao: 0.04, volume: 0.035 }),
   tique: (ctx) => nota(ctx, { freq: 1600, duracao: 0.03, volume: 0.05 }),
   gosma: (ctx) => nota(ctx, { freq: 190, ate: 55, duracao: 0.3, onda: 'sine', volume: 0.3 }),

@@ -19,10 +19,12 @@ function desfazerTrocasDoTeclado(texto) {
   return TROCAS_DO_TECLADO.reduce((atual, [padrao, certo]) => atual.replace(padrao, certo), texto);
 }
 
-export function Editor({ valor, aoMudar, aoRodar }) {
+// linhaMarcada: a linha que a lupa aponta (0 = nenhuma)
+export function Editor({ valor, aoMudar, aoRodar, linhaMarcada = 0 }) {
   const areaRef = useRef(null);
   const numerosRef = useRef(null);
   const realceRef = useRef(null);
+  const faixaRef = useRef(null);
   const cursorPendenteRef = useRef(null);
 
   // quando o texto é corrigido, o navegador joga o cursor pro fim; volta ele pro lugar
@@ -33,6 +35,21 @@ export function Editor({ valor, aoMudar, aoRodar }) {
     area.selectionStart = area.selectionEnd = cursorPendenteRef.current;
     cursorPendenteRef.current = null;
   });
+
+  // a faixa da lupa nasce no topo; acerta com a rolagem atual e, se a linha marcada
+  // estiver fora da vista, rola até ela
+  useLayoutEffect(() => {
+    if (!linhaMarcada) return;
+    const area = areaRef.current;
+    const altura = parseFloat(getComputedStyle(area).lineHeight) || 22;
+    const topo = parseFloat(getComputedStyle(area).paddingTop) + (linhaMarcada - 1) * altura;
+    if (topo < area.scrollTop || topo + altura > area.scrollTop + area.clientHeight) {
+      area.scrollTop = Math.max(0, topo - area.clientHeight / 2);
+    }
+    faixaRef.current.scrollTop = area.scrollTop;
+    numerosRef.current.scrollTop = area.scrollTop;
+  }, [linhaMarcada]);
+
   const totalDeLinhas = valor.split('\n').length;
 
   function inserir(texto) {
@@ -67,6 +84,7 @@ export function Editor({ valor, aoMudar, aoRodar }) {
     numerosRef.current.scrollTop = scrollTop;
     realceRef.current.scrollTop = scrollTop;
     realceRef.current.scrollLeft = scrollLeft;
+    if (faixaRef.current) faixaRef.current.scrollTop = scrollTop;
   }
 
   function aoApertarTecla(evento) {
@@ -100,9 +118,22 @@ export function Editor({ valor, aoMudar, aoRodar }) {
     <div className="editor">
       <div className="editor__area">
         <pre className="editor__numeros" ref={numerosRef} aria-hidden="true">
-          {Array.from({ length: totalDeLinhas }, (_, i) => i + 1).join('\n')}
+          {Array.from({ length: totalDeLinhas }, (_, i) => (
+            <span key={i} className={i + 1 === linhaMarcada ? 'editor__numero editor__numero--marcado' : 'editor__numero'}>
+              {i + 1}
+            </span>
+          ))}
         </pre>
         <div className="editor__campo">
+          {linhaMarcada > 0 && (
+            <pre className="editor__faixa" ref={faixaRef} aria-hidden="true">
+              {Array.from({ length: totalDeLinhas + 1 }, (_, i) => (
+                <span key={i} className={i + 1 === linhaMarcada ? 'editor__faixa-linha--marcada' : undefined}>
+                  {' '}
+                </span>
+              ))}
+            </pre>
+          )}
           <pre className="editor__realce" ref={realceRef} aria-hidden="true">
             <CodigoColorido codigo={valor} />
             {'\n'}

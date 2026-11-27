@@ -14,6 +14,7 @@ export const FALAS = {
   combo: ['Para de consertar tudo!', 'Você tá rápido demais!', 'Isso não é justo!'],
   pulo: ['Desistiu? Hehehe!', 'Fugiu do bug!', 'Esse fica pra depois, né?'],
   erro: ['Errou! Hehe.', 'Quase... só que não.', 'Ainda quebrado!', 'Tenta de novo!'],
+  lupa: ['Ei! Com lupa não vale!', 'Tá roubando com essa lupa...', 'Hmpf. Achar a linha é fácil, quero ver consertar.'],
 };
 
 export const sortear = (lista) => lista[Math.floor(Math.random() * lista.length)];

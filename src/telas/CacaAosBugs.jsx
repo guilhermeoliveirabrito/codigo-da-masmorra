@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { BUGS } from '../caca/bugs';
+import { BUGS, linhaDoBug } from '../caca/bugs';
 import { CenaDoBug, FALAS, sortear, useGoblin, useTelaDoBug } from '../caca/CenaDoBug';
 import { conferir } from '../caca/conferir';
 import { Editor } from '../components/Editor';
@@ -33,6 +33,19 @@ export function bugsDisponiveis(concluidas) {
   return BUGS.filter((bug) => concluidas.includes(bug.fase));
 }
 
+// o que a lupa mostra embaixo do editor
+export function PistaDaLupa({ linha, pista, aviso }) {
+  return (
+    <p className="caca__lupa" role="status">
+      <Icone nome="lupa" />
+      <span>
+        <strong>Linha {linha}:</strong> {pista}
+        {aviso && <small> {aviso}</small>}
+      </span>
+    </p>
+  );
+}
+
 export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar }) {
   const disponiveis = useMemo(() => bugsDisponiveis(concluidas), [concluidas]);
   const [etapa, setEtapa] = useState('comeco'); // comeco, jogando, fim
@@ -48,6 +61,8 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
   // depois de um conserto, o próximo bug demora um pouco: nesse meio-tempo nada conta de novo
   const [trocando, setTrocando] = useState(false);
   const [final, setFinal] = useState(null);
+  // id do bug em que a lupa foi usada (o conserto dele vale metade)
+  const [lupa, setLupa] = useState(null);
 
   const bug = BUGS.find((b) => b.id === fila[0]) ?? null;
   const fimRef = useRef(0);
@@ -68,6 +83,7 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
       const proximo = BUGS.find((b) => b.id === id);
       setCodigo(proximo.codigo[modo]);
       setResultado(null);
+      setLupa(null);
       mostrarNaCena(proximo.codigo[modo], proximo);
     },
     [modo, mostrarNaCena]
@@ -146,6 +162,8 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
   }
 
   const travado = rodando || trocando || etapa !== 'jogando' || !bug;
+  const comLupa = Boolean(bug) && lupa === bug.id;
+  const linhaDaLupa = comLupa ? linhaDoBug(bug, modo, codigo) : 0;
 
   async function consertar() {
     if (travado) return;
@@ -163,7 +181,7 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
       return;
     }
 
-    const valeu = 100 * placar.combo;
+    const valeu = (comLupa ? 50 : 100) * placar.combo;
     const combo = Math.min(placar.combo + 1, COMBO_MAXIMO);
     setPlacar((atual) => ({
       pontos: atual.pontos + valeu,
@@ -172,7 +190,8 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
       consertados: atual.consertados + 1,
     }));
     setGanho({ texto: `+${valeu}`, vez: Date.now() });
-    setResultado({ tipo: 'ok', mensagem: `Consertado! +${valeu} pontos.`, id: Date.now(), avisos: [] });
+    const mensagem = `Consertado! +${valeu} pontos${comLupa ? ' (metade, por causa da lupa)' : ''}.`;
+    setResultado({ tipo: 'ok', mensagem, id: Date.now(), avisos: [] });
     falar(combo >= 4 ? sortear(FALAS.combo) : sortear(FALAS.conserto), true);
     tocar('acerto');
     const resto = fila.slice(1);
@@ -183,6 +202,13 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
       proximoBug(resto);
       if (resto.length) falar(sortear(FALAS.novo));
     }, 900);
+  }
+
+  function usarLupa() {
+    if (travado || comLupa) return;
+    setLupa(bug.id);
+    falar(sortear(FALAS.lupa));
+    tocar('lupa');
   }
 
   function pular() {
@@ -230,8 +256,28 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
         <div className="jogo__barra">
           <span className="jogo__arquivo">{bug?.arquivo ?? 'Bug.jsx'}</span>
           <div className="jogo__botoes">
-            <button type="button" className="botao botao--pedra" onClick={pular} disabled={travado}>
-              Pular
+            <button
+              type="button"
+              className="botao botao--pedra"
+              onClick={pular}
+              disabled={travado}
+              aria-label="Pular"
+              title="Manda o bug pro fim da fila e zera o combo"
+            >
+              <Icone nome="pular" />
+              <span className="so-tela-grande">Pular</span>
+            </button>
+            <button
+              type="button"
+              className="botao botao--pedra"
+              onClick={usarLupa}
+              disabled={travado || comLupa}
+              aria-label="Lupa"
+              title="Mostra a linha do bug, mas o conserto vale metade"
+              data-som="nenhum"
+            >
+              <Icone nome="lupa" className="icone--lupa" />
+              <span className="so-tela-grande">Lupa</span>
             </button>
             <button type="button" className="botao botao--fogo" onClick={consertar} disabled={travado} data-som="nenhum">
               <Icone nome="rodar" />
@@ -239,11 +285,20 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
             </button>
           </div>
         </div>
-        <Editor valor={codigo} aoMudar={setCodigo} aoRodar={consertar} />
+        <Editor
+          valor={codigo}
+          aoMudar={setCodigo}
+          aoRodar={consertar}
+          linhaMarcada={linhaDaLupa}
+        />
+        {comLupa && <PistaDaLupa linha={linhaDaLupa} pista={bug.pista} aviso="Esse conserto vale metade." />}
         {resultado ? (
           <Resultado key={resultado.id} resultado={resultado} />
         ) : (
-          <p className="caca__ajuda">Ache o que o goblin quebrou e aperte Consertar (ou Ctrl + Enter). Pular zera o combo.</p>
+          <p className="caca__ajuda">
+            Ache o que o goblin quebrou e aperte Consertar (ou Ctrl + Enter). Pular zera o combo, e a lupa corta os pontos
+            pela metade.
+          </p>
         )}
       </section>
 
@@ -259,6 +314,7 @@ export function CacaAosBugs({ modo, concluidas, recorde, aoTerminar, aoVoltar })
             <ul className="caca__regras">
               <li>Cada conserto vale 100 pontos vezes o combo, que sobe até x{COMBO_MAXIMO}.</li>
               <li>Pular manda o bug pro fim da fila e zera o combo.</li>
+              <li>Travou? A lupa mostra a linha do bug, mas aí o conserto vale metade.</li>
               <li>Consertou tudo antes do tempo? Cada segundo que sobrou vale {BONUS_POR_SEGUNDO} pontos.</li>
               <li>
                 No fim, a cada {PONTOS_POR_MOEDA} pontos você ganha uma moeda.

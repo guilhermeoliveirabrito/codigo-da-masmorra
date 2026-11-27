@@ -14,6 +14,7 @@ import {
 
 // Os bugs que o goblin espalha. Cada um é de uma fase: só aparece depois que você passou dela.
 // codigo: o componente quebrado; testar: confere o conserto (igual ao verificar das fases)
+// marca: um pedaço da linha quebrada (a lupa usa pra achar a linha); pista: lembrete do assunto
 
 const esperar = (ms) => new Promise((pronto) => setTimeout(pronto, ms));
 
@@ -22,6 +23,14 @@ async function esperarAte(condicao, limite) {
     if (condicao()) return;
     await esperar(15);
   }
+}
+
+// em que linha está o problema. Procura no código da tela (a pessoa pode ter mudado
+// linhas de lugar); se a linha já foi mexida e a marca sumiu, vale a do código original
+export function linhaDoBug(bug, modo, codigo = bug.codigo[modo]) {
+  const marca = typeof bug.marca === 'string' ? bug.marca : bug.marca[modo];
+  const achar = (texto) => texto.split('\n').findIndex((linha) => linha.includes(marca)) + 1;
+  return achar(codigo) || achar(bug.codigo[modo]);
 }
 
 const evento = (modo) => (modo === 'web' ? 'onClick' : 'onPress');
@@ -126,6 +135,8 @@ export const BUGS = [
     fase: 'placa',
     componente: 'Placa',
     arquivo: 'Placa.jsx',
+    marca: 'masmorrra',
+    pista: 'Confira o texto letra por letra.',
     missao: 'A placa devia dizer "Bem-vindo à masmorra". O goblin mexeu numa letra.',
     codigo: {
       web: `export function Placa() {
@@ -146,6 +157,8 @@ export function Placa() {
     fase: 'placa',
     componente: 'Placa',
     arquivo: 'Placa.jsx',
+    marca: 'Bem-vindo',
+    pista: 'Toda tag que abre precisa fechar.',
     missao: 'A placa sumiu e o código nem roda. Tem uma tag que não fecha.',
     dica: {
       web: 'Toda tag que abre precisa fechar, com a barra: `<p>...</p>`.',
@@ -170,6 +183,8 @@ export function Placa() {
     fase: 'placa',
     componente: 'Placa',
     arquivo: 'Placa.jsx',
+    marca: 'Bem-vindo',
+    pista: 'O componente precisa devolver o JSX.',
     missao: 'O componente monta a placa, mas ela não aparece na tela.',
     codigo: {
       web: `export function Placa() {
@@ -192,6 +207,8 @@ export function Placa() {
     fase: 'crachas',
     componente: 'Turma',
     arquivo: 'Turma.jsx',
+    marca: 'name="Lia"',
+    pista: 'O nome da prop tem que ser igual dos dois lados.',
     missao: 'Cada crachá devia mostrar um nome: Lia e Tom. Um deles saiu em branco.',
     codigo: {
       web: `function Cracha(props) {
@@ -242,6 +259,8 @@ export function Turma() {
     fase: 'crachas',
     componente: 'Turma',
     arquivo: 'Turma.jsx',
+    marca: 'Nome: props.nome',
+    pista: 'Variável dentro do JSX vai entre chaves.',
     missao: 'O crachá devia mostrar "Nome: Lia", mas está escrevendo outra coisa.',
     codigo: {
       web: `function Cracha(props) {
@@ -274,6 +293,8 @@ export function Turma() {
     fase: 'alavanca',
     componente: 'Alavanca',
     arquivo: 'Alavanca.jsx',
+    marca: 'aoPuxar()',
+    pista: 'Passe a função, não o resultado dela.',
     missao: 'A alavanca só devia disparar quando alguém clicasse nela. Agora ela dispara sozinha.',
     props: { aoPuxar: () => {} },
     codigo: {
@@ -299,6 +320,8 @@ export function Alavanca({ aoPuxar }) {
     fase: 'alavanca',
     componente: 'Alavanca',
     arquivo: 'Alavanca.jsx',
+    marca: { web: 'onclick', mobile: 'onpress' },
+    pista: 'Evento no React tem maiúscula no meio.',
     missao: 'Clicar na alavanca não faz nada. Parece certo, mas tem uma letra fora do lugar.',
     props: { aoPuxar: () => {} },
     codigo: {
@@ -326,6 +349,8 @@ export function Alavanca({ aoPuxar }) {
     fase: 'tocha',
     componente: 'Tocha',
     arquivo: 'Tocha.jsx',
+    marca: 'acesa = !acesa',
+    pista: 'Estado só muda pela função do useState.',
     missao: 'A tocha devia acender e apagar a cada clique, mas o botão não funciona.',
     codigo: {
       web: `import { useState } from 'react';
@@ -361,6 +386,8 @@ export function Tocha() {
     fase: 'tocha',
     componente: 'Tocha',
     arquivo: 'Tocha.jsx',
+    marca: 'useState(true)',
+    pista: 'O valor do começo vai dentro do useState.',
     missao: 'A tocha devia começar apagada, com o botão mostrando Acender.',
     codigo: {
       web: `import { useState } from 'react';
@@ -396,6 +423,8 @@ export function Tocha() {
     fase: 'portoes',
     componente: 'Portao',
     arquivo: 'Portao.jsx',
+    marca: "'Fechado' : 'Aberto'",
+    pista: 'No ? : o primeiro valor é o do true.',
     missao: 'Quem tem a chave devia ver o portão Aberto. Quem não tem, Fechado.',
     props: { temChave: true },
     codigo: {
@@ -421,6 +450,8 @@ export function Portao({ temChave }) {
     fase: 'portoes',
     componente: 'Portao',
     arquivo: 'Portao.jsx',
+    marca: '!temChave',
+    pista: 'O ! inverte a condição.',
     missao: 'O "Pode passar" só devia aparecer pra quem tem a chave.',
     props: { temChave: true },
     codigo: {
@@ -458,6 +489,8 @@ export function Portao({ temChave }) {
     fase: 'ponte',
     componente: 'Ponte',
     arquivo: 'Ponte.jsx',
+    marca: 'forEach',
+    pista: 'Só o map devolve uma lista nova.',
     missao: 'A ponte devia ter uma tábua pra cada item: carvalho, pinho e cedro. Não aparece nenhuma.',
     codigo: {
       web: `const TABUAS = ['carvalho', 'pinho', 'cedro'];
@@ -507,6 +540,8 @@ export function Ponte() {
     fase: 'ponte',
     componente: 'Ponte',
     arquivo: 'Ponte.jsx',
+    marca: '>{tabua}<',
+    pista: 'Item de lista precisa de key.',
     missao: 'A ponte aparece, mas o React reclama. Cada tábua da lista precisa de uma coisa.',
     codigo: {
       web: `const TABUAS = ['carvalho', 'pinho', 'cedro'];
@@ -555,6 +590,8 @@ export function Ponte() {
     fase: 'rio',
     componente: 'Rio',
     arquivo: 'Rio.jsx',
+    marca: "'column'",
+    pista: 'Lado a lado é \'row\'.',
     missao: 'As pedras deviam ficar lado a lado, em fila, pro Tom atravessar.',
     codigo: {
       web: `export function Rio() {
@@ -602,6 +639,8 @@ export function Rio() {
     fase: 'porta',
     componente: 'Ampulheta',
     arquivo: 'Ampulheta.jsx',
+    marca: 'setInterval(tique, 1000)',
+    pista: 'O efeito pode devolver uma função de limpeza.',
     missao: 'A ampulheta continua batendo depois que sai da tela. Falta arrumar a bagunça no fim.',
     props: { tique: () => {} },
     codigo: {
@@ -664,6 +703,8 @@ export function Ampulheta({ tique }) {
     fase: 'porta',
     componente: 'Porta',
     arquivo: 'Porta.jsx',
+    marca: '}, []);',
+    pista: 'A lista no fim diz quando o efeito roda de novo.',
     missao: 'A porta devia contar um rangido toda vez que abre. O contador não sai do zero.',
     codigo: {
       web: `import { useEffect, useState } from 'react';
@@ -737,6 +778,8 @@ export function Porta() {
     fase: 'mensageiro',
     componente: 'Mapa',
     arquivo: 'Mapa.jsx',
+    marca: 'setSalas(resposta)',
+    pista: 'A resposta do fetch precisa do .json().',
     missao: 'O corvo trouxe o mapa, mas a tela quebra quando ele chega.',
     rotas: { '/api/salas': [{ nome: 'Cripta' }, { nome: 'Biblioteca' }] },
     codigo: {
@@ -814,6 +857,8 @@ export function Mapa() {
     fase: 'guardiao',
     componente: 'Dragao',
     arquivo: 'Dragao.jsx',
+    marca: 'energia = 0',
+    pista: 'Um = guarda, === compara.',
     missao: 'Com a energia em 0, o dragão devia aparecer Dormindo. Com energia, Acordado.',
     props: { energia: 0 },
     codigo: {
